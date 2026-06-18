@@ -1,21 +1,26 @@
 from pathlib import Path
+import os
+import dj_database_url
 
 BASE_DIR = Path(__file__).resolve().parent.parent
-
 
 # =========================
 # SECURITY
 # =========================
-SECRET_KEY = 'django-insecure-change-this-key-in-production'
 
-DEBUG = True
+SECRET_KEY = os.environ.get(
+    "SECRET_KEY",
+    "django-insecure-change-this-key-in-production"
+)
 
-ALLOWED_HOSTS = []
+DEBUG = os.environ.get("DEBUG", "True") == "True"
 
+ALLOWED_HOSTS = ["*"]
 
 # =========================
 # APPLICATIONS
 # =========================
+
 INSTALLED_APPS = [
     'django.contrib.admin',
     'django.contrib.auth',
@@ -23,19 +28,20 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-     "channels",
 
-    # your app
+    'channels',
+
     'accounts.apps.AccountsConfig',
 ]
 
-
 # =========================
 # MIDDLEWARE
-# IMPORTANT: DO NOT ADD ROLE REDIRECT LOGIC HERE
 # =========================
+
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
+    'whitenoise.middleware.WhiteNoiseMiddleware',
+
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -44,25 +50,25 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
 
-
 # =========================
 # AUTH BACKENDS
 # =========================
+
 AUTHENTICATION_BACKENDS = [
-    'accounts.backends.EmailBackend',  # login with email
+    'accounts.backends.EmailBackend',
     'django.contrib.auth.backends.ModelBackend',
 ]
-
 
 # =========================
 # URLS
 # =========================
-ROOT_URLCONF = 'home_service.urls'
 
+ROOT_URLCONF = 'home_service.urls'
 
 # =========================
 # TEMPLATES
 # =========================
+
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
@@ -78,38 +84,48 @@ TEMPLATES = [
     },
 ]
 
+# =========================
+# WSGI / ASGI
+# =========================
 
-# =========================
-# WSGI
-# =========================
 WSGI_APPLICATION = 'home_service.wsgi.application'
 
+# Uncomment if using Channels
+# ASGI_APPLICATION = 'home_service.asgi.application'
 
 # =========================
 # DATABASE
 # =========================
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
-    }
-}
 
+DATABASES = {
+    "default": dj_database_url.config(
+        default=f"sqlite:///{BASE_DIR / 'db.sqlite3'}"
+    )
+}
 
 # =========================
 # PASSWORD VALIDATION
 # =========================
-AUTH_PASSWORD_VALIDATORS = [
-    {'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator'},
-    {'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator'},
-    {'NAME': 'django.contrib.auth.password_validation.CommonPasswordValidator'},
-    {'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator'},
-]
 
+AUTH_PASSWORD_VALIDATORS = [
+    {
+        'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator'
+    },
+    {
+        'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator'
+    },
+    {
+        'NAME': 'django.contrib.auth.password_validation.CommonPasswordValidator'
+    },
+    {
+        'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator'
+    },
+]
 
 # =========================
 # INTERNATIONALIZATION
 # =========================
+
 LANGUAGE_CODE = 'en-us'
 
 TIME_ZONE = 'Asia/Kolkata'
@@ -117,55 +133,56 @@ TIME_ZONE = 'Asia/Kolkata'
 USE_I18N = True
 USE_TZ = True
 
-
 # =========================
 # STATIC FILES
 # =========================
-STATIC_URL = 'static/'
 
+STATIC_URL = '/static/'
+
+STATIC_ROOT = BASE_DIR / 'staticfiles'
+
+STATICFILES_STORAGE = (
+    'whitenoise.storage.CompressedManifestStaticFilesStorage'
+)
 
 # =========================
 # MEDIA FILES
 # =========================
+
 MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'media'
-
 
 # =========================
 # LOGIN SETTINGS
 # =========================
+
 LOGIN_URL = '/login/'
 LOGIN_REDIRECT_URL = '/customer-dashboard/'
 LOGOUT_REDIRECT_URL = '/login/'
 
+# =========================
+# SESSION SETTINGS
+# =========================
 
-# =========================
-# SESSION SETTINGS (IMPORTANT FOR OTP LOGIN)
-# =========================
 SESSION_ENGINE = 'django.contrib.sessions.backends.db'
+SESSION_COOKIE_NAME = 'sessionid'
 SESSION_COOKIE_AGE = 86400
 SESSION_SAVE_EVERY_REQUEST = True
-
 
 # =========================
 # DEFAULT PRIMARY KEY
 # =========================
+
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
+# =========================
+# EMAIL CONFIG
+# =========================
 
-# =========================
-# EMAIL CONFIG (OTP)
-# =========================
 EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
 EMAIL_HOST = "smtp.gmail.com"
 EMAIL_PORT = 587
 EMAIL_USE_TLS = True
 
-EMAIL_HOST_USER = "swainpabitra9861@gmail.com"
-EMAIL_HOST_PASSWORD = "mbvaoisfhvipkpvl"
-
-# SESSION SETTINGS (KEEP ONLY THIS ONCE)
-SESSION_ENGINE = 'django.contrib.sessions.backends.db'
-SESSION_COOKIE_NAME = 'sessionid'
-SESSION_COOKIE_AGE = 86400  # 1 day
-SESSION_SAVE_EVERY_REQUEST = True
+EMAIL_HOST_USER = os.environ.get("EMAIL_HOST_USER")
+EMAIL_HOST_PASSWORD = os.environ.get("EMAIL_HOST_PASSWORD")
