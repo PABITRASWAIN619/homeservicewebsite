@@ -1,0 +1,138 @@
+{% extends 'worker/base.html' %} {% block content %}
+
+<div class="container mt-4">
+  <div class="card shadow-sm p-4">
+    <h4 class="mb-4">Edit Profile</h4>
+
+    <form method="POST">
+      {% csrf_token %}
+
+      <div class="mb-3">
+        <label class="form-label">Phone</label>
+        <input
+          type="text"
+          name="phone"
+          value="{{ profile.phone }}"
+          class="form-control"
+        />
+      </div>
+
+      <div class="mb-3">
+        <label class="form-label">Location (Address)</label>
+        <div class="input-group">
+          <input
+            type="text"
+            name="location"
+            id="location-input"
+            class="form-control"
+            value="{{ location_value }}"
+            placeholder="Click button to detect..."
+          />
+          <button type="button" class="btn btn-primary" onclick="getLocation()">
+            <i class="bi bi-geo-alt"></i> Detect Location
+          </button>
+        </div>
+      </div>
+
+      <div class="row mb-3">
+        <div class="col-md-6">
+          <label class="form-label">Latitude</label>
+          <input
+            type="text"
+            name="latitude"
+            id="lat-input"
+            class="form-control"
+            value="{{ profile.latitude }}"
+            readonly
+          />
+        </div>
+        <div class="col-md-6">
+          <label class="form-label">Longitude</label>
+          <input
+            type="text"
+            name="longitude"
+            id="lng-input"
+            class="form-control"
+            value="{{ profile.longitude }}"
+            readonly
+          />
+        </div>
+      </div>
+
+      <div class="mb-3">
+        <label class="form-label">Address</label>
+        <textarea name="address" class="form-control" rows="3">
+{{ profile.address }}</textarea
+        >
+      </div>
+
+      <div class="mb-3">
+        <label class="form-label">Experience (Years)</label>
+        <input
+          type="text"
+          name="experience"
+          value="{{ profile.experience }}"
+          class="form-control"
+        />
+      </div>
+
+      <div class="mb-3">
+        <label class="form-label">Pincode</label>
+        <input
+          type="text"
+          name="pincode"
+          value="{{ profile.pincode }}"
+          class="form-control"
+        />
+      </div>
+
+      <button type="submit" class="btn btn-success w-100">Save Changes</button>
+    </form>
+  </div>
+</div>
+
+<script>
+  function getLocation() {
+    const locInput = document.getElementById("location-input");
+    const latInput = document.getElementById("lat-input");
+    const lngInput = document.getElementById("lng-input");
+
+    if (navigator.geolocation) {
+      locInput.value = "Detecting...";
+
+      navigator.geolocation.getCurrentPosition(
+        function (position) {
+          const lat = position.coords.latitude;
+          const lon = position.coords.longitude;
+
+          // Update Lat/Lng fields
+          latInput.value = lat.toFixed(6);
+          lngInput.value = lon.toFixed(6);
+
+          // Reverse geocoding to get human-readable address
+          fetch(
+            `https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lon}`,
+          )
+            .then((res) => res.json())
+            .then((data) => {
+              if (data && data.display_name) {
+                locInput.value = data.display_name;
+              } else {
+                locInput.value = "Address not found";
+              }
+            })
+            .catch(() => {
+              locInput.value = "Error fetching address";
+            });
+        },
+        function () {
+          locInput.value = "Access denied";
+        },
+      );
+    } else {
+      alert("Geolocation is not supported by your browser.");
+    }
+  }
+</script>
+
+{% endblock %}

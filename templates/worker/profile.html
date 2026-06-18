@@ -1,0 +1,30 @@
+{% extends 'worker/base.html' %} {% block content %}
+
+<div class="container mt-4">
+  <h2>{{ request.user.username }}</h2>
+
+  <p class="text-muted">{{ worker.service_type }}</p>
+
+  <hr />
+
+  <div class="row">
+    <div class="col-md-6">
+      <p><strong>Email:</strong> {{ request.user.email }}</p>
+      <p><strong>Phone:</strong> {{ worker.phone }}</p>
+      <p><strong>Experience:</strong> {{ worker.experience }} Years</p>
+    </div>
+
+    <div class="col-md-6">
+      <p><strong>Address:</strong> {{ worker.address }}</p>
+      <p><strong>Pincode:</strong> {{ worker.pincode }}</p>
+
+      <p><strong>Rating:</strong> ⭐ 4.8/5</p>
+    </div>
+  </div>
+
+  <a href="{% url 'edit_worker_profile' %}" class="btn btn-primary mt-3">
+    Edit Profile
+  </a>
+</div>
+
+{% endblock %}

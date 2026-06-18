@@ -1,0 +1,592 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Home Service App - On-Demand Professional Help</title>
+
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css"
+      rel="stylesheet"
+    />
+
+    <style>
+      :root {
+        --primary-color: #0d6efd;
+        --secondary-color: #198754;
+        --dark-bg: #11141a;
+        --light-bg: #f8f9fa;
+      }
+
+      body {
+        background: var(--light-bg);
+        font-family: "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+        color: #333;
+      }
+
+      /* NAVBAR */
+      .navbar {
+        background: white;
+        box-shadow: 0 2px 15px rgba(0, 0, 0, 0.05);
+        padding: 15px 0;
+      }
+
+      /* HERO SECTION */
+      .hero {
+        padding: 100px 20px;
+        text-align: center;
+        background: linear-gradient(135deg, #e3f2fd 0%, #ffffff 100%);
+        position: relative;
+        overflow: hidden;
+      }
+
+      .hero h1 {
+        font-size: 52px;
+        font-weight: 800;
+        color: #0b4ebd;
+        letter-spacing: -1px;
+      }
+
+      .hero p.lead {
+        font-size: 19px;
+        color: #555;
+        max-width: 700px;
+        margin: 20px auto 30px auto;
+      }
+
+      .hero img {
+        max-width: 280px;
+        margin-top: 40px;
+        filter: drop-shadow(0 15px 25px rgba(13, 110, 253, 0.15));
+        animation: floatImg 4s ease-in-out infinite alternate;
+      }
+
+      @keyframes floatImg {
+        0% {
+          transform: translateY(0px);
+        }
+        100% {
+          transform: translateY(-15px);
+        }
+      }
+
+      /* GLOBAL SECTION UTILS */
+      .section-title {
+        color: #0b4ebd;
+        font-weight: 800;
+        font-size: 36px;
+        margin-bottom: 10px;
+        position: relative;
+      }
+
+      .section-subtitle {
+        color: #6c757d;
+        margin-bottom: 50px;
+        font-size: 16px;
+      }
+
+      /* SERVICE CARDS */
+      .service-card {
+        border: none;
+        border-radius: 16px;
+        background: white;
+        box-shadow: 0 5px 20px rgba(0, 0, 0, 0.04);
+        transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+        padding: 30px 20px;
+        text-align: center;
+        height: 100%;
+      }
+
+      .service-card:hover {
+        transform: translateY(-10px);
+        box-shadow: 0 15px 30px rgba(13, 110, 253, 0.1);
+      }
+
+      .service-icon {
+        font-size: 40px;
+        color: var(--primary-color);
+        margin-bottom: 15px;
+        display: inline-block;
+      }
+
+      .service-card h4 {
+        font-size: 18px;
+        font-weight: 700;
+        margin-bottom: 8px;
+      }
+
+      /* HOW IT WORKS STEPS */
+      .step-card {
+        border: none;
+        background: transparent;
+        text-align: center;
+        position: relative;
+      }
+
+      .step-badge {
+        width: 50px;
+        height: 50px;
+        background: var(--primary-color);
+        color: white;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: bold;
+        font-size: 18px;
+        margin: 0 auto 20px auto;
+        box-shadow: 0 4px 10px rgba(13, 110, 253, 0.3);
+      }
+
+      .step-card h5 {
+        font-weight: 700;
+        font-size: 16px;
+        margin-bottom: 8px;
+      }
+
+      .step-card p {
+        font-size: 14px;
+        color: #6c757d;
+      }
+
+      /* APP FEATURE CARDS */
+      .feature-card {
+        background: white;
+        padding: 30px 25px;
+        border-radius: 16px;
+        border-left: 4px solid var(--primary-color);
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.03);
+        transition: 0.3s;
+        height: 100%;
+      }
+
+      .feature-card:hover {
+        transform: scale(1.03);
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.08);
+      }
+
+      .feature-card i {
+        font-size: 32px;
+        color: var(--primary-color);
+        margin-bottom: 15px;
+        display: block;
+      }
+
+      .feature-card h5 {
+        font-weight: 700;
+        font-size: 18px;
+      }
+
+      /* BUTTONS */
+      .btn-glow {
+        padding: 14px 35px;
+        font-weight: 600;
+        border-radius: 10px;
+        transition: all 0.3s;
+      }
+
+      .btn-glow:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 20px rgba(13, 110, 253, 0.4);
+      }
+
+      /* REAL-TIME ENTERPRISE FOOTER */
+      footer {
+        background: var(--dark-bg);
+        color: #a0aec0;
+        padding: 70px 0 20px 0;
+        margin-top: 100px;
+        border-top: 5px solid var(--primary-color);
+      }
+
+      footer h5 {
+        color: white;
+        font-weight: 700;
+        margin-bottom: 22px;
+        font-size: 18px;
+      }
+
+      footer a {
+        color: #a0aec0;
+        text-decoration: none;
+        transition: 0.3s;
+        display: inline-block;
+        margin-bottom: 10px;
+        font-size: 15px;
+      }
+
+      footer a:hover {
+        color: var(--primary-color);
+        transform: translateX(5px);
+      }
+
+      footer .social-icons a {
+        font-size: 20px;
+        margin-right: 15px;
+        color: #cbd5e1;
+        background: rgba(255, 255, 255, 0.05);
+        width: 40px;
+        height: 40px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 50%;
+        transition: 0.3s;
+        margin-bottom: 0; /* Override list styling alignment */
+      }
+
+      footer .social-icons a:hover {
+        background: var(--primary-color);
+        color: white;
+        transform: translateY(-3px);
+      }
+
+      footer .contact-info li {
+        margin-bottom: 12px;
+        font-size: 15px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      }
+
+      footer .contact-info i {
+        color: var(--primary-color);
+      }
+
+      footer hr {
+        border-color: rgba(255, 255, 255, 0.1);
+        margin: 40px 0 20px 0;
+      }
+    </style>
+  </head>
+
+  <body>
+    <nav class="navbar navbar-expand-lg px-4 sticky-top">
+      <div class="container">
+        <a class="navbar-brand fw-bold text-primary fs-3" href="#">
+          <i class="bi bi-house-gear-fill me-2"></i>HomeService
+        </a>
+
+        <button
+          class="navbar-toggler"
+          type="button"
+          data-bs-toggle="collapse"
+          data-bs-target="#navComponents"
+        >
+          <span class="navbar-toggler-icon"></span>
+        </button>
+
+        <div class="collapse navbar-collapse" id="navComponents">
+          <div class="ms-auto d-flex flex-wrap gap-2 mt-3 mt-lg-0">
+            <a href="/login/" class="btn btn-outline-primary px-4 fw-medium"
+              >Login</a
+            >
+            <a
+              href="/signup/customer/"
+              class="btn btn-warning px-4 fw-medium text-dark"
+              >Customer Register</a
+            >
+            <a
+              href="/worker-signup/step1/"
+              class="btn btn-success px-4 fw-medium"
+            >
+              <i class="bi bi-briefcase-fill me-1"></i>Worker Signup
+            </a>
+          </div>
+        </div>
+      </div>
+    </nav>
+
+    <section class="hero">
+      <div class="container">
+        <h1>
+          Essential Home Services<br /><span class="text-dark"
+            >At Your Doorstep</span
+          >
+        </h1>
+        <p class="lead">
+          Skip the hassle. Book verified, highly rated electricians, plumbers,
+          cleaners, carpenters, and appliance experts in seconds.
+        </p>
+
+        <a
+          href="/login/"
+          class="btn btn-primary btn-lg btn-glow mt-2 shadow-sm"
+        >
+          <i class="bi bi-calendar-check me-2"></i>Book a Service Now
+        </a>
+
+        <div>
+          <img
+            src="https://cdn-icons-png.flaticon.com/512/3209/3209265.png"
+            alt="Home Service Vector Illustration"
+          />
+        </div>
+      </div>
+    </section>
+
+    <section class="container mt-5 pt-4">
+      <div class="text-center">
+        <h2 class="section-title">Our Premium Services</h2>
+        <p class="section-subtitle">
+          Select from our wide range of professional, background-checked
+          specialized fields
+        </p>
+      </div>
+
+      <div class="row g-4">
+        <div class="col-6 col-md-4">
+          <div class="service-card">
+            <div class="service-icon">
+              <i class="bi bi-lightning-charge-fill"></i>
+            </div>
+            <h4>Electrician</h4>
+            <p class="text-muted small mb-0">
+              Short circuits, wiring, setup & fixtures
+            </p>
+          </div>
+        </div>
+        <div class="col-6 col-md-4">
+          <div class="service-card">
+            <div class="service-icon"><i class="bi bi-droplet-fill"></i></div>
+            <h4>Plumber</h4>
+            <p class="text-muted small mb-0">
+              Leak repairs, pipe installations & drainage
+            </p>
+          </div>
+        </div>
+        <div class="col-6 col-md-4">
+          <div class="service-card">
+            <div class="service-icon"><i class="bi bi-snow2"></i></div>
+            <h4>AC Repair</h4>
+            <p class="text-muted small mb-0">
+              Servicing, gas cooling refills & mounting
+            </p>
+          </div>
+        </div>
+        <div class="col-6 col-md-4">
+          <div class="service-card">
+            <div class="service-icon"><i class="bi bi-phone-fill"></i></div>
+            <h4>Mobile Repair</h4>
+            <p class="text-muted small mb-0">
+              Screen replacements, hardware fixes & diagnostics
+            </p>
+          </div>
+        </div>
+        <div class="col-6 col-md-4">
+          <div class="service-card">
+            <div class="service-icon"><i class="bi bi-tools"></i></div>
+            <h4>Carpenter</h4>
+            <p class="text-muted small mb-0">
+              Furniture assembly, lock fix & structural modifications
+            </p>
+          </div>
+        </div>
+        <div class="col-6 col-md-4">
+          <div class="service-card">
+            <div class="service-icon"><i class="bi bi-palette-fill"></i></div>
+            <h4>Painter</h4>
+            <p class="text-muted small mb-0">
+              Interior layout painting, touch-ups & wallpaper
+            </p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="container mt-5 pt-5">
+      <div class="text-center">
+        <h2 class="section-title">How It Works</h2>
+        <p class="section-subtitle">
+          Simple, straightforward architecture built around safety and
+          transparency
+        </p>
+      </div>
+
+      <div class="row g-4 justify-content-center">
+        <div class="col-sm-6 col-lg-2-5 col-md-4">
+          <div class="step-card">
+            <div class="step-badge">1</div>
+            <h5>Book Service</h5>
+            <p>Pick a domain service and choose a convenient schedule tier.</p>
+          </div>
+        </div>
+        <div class="col-sm-6 col-lg-2-5 col-md-4">
+          <div class="step-card">
+            <div class="step-badge">2</div>
+            <h5>Admin Assigns</h5>
+            <p>
+              The backend portal pairs you immediately with verified operators.
+            </p>
+          </div>
+        </div>
+        <div class="col-sm-6 col-lg-2-5 col-md-4">
+          <div class="step-card">
+            <div class="step-badge">3</div>
+            <h5>Worker Dispatches</h5>
+            <p>Track arrival parameters on-demand securely.</p>
+          </div>
+        </div>
+        <div class="col-sm-6 col-lg-2-5 col-md-4">
+          <div class="step-card">
+            <div class="step-badge">4</div>
+            <h5>Job Executed</h5>
+            <p>Premium standard procedures completed efficiently.</p>
+          </div>
+        </div>
+        <div class="col-sm-6 col-lg-2-5 col-md-4">
+          <div class="step-card">
+            <div class="step-badge">5</div>
+            <h5>Secure Pay</h5>
+            <p>Authenticate validation protocols via OTP modules seamlessly.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="container mt-5 pt-5">
+      <div class="text-center">
+        <h2 class="section-title">Application Engine Features</h2>
+        <p class="section-subtitle">
+          Engineered to bring absolute visibility, speed, and validation control
+          metrics
+        </p>
+      </div>
+
+      <div class="row g-4">
+        <div class="col-md-3">
+          <div class="feature-card">
+            <i class="bi bi-shield-lock-fill"></i>
+            <h5>Secure Login System</h5>
+            <p class="text-muted small mb-0">
+              Role-isolated dashboards for managers, customers, and field
+              agents.
+            </p>
+          </div>
+        </div>
+        <div class="col-md-3">
+          <div class="feature-card">
+            <i class="bi bi-geo-alt-fill"></i>
+            <h5>Live Status Tracking</h5>
+            <p class="text-muted small mb-0">
+              Real-time status tracking updates from confirmation to dispatcher
+              arrival phases.
+            </p>
+          </div>
+        </div>
+        <div class="col-md-3">
+          <div class="feature-card">
+            <i class="bi bi-phone-vibrate-fill"></i>
+            <h5>OTP Verification</h5>
+            <p class="text-muted small mb-0">
+              Job security safeguards requiring a client completion code before
+              unlocking payment modules.
+            </p>
+          </div>
+        </div>
+        <div class="col-md-3">
+          <div class="feature-card">
+            <i class="bi bi-sliders"></i>
+            <h5>Admin Control Panel</h5>
+            <p class="text-muted small mb-0">
+              Comprehensive monitoring suite tracking active tickets, payouts,
+              and customer reviews.
+            </p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <footer>
+      <div class="container">
+        <div class="row g-4 text-start">
+          <div class="col-lg-4 col-md-6">
+            <h5 class="text-primary">
+              <i class="bi bi-house-gear-fill me-2"></i>HomeService
+            </h5>
+            <p class="small text-muted mt-3">
+              Bringing structural and operational maintenance conveniences
+              directly to you. We match certified trade operators with corporate
+              and local consumers instantly.
+            </p>
+            <div class="social-icons mt-4">
+              <a href="https://facebook.com" target="_blank" title="Facebook"
+                ><i class="bi bi-facebook"></i
+              ></a>
+              <a href="https://x.com" target="_blank" title="Twitter / X"
+                ><i class="bi bi-twitter-x"></i
+              ></a>
+              <a href="https://linkedin.com" target="_blank" title="LinkedIn"
+                ><i class="bi bi-linkedin"></i
+              ></a>
+              <a href="https://instagram.com" target="_blank" title="Instagram"
+                ><i class="bi bi-instagram"></i
+              ></a>
+            </div>
+          </div>
+
+          <div class="col-lg-2 col-md-6">
+            <h5>For Customers</h5>
+            <ul class="list-unstyled">
+              <li><a href="/login/">Book a Service</a></li>
+              <li><a href="/signup/customer/">Create Free Account</a></li>
+              <li><a href="#">Pricing Metrics</a></li>
+              <li><a href="#">Safety & Screening</a></li>
+              <li><a href="#">Help Guidelines</a></li>
+            </ul>
+          </div>
+
+          <div class="col-lg-2 col-md-6">
+            <h5>For Workers</h5>
+            <ul class="list-unstyled">
+              <li><a href="/worker-signup/step1/">Join as a Partner</a></li>
+              <li><a href="/login/">Service Portal Login</a></li>
+              <li><a href="#">Payout Metrics</a></li>
+              <li><a href="#">Insurance Coverage</a></li>
+              <li><a href="#">Partner Success Stories</a></li>
+            </ul>
+          </div>
+
+          <div class="col-lg-4 col-md-6">
+            <h5>Support Desk</h5>
+            <ul class="list-unstyled contact-info">
+              <li>
+                <i class="bi bi-geo-alt-fill"></i> 100 Tech Park Avenue, Suite
+                400
+              </li>
+              <li><i class="bi bi-telephone-fill"></i> +1 (555) 234-5678</li>
+              <li>
+                <i class="bi bi-envelope-fill"></i> support@homeserviceapp.local
+              </li>
+              <li>
+                <i class="bi bi-clock-fill"></i> Mon - Sun: 7:00 AM - 11:00 PM
+              </li>
+            </ul>
+          </div>
+        </div>
+
+        <hr />
+
+        <div class="row align-items-center">
+          <div class="col-md-6 text-center text-md-start">
+            <p class="small mb-0">
+              © 2026 Home Service App. All rights reserved.
+            </p>
+          </div>
+          <div class="col-md-6 text-center text-md-end mt-2 mt-md-0">
+            <span class="small text-muted"
+              >Built securely with Django Framework 💙</span
+            >
+          </div>
+        </div>
+      </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/js/bootstrap.bundle.min.js"></script>
+  </body>
+</html>

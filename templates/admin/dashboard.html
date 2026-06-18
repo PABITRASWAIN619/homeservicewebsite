@@ -1,0 +1,152 @@
+{% extends "admin/base.html" %} {% load static %} {% block content %}
+
+<style>
+  .dashboard-header {
+    margin-bottom: 25px;
+  }
+
+  .dashboard-header h2 {
+    font-weight: 700;
+    color: #1e293b;
+  }
+
+  .stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 20px;
+    margin-bottom: 30px;
+  }
+
+  .card-box {
+    background: #fff;
+    padding: 25px;
+    border-radius: 15px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+    text-align: center;
+  }
+
+  .card-box h5 {
+    color: #64748b;
+    margin-bottom: 10px;
+  }
+
+  .card-box h3 {
+    font-size: 32px;
+    font-weight: bold;
+    color: #2563eb;
+  }
+
+  .quick-links {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 20px;
+  }
+
+  .quick-card {
+    background: white;
+    border-radius: 15px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+    overflow: hidden;
+  }
+
+  .quick-card a {
+    display: block;
+    padding: 25px;
+    text-decoration: none;
+    color: #111827;
+    font-weight: 600;
+    transition: 0.3s;
+  }
+
+  .quick-card a:hover {
+    background: #2563eb;
+    color: white;
+  }
+
+  .welcome-box {
+    background: linear-gradient(135deg, #2563eb, #1e40af);
+    color: white;
+    padding: 30px;
+    border-radius: 15px;
+    margin-bottom: 25px;
+  }
+
+  .welcome-box h3 {
+    margin-bottom: 10px;
+  }
+
+  @media (max-width: 768px) {
+    .card-box h3 {
+      font-size: 26px;
+    }
+
+    .welcome-box {
+      padding: 20px;
+    }
+  }
+</style>
+
+<div class="dashboard-header">
+  <h2>📊 Admin Dashboard</h2>
+</div>
+
+<div class="welcome-box">
+  <h3>Welcome Admin 👋</h3>
+  <p>
+    Manage workers, customers, bookings, support requests and system activities.
+  </p>
+</div>
+
+<!-- Statistics -->
+<div class="stats-grid">
+  <div class="card-box">
+    <h5>👷 Workers</h5>
+    <h3>{{ total_workers }}</h3>
+  </div>
+
+  <div class="card-box">
+    <h5>👥 Customers</h5>
+    <h3>{{ total_customers }}</h3>
+  </div>
+
+  <div class="card-box">
+    <h5>📅 Bookings</h5>
+    <h3>{{ total_bookings }}</h3>
+  </div>
+
+  <div class="card-box">
+    <h5>⏳ Pending</h5>
+    <h3>{{ pending_bookings }}</h3>
+  </div>
+</div>
+
+<!-- Quick Actions -->
+<h4 class="mb-3">⚡ Quick Actions</h4>
+
+<div class="quick-links">
+  <div class="quick-card">
+    <a href="{% url 'admin_workers' %}"> 👷 Manage Workers </a>
+  </div>
+
+  <div class="quick-card">
+    <a href="{% url 'admin_customers' %}"> 👥 Manage Customers </a>
+  </div>
+
+  <div class="quick-card">
+    <a href="{% url 'admin_bookings' %}"> 📅 Manage Bookings </a>
+  </div>
+
+  <div class="quick-card">
+    <a href="{% url 'admin_profile' %}"> 👤 Admin Profile </a>
+  </div>
+
+  <div class="quick-card">
+    <a href="{% url 'admin_support' %}"> 💬 Support </a>
+  </div>
+
+  <div class="quick-card">
+    <a href="{% url 'logout' %}"> 🚪 Logout </a>
+  </div>
+</div>
+
+{% endblock %}

@@ -1,0 +1,560 @@
+{% extends 'worker/base.html' %} {% block content %}
+
+<style>
+  :root {
+    --primary-emerald: #10b981;
+    --neon-glow: #00f2fe;
+    --royal-purple: #6366f1;
+    --gradient-premium: linear-gradient(
+      135deg,
+      #0f172a 0%,
+      #1e1b4b 50%,
+      #311042 100%
+    );
+    --card-glass: rgba(255, 255, 255, 0.85);
+    --text-dark: #0f172a;
+    --text-muted: #475569;
+    --premium-shadow: 0 25px 50px -12px rgba(15, 23, 42, 0.25);
+  }
+
+  /* PREMIUM BACKGROUND REHAUL */
+  body {
+    background: var(--gradient-premium) !important;
+    background-attachment: fixed !important;
+    color: #f8fafc;
+    font-family: "Segoe UI", Roboto, sans-serif;
+  }
+
+  /* INSTAGRAM CREATOR HUB INSPIRED FLOATING CARD */
+  .profile-container-card {
+    background: var(--card-glass);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border: 1px solid rgba(255, 255, 255, 0.4);
+    border-radius: 35px;
+    box-shadow: var(--premium-shadow);
+    overflow: hidden;
+    margin-bottom: 40px;
+    transition: transform 0.3s ease;
+  }
+
+  .profile-cover-banner {
+    background:
+      linear-gradient(
+        180deg,
+        rgba(0, 0, 0, 0.4) 0%,
+        rgba(255, 255, 255, 0) 100%
+      ),
+      var(--gradient-premium);
+    height: 200px;
+    position: relative;
+  }
+
+  .profile-meta-header {
+    padding: 0 50px 35px 50px;
+    position: relative;
+    margin-top: -100px;
+    z-index: 5;
+  }
+
+  /* GLOWING INSTAGRAM-STYLE AVATAR BADGE */
+  .profile-avatar-wrapper {
+    position: relative;
+    display: inline-block;
+    padding: 6px;
+    background: linear-gradient(
+      45deg,
+      #f9ce34,
+      #ee2a7b,
+      #6228d7
+    ); /* Instagram gradient ring */
+    border-radius: 50%;
+    box-shadow: 0 10px 30px rgba(238, 42, 123, 0.3);
+  }
+
+  .profile-avatar-img {
+    width: 150px;
+    height: 150px;
+    border-radius: 50%;
+    border: 4px solid #ffffff;
+    object-fit: cover;
+    background-color: #f8fafc;
+    transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  }
+
+  .profile-avatar-wrapper:hover .profile-avatar-img {
+    transform: scale(1.04) rotate(-2deg);
+  }
+
+  /* Live Pulsating Online Status Beacon Checkmark */
+  .profile-avatar-wrapper::after {
+    content: "\b3ac"; /* bootstrap icon check-circle-fill */
+    font-family: "bootstrap-icons";
+    position: absolute;
+    bottom: 12px;
+    right: 12px;
+    width: 26px;
+    height: 26px;
+    background-color: var(--primary-emerald);
+    color: white;
+    font-size: 14px;
+    font-weight: bold;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 4px solid #ffffff;
+    border-radius: 50%;
+    box-shadow: 0 4px 15px rgba(16, 185, 129, 0.6);
+  }
+
+  .worker-name-heading {
+    font-size: 32px;
+    font-weight: 900;
+    letter-spacing: -1px;
+    color: var(--text-dark);
+  }
+
+  /* REFINED COUNTER HIGHLIGHT METRIC CHIPS */
+  .info-stat-badge {
+    padding: 14px 26px;
+    background: rgba(255, 255, 255, 0.7);
+    backdrop-filter: blur(10px);
+    border-radius: 22px;
+    border: 1px solid rgba(226, 232, 240, 0.8);
+    text-align: center;
+    min-width: 140px;
+    transition: all 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
+  }
+
+  .info-stat-badge:hover {
+    background: #ffffff;
+    border-color: var(--royal-purple);
+    box-shadow: 0 15px 30px rgba(99, 102, 241, 0.15);
+    transform: translateY(-3px);
+  }
+
+  .info-stat-badge span {
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1.25px;
+    color: var(--text-muted);
+    display: block;
+    margin-bottom: 4px;
+  }
+
+  .info-stat-badge div {
+    font-size: 19px;
+    font-weight: 800;
+    color: var(--text-dark);
+  }
+
+  /* HIGH-TECH INTERACTIVE ATTRIBUTE GRID CHIPS */
+  .attribute-panel-title {
+    font-size: 15px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    color: var(--text-muted);
+    margin-bottom: 25px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .attribute-link-wrapper {
+    text-decoration: none !important;
+    color: inherit !important;
+    display: block;
+    height: 100%;
+  }
+
+  .attribute-item-box {
+    background: rgba(248, 250, 252, 0.6);
+    border: 1px solid rgba(226, 232, 240, 0.8);
+    border-radius: 24px;
+    padding: 24px 28px;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    cursor: pointer;
+    position: relative;
+  }
+
+  .attribute-item-box:hover {
+    background: #ffffff;
+    border-color: var(--royal-purple);
+    box-shadow: 0 15px 35px rgba(99, 102, 241, 0.12);
+    transform: translateY(-5px);
+  }
+
+  .attribute-icon-frame {
+    width: 52px;
+    height: 52px;
+    border-radius: 16px;
+    background: #ffffff;
+    color: var(--text-muted);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 22px;
+    flex-shrink: 0;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.02);
+    border: 1px solid #e2e8f0;
+    transition: all 0.25s ease;
+  }
+
+  .attribute-item-box:hover .attribute-icon-frame {
+    background: linear-gradient(135deg, #4f46e5 0%, #6366f1 100%);
+    color: white;
+    border-color: transparent;
+    transform: scale(1.05);
+    box-shadow: 0 8px 20px rgba(99, 102, 241, 0.3);
+  }
+
+  .attribute-label-text {
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--text-muted);
+    margin-bottom: 4px;
+    text-transform: uppercase;
+    letter-spacing: 0.75px;
+  }
+
+  .attribute-value-text {
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--text-dark);
+    margin: 0;
+    word-break: break-word;
+  }
+
+  /* INSTAGRAM-STYLE GLOWING PRIMARY PROFILE ACTION BUTTON */
+  .btn-modify-profile {
+    background: linear-gradient(45deg, #f9ce34, #ee2a7b, #6228d7);
+    color: white !important;
+    border: none;
+    padding: 16px 45px;
+    font-size: 16px;
+    font-weight: 700;
+    border-radius: 50px;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    box-shadow: 0 10px 30px rgba(238, 42, 123, 0.35);
+    transition: all 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
+    letter-spacing: 0.5px;
+  }
+
+  .btn-modify-profile:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 15px 35px rgba(238, 42, 123, 0.5);
+  }
+
+  /* TOAST FLOATING POPUPS DECK */
+  .toast-container {
+    position: fixed;
+    bottom: 40px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 2000;
+  }
+
+  .custom-toast {
+    background: #0f172a;
+    color: white;
+    padding: 14px 28px;
+    border-radius: 50px;
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    font-weight: 600;
+    font-size: 14px;
+    opacity: 0;
+    transform: translateY(20px);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+  }
+
+  .custom-toast.show {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  /* DIALOG CONTAINER MODALS MODS */
+  .modal-content {
+    border: none;
+    border-radius: 30px;
+    box-shadow: 0 30px 60px rgba(0, 0, 0, 0.4);
+    background: #ffffff;
+  }
+</style>
+
+<!-- Floating clipboard feedback desk overlay -->
+<div class="toast-container">
+  <div class="custom-toast" id="clipboardToast">
+    <i class="bi bi-fire text-warning fs-5"></i>
+    <span id="toastMessage">Secure key copied!</span>
+  </div>
+</div>
+
+<div class="container mt-5 pb-5">
+  <div class="card profile-container-card">
+    <div class="profile-cover-banner"></div>
+
+    <div class="profile-meta-header">
+      <div
+        class="d-flex flex-column flex-md-row align-items-center align-items-md-end justify-content-between gap-4"
+      >
+        <div
+          class="d-flex flex-column flex-md-row align-items-center align-items-md-end gap-4 text-center text-md-start"
+        >
+          <div class="profile-avatar-wrapper">
+            <!-- Fixed default image asset parsing rules -->
+            <img
+              src="{% if worker.profile_image %}{{ worker.profile_image.url }}{% else %}https://cdn-icons-png.flaticon.com/512/3135/3135715.png{% endif %}"
+              class="profile-avatar-img"
+              alt="Worker Account Creator Profile Avatar Picture"
+            />
+          </div>
+          <div class="mb-2">
+            <h2 class="worker-name-heading mb-2">
+              {{ request.user.username }}
+              <i
+                class="bi bi-patch-check-fill text-primary ms-1"
+                title="Verified Home Service Creator Partner"
+              ></i>
+            </h2>
+            <p class="text-muted fw-bold mb-0">
+              <span
+                class="badge bg-white text-dark border border-light-subtle px-3 py-2 rounded-pill shadow-sm"
+              >
+                <i class="bi bi-gem text-indigo me-1"></i> Pro {{
+                worker.service_type|default:"Specialist" }}
+              </span>
+            </p>
+          </div>
+        </div>
+
+        <!-- Metric Counter Indicator Tracker Dashboard Modules -->
+        <div class="d-flex gap-3 mb-2">
+          <div class="info-stat-badge">
+            <span>Experience</span>
+            <div>{{ worker.experience|default:"0" }} Years</div>
+          </div>
+          <div class="info-stat-badge">
+            <span>Region Hub</span>
+            <div>{{ worker.pincode|default:"750003" }}</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- MAIN BODY DATA CREDENTIALS SHEETS -->
+    <div class="card-body p-4 p-md-5 bg-white text-dark">
+      <div class="attribute-panel-title">
+        <i class="bi bi-instagram text-danger"></i> Creator Hub Ledger (Tap row
+        field to execute interactive script)
+      </div>
+
+      <div class="row g-4 mb-5">
+        <!-- 1. Username Copy Value Card -->
+        <div class="col-md-6">
+          <div
+            class="attribute-item-box"
+            onclick="copyValue('{{ request.user.username }}', 'Username copied to clipboard desk!')"
+          >
+            <div class="attribute-icon-frame">
+              <i class="bi bi-person-circle"></i>
+            </div>
+            <div>
+              <div class="attribute-label-text">Profile Full Name</div>
+              <p class="attribute-value-text">{{ request.user.username }}</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- 2. Email Direct App Launch Trigger -->
+        <div class="col-md-6">
+          <a
+            href="mailto:{{ request.user.email }}"
+            class="attribute-link-wrapper"
+            title="Launch default messaging app"
+          >
+            <div class="attribute-item-box">
+              <div class="attribute-icon-frame">
+                <i class="bi bi-envelope-heart-fill"></i>
+              </div>
+              <div>
+                <div class="attribute-label-text">Email Address</div>
+                <p class="attribute-value-text">{{ request.user.email }}</p>
+              </div>
+            </div>
+          </a>
+        </div>
+
+        <!-- 3. Cellular Dialer Native Interconnect Trigger -->
+        <div class="col-md-6">
+          <a
+            href="tel:{{ worker.phone }}"
+            class="attribute-link-wrapper"
+            title="Invoke telephone auto calling dialer"
+          >
+            <div class="attribute-item-box">
+              <div class="attribute-icon-frame">
+                <i class="bi bi-phone-vibrate-fill"></i>
+              </div>
+              <div>
+                <div class="attribute-label-text">Contact Line</div>
+                <p class="attribute-value-text">
+                  {{ worker.phone|default:"--" }}
+                </p>
+              </div>
+            </div>
+          </a>
+        </div>
+
+        <!-- 4. Domain Specialty Skill Allocation Component -->
+        <div class="col-md-6">
+          <div
+            class="attribute-item-box"
+            data-bs-toggle="modal"
+            data-bs-target="#infoModal"
+            onclick="setupModal('Service Scope Portfolio', 'Your verification credentials are bound under the platform category: **{{ worker.service_type }}**. For adding skills or altering domain trees, submit valid certifications to management desks.')"
+          >
+            <div class="attribute-icon-frame">
+              <i class="bi bi-lightning-charge-fill"></i>
+            </div>
+            <div>
+              <div class="attribute-label-text">Service Domain Branch</div>
+              <p class="attribute-value-text">
+                {{ worker.service_type|default:"Not Set" }}
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <!-- 5. Operational Base Target City -->
+        <div class="col-md-6">
+          <div
+            class="attribute-item-box"
+            data-bs-toggle="modal"
+            data-bs-target="#infoModal"
+            onclick="setupModal('Active Operational Bounds', 'Your dispatcher hub handles telemetry records inside the city bounds of: **{{ worker.location }}**. Active field request logs automatically adjust to this region perimeter.')"
+          >
+            <div class="attribute-icon-frame"><i class="bi bi-radar"></i></div>
+            <div>
+              <div class="attribute-label-text">Operation Hub City</div>
+              <p class="attribute-value-text">
+                {{ worker.location|default:"--" }}
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <!-- 6. Full Physical Core Address Sheet -->
+        <div class="col-md-6">
+          <div
+            class="attribute-item-box"
+            onclick="copyValue('{{ worker.address|default:'' }}', 'Full home base address copied!')"
+          >
+            <div class="attribute-icon-frame">
+              <i class="bi bi-signpost-2-fill"></i>
+            </div>
+            <div>
+              <div class="attribute-label-text">Residential Base Address</div>
+              <p class="attribute-value-text">
+                {{ worker.address|default:"--" }}
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- INTERACTIVE ACCOUNT SUBMIT MODIFICATION LINK -->
+      <div class="text-center text-md-start">
+        <a href="{% url 'edit_worker_profile' %}" class="btn-modify-profile">
+          <i class="bi bi-magic"></i> Edit Partner Profile
+        </a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- INFO INGESTION DIALOG OVERLAY MODAL CHASSIS -->
+<div class="modal fade" id="infoModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content text-dark">
+      <div class="modal-header bg-light py-3 px-4">
+        <h5
+          class="modal-title fw-bold text-dark d-flex align-items-center gap-2"
+          id="modalTitle"
+        >
+          Account Metrics Info
+        </h5>
+        <button
+          type="button"
+          class="btn-close"
+          data-bs-dismiss="modal"
+          aria-label="Close"
+        ></button>
+      </div>
+      <div class="modal-body p-5 text-center">
+        <div
+          class="attribute-icon-frame mx-auto mb-3"
+          style="
+            width: 65px;
+            height: 65px;
+            font-size: 28px;
+            background: rgba(99, 102, 241, 0.1);
+            color: var(--royal-purple);
+            border: none;
+          "
+        >
+          <i class="bi bi-layers-half"></i>
+        </div>
+        <p class="text-dark fw-semibold lh-base mb-0 fs-5" id="modalBodyText">
+          Descriptive specification parameter information text.
+        </p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- CLIENT APPLICATION JAVASCRIPT CONTROLLERS -->
+<script>
+  // Clipboard text engine utility execution
+  function copyValue(textToCopy, statusMessage) {
+    if (
+      !textToCopy ||
+      textToCopy === "--" ||
+      textToCopy === "None" ||
+      textToCopy === ""
+    )
+      return;
+
+    navigator.clipboard.writeText(textToCopy).then(() => {
+      const toastElement = document.getElementById("clipboardToast");
+      document.getElementById("toastMessage").innerText = statusMessage;
+
+      toastElement.classList.add("show");
+
+      setTimeout(() => {
+        toastElement.classList.remove("show");
+      }, 2500);
+    });
+  }
+
+  // Populate info modal structures instantly on trigger
+  function setupModal(title, description) {
+    document.getElementById("modalTitle").innerHTML =
+      `<i class="bi bi-star-fill text-warning"></i> ${title}`;
+    document.getElementById("modalBodyText").innerText = description;
+  }
+</script>
+
+{% endblock %}

@@ -1,0 +1,306 @@
+{% extends 'customer/base.html' %} {% block content %}
+
+<style>
+  :root {
+    --primary-gradient: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+    --surface-card: #ffffff;
+    --text-main: #2d3748;
+    --border-color: #e2e8f0;
+  }
+
+  .tracking-wrapper {
+    background-color: #f8fafc;
+    border-radius: 16px;
+    overflow: hidden;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.05);
+    margin-top: 1.5rem;
+    margin-bottom: 3rem;
+  }
+
+  .info-sidebar {
+    background: var(--surface-card);
+    padding: 2rem;
+    border-right: 1px solid var(--border-color);
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+  }
+
+  .page-title {
+    font-weight: 700;
+    color: var(--text-main);
+    letter-spacing: -0.5px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  /* Live Pulsing Radar Ring */
+  .live-pulse-ring {
+    width: 10px;
+    height: 10px;
+    background: #ef4444;
+    border-radius: 50%;
+    box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.7);
+    animation: pulse-radar 1.6s infinite;
+    display: inline-block;
+  }
+
+  @keyframes pulse-radar {
+    0% {
+      transform: scale(0.95);
+      box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.7);
+    }
+    70% {
+      transform: scale(1);
+      box-shadow: 0 0 0 8px rgba(239, 68, 68, 0);
+    }
+    100% {
+      transform: scale(0.95);
+      box-shadow: 0 0 0 0 rgba(239, 68, 68, 0);
+    }
+  }
+
+  .status-card {
+    background: #f1f5f9;
+    border-radius: 12px;
+    padding: 1rem 1.25rem;
+    border-left: 4px solid #2a5298;
+  }
+
+  .detail-label {
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    color: #64748b;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+    margin-bottom: 2px;
+  }
+
+  .detail-value {
+    color: var(--text-main);
+    font-weight: 600;
+    font-size: 0.95rem;
+  }
+
+  #distance-eta {
+    background: #e0f2fe;
+    color: #0369a1;
+    border-radius: 12px;
+    padding: 1rem;
+    font-weight: 700;
+    font-size: 1.1rem;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    border: 1px solid #bae6fd;
+  }
+
+  /* Map Container Layout Settings */
+  #map {
+    height: 600px;
+    width: 100%;
+    position: relative;
+    background-color: #e5e5e5;
+  }
+
+  .coords-pill {
+    font-family: monospace;
+    font-size: 0.8rem;
+    background: #f8fafc;
+    padding: 4px 8px;
+    border-radius: 6px;
+    border: 1px solid var(--border-color);
+  }
+</style>
+
+<div class="container">
+  <div class="row tracking-wrapper g-0">
+    <div class="col-lg-4 info-sidebar">
+      <div>
+        <div class="d-flex align-items-center justify-content-between mb-4">
+          <h3 class="page-title m-0">Live Tracking</h3>
+          <span
+            class="d-flex align-items-center gap-2 text-danger small fw-bold"
+          >
+            <span class="live-pulse-ring"></span> LIVE
+          </span>
+        </div>
+
+        <div class="d-flex flex-column gap-3">
+          <div class="status-card">
+            <div class="detail-label">Booking Status</div>
+            <div class="detail-value text-capitalize">{{ booking.status }}</div>
+          </div>
+
+          <div>
+            <div class="detail-label">
+              <i class="bi bi-geo-alt-fill me-1"></i> Destination Address
+            </div>
+            <div class="detail-value fw-normal text-muted">
+              {{ booking.address }}
+            </div>
+          </div>
+
+          <hr class="my-2 text-muted opacity-25" />
+
+          {% if booking.worker %}
+          <div>
+            <div class="detail-label">Your Professional Expert</div>
+            <div class="detail-value h5 text-primary mb-1">
+              <i class="bi bi-person-badge-fill me-1"></i> {{
+              booking.worker.user.username }}
+            </div>
+            <div class="text-muted small fw-medium">
+              <i class="bi bi-tools me-1"></i> {{ booking.worker.service_type }}
+            </div>
+          </div>
+
+          <div>
+            <div class="detail-label">Realtime Telemetry Coordinates</div>
+            <div class="d-flex gap-2 mt-1">
+              <span class="coords-pill"
+                >Lat:
+                <span id="lat"
+                  >{{ booking.worker.latitude|default:"0.0" }}</span
+                ></span
+              >
+              <span class="coords-pill"
+                >Lng:
+                <span id="lng"
+                  >{{ booking.worker.longitude|default:"0.0" }}</span
+                ></span
+              >
+            </div>
+          </div>
+          {% else %}
+          <div
+            class="alert alert-warning border-warning d-flex align-items-center gap-2 rounded-3 py-3"
+            role="alert"
+          >
+            <i class="bi bi-exclamation-triangle-fill fs-5"></i>
+            <div>
+              Worker assignment processing. Tracking will activate shortly!
+            </div>
+          </div>
+          {% endif %}
+        </div>
+      </div>
+
+      {% if booking.worker %}
+      <div class="mt-4">
+        <div id="distance-eta">
+          <i class="bi bi-truck-flatbed spinner-border-sm text-primary"></i>
+          <span id="distance-text">Calculating distance...</span>
+        </div>
+      </div>
+      {% endif %}
+    </div>
+
+    <div class="col-lg-8">
+      <div id="map"></div>
+    </div>
+  </div>
+</div>
+
+<script src="https://maps.googleapis.com/maps/api/js?key="AIzaSyBTmr4oSrSKLqbFtEWasKoM0RPtbYYfnzk" async defer></script>
+
+<div id="map" style="height: 400px; width: 100%"></div>
+
+
+<script>
+  let map;
+  let workerMarker;
+  let customerMarker;
+
+  // Pass template variables into JS
+  const bookingStatus = "{{ booking.status|lower }}";
+  const customerLat = 17.3850; // Replace with dynamic template values if available
+  const customerLng = 78.4867;
+  const customerPos = { lat: customerLat, lng: customerLng };
+
+  function initMap() {
+    map = new google.maps.Map(document.getElementById("map"), {
+      zoom: 14,
+      center: customerPos,
+      disableDefaultUI: false,
+      mapTypeControl: false
+    });
+
+    // Customer Location Marker
+    customerMarker = new google.maps.Marker({
+      position: customerPos,
+      map: map,
+      title: "Your Location"
+    });
+
+    {% if booking.worker %}
+      workerMarker = new google.maps.Marker({
+        map: map,
+        title: "Assigned Expert"
+      });
+
+      // Start tracking only if not completed
+      if (bookingStatus !== 'completed') {
+        loadWorkerTelemetry();
+        setInterval(loadWorkerTelemetry, 5000);
+      } else {
+        document.getElementById("distance-text").innerText = "Service Completed";
+      }
+    {% endif %}
+  }
+
+  function loadWorkerTelemetry() {
+    // If the booking is completed, stop updating
+    if (bookingStatus === 'completed') return;
+
+    const workerId = "{{ booking.worker.id|default:'' }}";
+    if (!workerId) return;
+
+    fetch(`/worker-location/${workerId}/`)
+      .then((res) => {
+        if(!res.ok) throw new Error("Telemetry Link Offline");
+        return res.json();
+      })
+      .then((data) => {
+        if (!data.latitude || !data.longitude) return;
+
+        let pos = {
+          lat: parseFloat(data.latitude),
+          lng: parseFloat(data.longitude),
+        };
+
+        workerMarker.setPosition(pos);
+
+        // Update Coordinates UI
+        document.getElementById("lat").innerText = pos.lat.toFixed(4);
+        document.getElementById("lng").innerText = pos.lng.toFixed(4);
+
+        // Calculate and update distance
+        let distanceKm = computeHaversineDistance(customerLat, customerLng, pos.lat, pos.lng);
+        document.getElementById("distance-text").innerText = "Worker is " + distanceKm.toFixed(2) + " km away";
+
+        // Auto-bounds
+        let bounds = new google.maps.LatLngBounds();
+        bounds.extend(customerMarker.getPosition());
+        bounds.extend(workerMarker.getPosition());
+        map.fitBounds(bounds);
+      })
+      .catch(err => console.log("Tracking server ping lost...", err));
+  }
+
+  function computeHaversineDistance(lat1, lon1, lat2, lon2) {
+    const R = 6371;
+    const dLat = ((lat2 - lat1) * Math.PI) / 180;
+    const dLon = ((lon2 - lon1) * Math.PI) / 180;
+    const a = Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+              Math.cos((lat1 * Math.PI) / 180) *
+              Math.cos((lat2 * Math.PI) / 180) *
+              Math.sin(dLon / 2) * Math.sin(dLon / 2);
+    return R * (2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a)));
+  }
+
+  window.onload = initMap;
+</script>
+
+{% endblock %}

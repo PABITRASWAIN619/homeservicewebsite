@@ -1,0 +1,484 @@
+{% load static %}
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Worker Signup - Step 2</title>
+
+    <link
+      href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght=400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css"
+    />
+
+    <style>
+      :root {
+        --primary-sky: #38bdf8;
+        --royal-purple: #6366f1;
+        --error-rose: #f43f5e;
+        --success-emerald: #10b981;
+        --gradient-premium: linear-gradient(
+          135deg,
+          #0f172a 0%,
+          #1e1b4b 50%,
+          #311042 100%
+        );
+        --card-bg: rgba(17, 24, 39, 0.75);
+        --input-bg: #0b1220;
+        --border-color: #334155;
+        --text-muted: #94a3b8;
+      }
+
+      * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+
+      body {
+        font-family: "Plus Jakarta Sans", sans-serif;
+        background: var(--gradient-premium) !important;
+        background-attachment: fixed !important;
+        min-height: 100vh;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        padding: 20px;
+      }
+
+      /* PREMIUM DARK CYBER GLASS CONTAINER */
+      .card {
+        width: 100%;
+        max-width: 450px;
+        background: var(--card-bg);
+        backdrop-filter: blur(16px);
+        -webkit-backdrop-filter: blur(16px);
+        padding: 40px 30px;
+        border-radius: 24px;
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+      }
+
+      /* Stepper Tracker Row */
+      .step-progress-tracker {
+        display: flex;
+        justify-content: center;
+        gap: 6px;
+        margin-bottom: 25px;
+      }
+
+      .progress-bar-segment {
+        height: 4px;
+        width: 40px;
+        border-radius: 2px;
+        background: rgba(255, 255, 255, 0.1);
+      }
+
+      .progress-bar-segment.completed {
+        background: var(--success-emerald);
+      }
+
+      .progress-bar-segment.active {
+        background: linear-gradient(
+          90deg,
+          var(--primary-sky),
+          var(--royal-purple)
+        );
+        box-shadow: 0 0 10px rgba(56, 189, 248, 0.4);
+      }
+
+      h2 {
+        text-align: center;
+        color: #ffffff;
+        font-size: 26px;
+        font-weight: 700;
+        letter-spacing: -0.5px;
+        margin-bottom: 8px;
+      }
+
+      .subtitle-desc {
+        text-align: center;
+        color: var(--text-muted);
+        font-size: 14px;
+        margin-bottom: 30px;
+      }
+
+      .input-box {
+        margin-bottom: 20px;
+        position: relative;
+      }
+
+      .input-box label {
+        display: block;
+        color: #f1f5f9;
+        font-size: 12px;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.75px;
+        margin-bottom: 8px;
+        padding-left: 4px;
+      }
+
+      .input-wrapper {
+        position: relative;
+        display: flex;
+        align-items: center;
+      }
+
+      .input-wrapper i.input-icon {
+        position: absolute;
+        left: 14px;
+        color: var(--text-muted);
+        font-size: 18px;
+        pointer-events: none;
+        transition: color 0.3s ease;
+        z-index: 5;
+      }
+
+      .input-box input,
+      .input-box select {
+        width: 100%;
+        padding: 14px 16px 14px 44px;
+        border-radius: 12px;
+        border: 1px solid var(--border-color);
+        background: var(--input-bg);
+        color: white;
+        font-size: 15px;
+        font-family: inherit;
+        outline: none;
+        transition: all 0.25s ease;
+        appearance: none; /* Clear native dropdown arrow tracking elements */
+        -webkit-appearance: none;
+      }
+
+      /* Native dropdown custom arrow integration hook */
+      .input-box select {
+        background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='%2394a3b8'%3e%3cpath fill-rule='evenodd' d='M1.646 4.646a.5.708 0 0 1 .708 0L8 10.293l5.646-5.647a.5.708 0 0 1 .708.708l-6 6a.5.708 0 0 1-.708 0l-6-6a.5.708 0 0 1 0-.708z'/%3e%3c/svg%3e");
+        background-repeat: no-repeat;
+        background-position: right 14px center;
+        background-size: 12px;
+        padding-right: 40px;
+      }
+
+      .input-box select option {
+        background-color: #111827;
+        color: white;
+      }
+
+      .input-box input:focus,
+      .input-box select:focus {
+        border-color: var(--primary-sky);
+        box-shadow: 0 0 0 4px rgba(56, 189, 248, 0.15);
+        background: #0f172a;
+      }
+
+      .input-box input:focus ~ i.input-icon,
+      .input-box select:focus ~ i.input-icon {
+        color: var(--primary-sky);
+      }
+
+      /* LIVE VALIDATION GLOWS */
+      .input-box.is-invalid-field input,
+      .input-box.is-invalid-field select {
+        border-color: var(--error-rose) !important;
+        box-shadow: 0 0 0 4px rgba(244, 63, 94, 0.15) !important;
+      }
+
+      .input-box.is-invalid-field i.input-icon {
+        color: var(--error-rose) !important;
+      }
+
+      .input-box.is-valid-field input,
+      .input-box.is-valid-field select {
+        border-color: var(--success-emerald) !important;
+      }
+
+      .input-box.is-valid-field i.input-icon {
+        color: var(--success-emerald) !important;
+      }
+
+      .field-error-feedback {
+        color: var(--error-rose);
+        font-size: 12px;
+        font-weight: 500;
+        margin-top: 6px;
+        padding-left: 4px;
+        display: none;
+        align-items: center;
+        gap: 6px;
+      }
+
+      button[type="submit"] {
+        width: 100%;
+        padding: 14px;
+        background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
+        border: none;
+        color: white;
+        border-radius: 12px;
+        font-size: 16px;
+        font-weight: 600;
+        letter-spacing: 0.5px;
+        cursor: pointer;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        box-shadow: 0 4px 15px rgba(37, 99, 235, 0.3);
+        transition: all 0.3s ease;
+        margin-top: 10px;
+      }
+
+      button[type="submit"]:hover {
+        background: linear-gradient(135deg, #1d4ed8 0%, #1e40af 100%);
+        transform: translateY(-2px);
+        box-shadow: 0 8px 25px rgba(37, 99, 235, 0.45);
+      }
+
+      @media (max-width: 480px) {
+        body {
+          padding: 15px;
+        }
+        .card {
+          padding: 30px 20px;
+          border-radius: 20px;
+        }
+        h2 {
+          font-size: 22px;
+        }
+        .input-box input,
+        .input-box select {
+          padding: 12px 14px 12px 40px;
+          font-size: 14px;
+        }
+      }
+    </style>
+  </head>
+
+  <body>
+    <div class="card">
+      <div class="step-progress-tracker">
+        <div class="progress-bar-segment completed"></div>
+        <div class="progress-bar-segment active"></div>
+        <div class="progress-bar-segment"></div>
+        <div class="progress-bar-segment"></div>
+      </div>
+
+      <h2>Worker Signup</h2>
+      <p class="subtitle-desc">
+        Step 2 of 4 – Professional Core Specifications
+      </p>
+
+      <form method="POST" id="serviceDetailsForm" novalidate>
+        {% csrf_token %}
+
+        <div class="input-box" id="serviceBox">
+          <label>Service Allocation Type</label>
+
+          <div class="input-wrapper">
+            <i class="bi bi-briefcase-fill input-icon"></i>
+
+            <select name="service_type" id="serviceSelect" required>
+              <option value="">Select Domain Specialization</option>
+
+              <option value="Electrician">Electrician</option>
+              <option value="Plumber">Plumber</option>
+              <option value="AC Repair">AC Repair</option>
+              <option value="Carpenter">Carpenter</option>
+              <option value="Painter">Painter</option>
+
+              <!-- FIXED VALUE -->
+              <option value="Cleaning Service">Cleaning Service</option>
+
+              <option value="Mobile Repair">Mobile Repair</option>
+            </select>
+          </div>
+
+          <div class="field-error-feedback" id="serviceError"></div>
+        </div>
+        <div class="input-box" id="addressBox">
+          <label>Full Operational Address</label>
+          <div class="input-wrapper">
+            <i class="bi bi-house-door-fill input-icon"></i>
+            <input
+              type="text"
+              name="address"
+              id="addressInput"
+              placeholder="Enter Street Name, Locality House Number"
+              required
+            />
+          </div>
+          <div class="field-error-feedback" id="addressError"></div>
+        </div>
+
+        <div class="input-box" id="pincodeBox">
+          <label>Regional Pin Code</label>
+          <div class="input-wrapper">
+            <i class="bi bi-geo-alt-fill input-icon"></i>
+            <input
+              type="text"
+              name="pincode"
+              id="pincodeInput"
+              placeholder="Enter 6-digit code"
+              maxlength="6"
+              required
+            />
+          </div>
+          <div class="field-error-feedback" id="pincodeError"></div>
+        </div>
+
+        <div class="input-box" id="experienceBox">
+          <label>Years of Trade Experience</label>
+          <div class="input-wrapper">
+            <i class="bi bi-award-fill input-icon"></i>
+            <input
+              type="text"
+              name="experience"
+              id="experienceInput"
+              placeholder="e.g., 3"
+              required
+            />
+          </div>
+          <div class="field-error-feedback" id="experienceError"></div>
+        </div>
+
+        <button type="submit">
+          Continue Next Step <i class="bi bi-arrow-right-short fs-5"></i>
+        </button>
+      </form>
+    </div>
+
+    <script>
+      document
+        .getElementById("serviceDetailsForm")
+        .addEventListener("submit", function (event) {
+          let isFormValid = true;
+
+          const serviceSelect = document.getElementById("serviceSelect");
+          const addressInput = document.getElementById("addressInput");
+          const pincodeInput = document.getElementById("pincodeInput");
+          const experienceInput = document.getElementById("experienceInput");
+
+          // Strict validation regex variables
+          const pincodeRegex = /^\d{6}$/;
+          // Forces experience to be input as a pure integer/decimal metric number
+          const experienceRegex = /^\d+(\.\d+)?$/;
+
+          // --- 1. Service Dropdown Validation ---
+          if (!serviceSelect.value) {
+            showError(
+              "serviceBox",
+              "serviceError",
+              "Selecting a service branch is required.",
+            );
+            isFormValid = false;
+          } else {
+            showSuccess("serviceBox", "serviceError");
+          }
+
+          // --- 2. Address Line Validation ---
+          if (!addressInput.value.trim()) {
+            showError(
+              "addressBox",
+              "addressError",
+              "Operational address cannot be left empty.",
+            );
+            isFormValid = false;
+          } else if (addressInput.value.trim().length < 8) {
+            showError(
+              "addressBox",
+              "addressError",
+              "Please provide a more descriptive, complete address.",
+            );
+            isFormValid = false;
+          } else {
+            showSuccess("addressBox", "addressError");
+          }
+
+          // --- 3. Pin Code Digit Verification ---
+          if (!pincodeInput.value.trim()) {
+            showError(
+              "pincodeBox",
+              "pincodeError",
+              "Postal region code is required.",
+            );
+            isFormValid = false;
+          } else if (!pincodeRegex.test(pincodeInput.value.trim())) {
+            showError(
+              "pincodeBox",
+              "pincodeError",
+              "Must be a valid 6-digit numerical pincode.",
+            );
+            isFormValid = false;
+          } else {
+            showSuccess("pincodeBox", "pincodeError");
+          }
+
+          // --- 4. Experience Threshold Logic Check ---
+          const expValue = experienceInput.value.trim();
+          if (!expValue) {
+            showError(
+              "experienceBox",
+              "experienceError",
+              "Experience value is required.",
+            );
+            isFormValid = false;
+          } else if (!experienceRegex.test(expValue)) {
+            showError(
+              "experienceBox",
+              "experienceError",
+              "Please enter a valid numeric value for years (e.g., 2 or 4.5).",
+            );
+            isFormValid = false;
+          } else {
+            const parsingYears = parseFloat(expValue);
+            if (parsingYears < 0) {
+              showError(
+                "experienceBox",
+                "experienceError",
+                "Experience cannot be negative.",
+              );
+              isFormValid = false;
+            } else if (parsingYears > 45) {
+              showError(
+                "experienceBox",
+                "experienceError",
+                "Experience value entered exceeds realistic registration limits.",
+              );
+              isFormValid = false;
+            } else {
+              showSuccess("experienceBox", "experienceError");
+            }
+          }
+
+          // Halt form transmission if triggers flag failures
+          if (!isFormValid) {
+            event.preventDefault();
+          }
+        });
+
+      // UI Layout Modifier Scripts
+      function showError(containerId, errorId, message) {
+        const container = document.getElementById(containerId);
+        const errorDiv = document.getElementById(errorId);
+
+        container.classList.add("is-invalid-field");
+        container.classList.remove("is-valid-field");
+        errorDiv.innerHTML = `<i class="bi bi-exclamation-circle-fill"></i> ${message}`;
+        errorDiv.style.display = "flex";
+      }
+
+      function showSuccess(containerId, errorId) {
+        const container = document.getElementById(containerId);
+        const errorDiv = document.getElementById(errorId);
+
+        container.classList.remove("is-invalid-field");
+        container.classList.add("is-valid-field");
+        errorDiv.style.display = "none";
+      }
+    </script>
+  </body>
+</html>

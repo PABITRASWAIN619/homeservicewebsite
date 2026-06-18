@@ -1,0 +1,268 @@
+{% extends 'worker/base.html' %} {% block content %}
+
+<style>
+  :root {
+    --primary-emerald: #10b981;
+    --star-gold: #f59e0b;
+    --gradient-teal: linear-gradient(135deg, #10b981 0%, #059669 100%);
+    --gradient-dark: linear-gradient(
+      135deg,
+      #0f172a 0%,
+      #1e1b4b 50%,
+      #311042 100%
+    );
+    --card-glass: rgba(255, 255, 255, 0.85);
+    --text-dark: #0f172a;
+    --text-muted: #475569;
+    --premium-shadow: 0 25px 50px -12px rgba(15, 23, 42, 0.25);
+  }
+
+  /* PREMIUM BACKGROUND COORDINATION */
+  body {
+    background: var(--gradient-dark) !important;
+    background-attachment: fixed !important;
+    color: #f8fafc;
+    font-family: "Segoe UI", Roboto, sans-serif;
+  }
+
+  /* MODERN HUB CONTAINER FRAME */
+  .reviews-wrapper-card {
+    background: var(--card-glass);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border: 1px solid rgba(255, 255, 255, 0.4);
+    border-radius: 35px;
+    box-shadow: var(--premium-shadow);
+    overflow: hidden;
+    color: var(--text-dark);
+  }
+
+  .reviews-header-banner {
+    background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+    padding: 26px 35px;
+    border: none;
+  }
+
+  /* INSTAGRAM-STYLE INSIGHT METRIC CHIP */
+  .rating-summary-box {
+    background: rgba(248, 250, 252, 0.6);
+    border: 1px solid rgba(226, 232, 240, 0.8);
+    border-radius: 24px;
+    padding: 30px;
+    text-align: center;
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.01);
+    transition: transform 0.3s ease;
+  }
+
+  .rating-summary-box:hover {
+    transform: translateY(-3px);
+    border-color: var(--star-gold);
+  }
+
+  .huge-rating-number {
+    font-size: 56px;
+    font-weight: 900;
+    color: var(--text-dark);
+    line-height: 1;
+    letter-spacing: -1px;
+  }
+
+  .global-stars-deck i {
+    color: var(--star-gold);
+    font-size: 18px;
+    margin: 0 2px;
+  }
+
+  /* STREAMLINED CUSTOMER REVIEWS FEED CARDS */
+  .review-feed-card {
+    background: rgba(248, 250, 252, 0.6);
+    border: 1px solid rgba(226, 232, 240, 0.8);
+    border-radius: 22px;
+    padding: 24px;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    position: relative;
+  }
+
+  .review-feed-card:hover {
+    background: #ffffff;
+    border-color: var(--primary-emerald);
+    box-shadow: 0 15px 35px rgba(16, 185, 129, 0.08);
+    transform: translateY(-4px);
+  }
+
+  .customer-meta-name {
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--text-dark);
+    margin: 0;
+  }
+
+  .star-badge-pill {
+    background: rgba(245, 158, 11, 0.1);
+    color: var(--star-gold);
+    padding: 4px 12px;
+    border-radius: 50px;
+    font-weight: 700;
+    font-size: 13px;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    border: 1px solid rgba(245, 158, 11, 0.2);
+  }
+
+  .review-timestamp-text {
+    font-size: 13px;
+    color: var(--text-muted);
+    font-weight: 600;
+  }
+
+  .review-comment-payload {
+    font-size: 16px;
+    line-height: 1.6;
+    color: #334155;
+    margin-top: 14px;
+    margin-bottom: 0;
+    font-style: italic;
+  }
+
+  .ticket-id-tag {
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--text-muted);
+    background: #f1f5f9;
+    padding: 4px 10px;
+    border-radius: 6px;
+    font-family: monospace;
+  }
+</style>
+
+<div class="container mt-4 pb-5">
+  <!-- CONSOLE HEADER VIEW -->
+  <div class="mb-4 text-white">
+    <h2 class="fw-bold m-0">Customer Reviews</h2>
+    <p class="text-white-50 small">
+      Track satisfaction metrics, community feedback loops, and reputation
+      indicators.
+    </p>
+  </div>
+
+  <!-- MAIN CHASSIS PANELS WINDOW -->
+  <div class="card reviews-wrapper-card">
+    <div class="card-header reviews-header-banner text-white">
+      <h4 class="m-0 fw-bold">
+        <i class="bi bi-chat-square-heart-fill text-danger me-2"></i>Live Client
+        Testimonials
+      </h4>
+    </div>
+
+    <div class="card-body p-4 p-md-5">
+      <!-- TOP PORTFOLIO STAT SUMMARY OVERLAY -->
+      <div class="row align-items-center g-4 mb-5">
+        <div class="col-md-4 text-center">
+          <div class="rating-summary-box shadow-sm">
+            <span
+              class="text-uppercase tracking-wider text-muted fw-bold small d-block mb-2"
+              >Average Rating</span
+            >
+            <div class="huge-rating-number mb-2">
+              {{ average_rating|default:"0.0" }}
+            </div>
+            <div class="global-stars-deck mb-1">
+              <i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i
+              ><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i
+              ><i class="bi bi-star-fill"></i>
+            </div>
+            <small class="text-muted fw-bold d-block mt-2"
+              >Based on {{ total_reviews_count|default:"0" }} reviews</small
+            >
+          </div>
+        </div>
+        <div class="col-md-8">
+          <h4 class="fw-bold text-dark mb-2">Marketplace Standing Insight</h4>
+          <p class="text-secondary small lh-base mb-0">
+            Reviews and star scores are collected directly from verified clients
+            after booking closure validation tokens are matched. Maintaining a
+            high score profile pushes your agent status context parameters
+            higher inside automatic area routing allocation dispatches!
+          </p>
+        </div>
+      </div>
+
+      <hr class="text-muted opacity-25 mb-5" />
+
+      <!-- FEED DATA MATRIX FLOW STREAM -->
+      <div class="d-flex flex-column gap-4">
+        {% for review in reviews %}
+        <div class="review-feed-card shadow-sm">
+          <div
+            class="d-flex flex-wrap align-items-center justify-content-between gap-3"
+          >
+            <div class="d-flex align-items-center gap-3">
+              <div
+                class="bg-gradient text-white rounded-circle d-flex align-items-center justify-content-center fw-bold shadow-sm"
+                style="
+                  width: 48px;
+                  height: 48px;
+                  background: var(--gradient-teal);
+                  font-size: 16px;
+                "
+              >
+                {{ review.booking.customer.user.username|slice:":1"|upper }}
+              </div>
+              <div>
+                <h5 class="customer-meta-name">
+                  {{ review.booking.customer.user.username }}
+                </h5>
+                <div class="mt-1">
+                  <div class="star-badge-pill">
+                    <i class="bi bi-star-fill"></i>
+                    <span>{{ review.rating }} / 5</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <span class="review-timestamp-text"
+              ><i class="bi bi-calendar-event me-1"></i>{{
+              review.created_at|date:"M d, Y" }}</span
+            >
+          </div>
+
+          <p class="review-comment-payload">"{{ review.comment }}"</p>
+
+          <div class="mt-3 text-end">
+            <span class="ticket-id-tag">Booking #{{ review.booking.id }}</span>
+          </div>
+        </div>
+
+        {% empty %}
+        <!-- Clean Empty System States Fallback Window -->
+        <div class="review-feed-card shadow-sm text-center py-5">
+          <div
+            class="attribute-icon-frame mx-auto mb-3"
+            style="
+              width: 60px;
+              height: 60px;
+              background: rgba(99, 102, 241, 0.1);
+              color: #6366f1;
+              border-radius: 50%;
+              display: flex;
+              align-items: center;
+              justify-content: center;
+              font-size: 24px;
+            "
+          >
+            <i class="bi bi-folder-x"></i>
+          </div>
+          <h4 class="fw-bold text-dark">No Reviews Yet</h4>
+          <p class="text-muted mb-0 px-4">
+            Customers have not submitted any performance evaluations metrics
+            onto your tracking profile space yet.
+          </p>
+        </div>
+        {% endfor %}
+      </div>
+    </div>
+  </div>
+</div>
+
+{% endblock %}

@@ -1,0 +1,219 @@
+{% extends "admin/base.html" %} {% block content %}
+
+<div class="container mt-4">
+  <div class="card shadow-sm">
+    <div class="card-header bg-dark text-white">
+      <h5 class="mb-0">All Bookings</h5>
+    </div>
+
+    <div class="card-body table-responsive">
+      <table class="table table-bordered table-hover align-middle">
+        <!-- ================= HEADER ================= -->
+        <thead class="table-dark">
+          <tr>
+            <th>Customer</th>
+            <th>Service</th>
+            <th>Address</th>
+            <th>Payment</th>
+            <th>Amount</th>
+            <th>Worker</th>
+            <th>Status</th>
+            <th>Location</th>
+            <th>OTP</th>
+            <th>Created</th>
+            <th>Action</th>
+          </tr>
+        </thead>
+
+        <!-- ================= BODY ================= -->
+        <tbody>
+          {% for b in bookings %}
+          <tr>
+            <!-- CUSTOMER -->
+            <td>
+              <strong>{{ b.customer.user.username }}</strong>
+              <br />
+              <small>{{ b.customer.phone }}</small>
+            </td>
+
+            <!-- SERVICE -->
+            <td>
+              <span class="badge bg-primary"> {{ b.service.name }} </span>
+            </td>
+
+            <!-- ADDRESS -->
+            <td>{{ b.address|truncatechars:40 }}</td>
+
+            <!-- PAYMENT -->
+            <td>
+              {% if b.payment_status %}
+              <span class="badge bg-success">Paid</span>
+              {% else %}
+              <span class="badge bg-warning text-dark">Pending</span>
+              {% endif %}
+            </td>
+
+            <!-- AMOUNT -->
+            <td>₹{{ b.amount }}</td>
+
+            <!-- WORKER -->
+            <td>
+              {% if b.worker %}
+              <strong>{{ b.worker.user.username }}</strong>
+              <br />
+              <small>{{ b.worker.phone }}</small>
+              {% else %}
+              <span class="text-danger">Not Assigned</span>
+              {% endif %}
+            </td>
+
+            <!-- STATUS -->
+            <td>
+  {% if b.status == "Pending" %}
+  <span class="badge bg-warning text-dark">Pending</span>
+
+  {% elif b.status == "Assigned" %}
+  <span class="badge bg-info">Assigned</span>
+
+  {% elif b.status == "Accepted" %}
+  <span class="badge bg-primary">Accepted</span>
+
+  {% elif b.status == "On The Way" %}
+  <span class="badge bg-primary">On The Way</span>
+
+  {% elif b.status == "Working" %}
+  <span class="badge bg-secondary">Working</span>
+
+  {% elif b.status == "Completed" %}
+  <span class="badge bg-success">Completed</span>
+
+  {% elif b.status == "Rejected" %}
+  <span class="badge bg-danger">Rejected</span>
+
+  {% else %}
+  <span class="badge bg-dark">{{ b.status }}</span>
+  {% endif %}
+</td>
+<td>
+  {% if b.latitude and b.longitude %}
+
+  <a
+    href="https://www.google.com/maps?q={{ b.latitude }},{{ b.longitude }}"
+    target="_blank"
+    class="btn btn-info btn-sm"
+  >
+    View Map
+  </a>
+
+  <br>
+
+  <small>
+    {{ b.latitude }},
+    {{ b.longitude }}
+  </small>
+
+  {% else %}
+  <span class="text-danger">
+    No Location
+  </span>
+  {% endif %}
+</td>
+            
+
+            <!-- OTP -->
+            <td>
+              {% if b.otp %}
+              <span class="fw-bold text-primary">{{ b.otp }}</span>
+              {% else %}
+              <span class="text-muted">Not Generated</span>
+              {% endif %}
+            </td>
+
+            <!-- CREATED -->
+            <td>
+              {{ b.created_at|date:"d M Y" }}
+              <br />
+              <small>{{ b.created_at|time:"H:i" }}</small>
+            </td>
+
+            <!-- ACTION -->
+            <td>
+              {% if not b.worker %}
+
+              <!-- AUTO ASSIGN -->
+              <a
+                href="{% url 'auto_assign_worker' b.id %}"
+                class="btn btn-success btn-sm mb-1"
+              >
+                Auto Assign
+              </a>
+
+              <!-- MANUAL ASSIGN BUTTON -->
+              <button
+                class="btn btn-primary btn-sm"
+                data-bs-toggle="modal"
+                data-bs-target="#assignModal{{ b.id }}"
+              >
+                Manual Assign
+              </button>
+
+              <!-- MODAL -->
+              <div class="modal fade" id="assignModal{{ b.id }}" tabindex="-1">
+                <div class="modal-dialog">
+                  <div class="modal-content">
+                    <form
+                      method="POST"
+                      action="{% url 'manual_assign_worker' b.id %}"
+                    >
+                      {% csrf_token %}
+
+                      <div class="modal-header">
+                        <h5 class="modal-title">Manual Assign Worker</h5>
+                        <button
+                          type="button"
+                          class="btn-close"
+                          data-bs-dismiss="modal"
+                        ></button>
+                      </div>
+
+                      <div class="modal-body">
+                        <label>Select Worker</label>
+
+                        <select name="worker_id" class="form-select" required>
+                          <option value="">-- Choose Worker --</option>
+
+                          {% for w in workers %}
+                          <option value="{{ w.id }}">
+                            {{ w.user.username }} ({{ w.service_type }})
+                          </option>
+                          {% endfor %}
+                        </select>
+                      </div>
+
+                      <div class="modal-footer">
+                        <button type="submit" class="btn btn-primary">
+                          Assign
+                        </button>
+                      </div>
+                    </form>
+                  </div>
+                </div>
+              </div>
+
+              {% else %}
+              <span class="text-success fw-bold">✔ Assigned</span>
+              {% endif %}
+            </td>
+          </tr>
+          {% empty %}
+          <tr>
+            <td colspan="10" class="text-center py-4">No bookings found</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+{% endblock %}

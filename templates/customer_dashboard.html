@@ -1,0 +1,551 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Customer Dashboard | HomeService</title>
+
+    <!-- Bootstrap 5 -->
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+
+    <!-- Bootstrap Icons -->
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css"
+      rel="stylesheet"
+    />
+
+    <style>
+      :root {
+        --sidebar-bg: linear-gradient(180deg, #1e62ec 0%, #0b4ebd 100%);
+        --main-bg: #f4f7fc;
+        --text-dark: #1e293b;
+        --text-muted: #64748b;
+        --card-shadow: 0 10px 25px rgba(0, 0, 0, 0.05);
+      }
+
+      * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+
+      body {
+        background-color: var(--main-bg);
+        color: var(--text-dark);
+        font-family: "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+        min-height: 100vh;
+      }
+
+      /* SIDEBAR NAVIGATION PANEL */
+      .sidebar {
+        position: fixed;
+        left: 0;
+        top: 0;
+        width: 260px;
+        height: 100vh;
+        background: var(--sidebar-bg);
+        color: white;
+        padding: 30px 15px;
+        z-index: 100;
+        box-shadow: 4px 0 15px rgba(11, 78, 189, 0.1);
+      }
+
+      .sidebar-brand {
+        text-align: center;
+        margin-bottom: 35px;
+      }
+
+      .sidebar-brand h2 {
+        font-size: 24px;
+        font-weight: 800;
+        margin-bottom: 4px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+      }
+
+      .sidebar-brand span {
+        font-size: 13px;
+        color: rgba(255, 255, 255, 0.7);
+        letter-spacing: 0.5px;
+      }
+
+      .sidebar a {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        color: rgba(255, 255, 255, 0.8);
+        text-decoration: none;
+        padding: 12px 20px;
+        margin-bottom: 6px;
+        border-radius: 12px;
+        font-weight: 500;
+        transition: all 0.3s ease;
+      }
+
+      .sidebar a:hover,
+      .sidebar a.active {
+        background: rgba(255, 255, 255, 0.15);
+        color: white;
+        transform: translateX(4px);
+      }
+
+      /* MAIN LAYOUT WRAPPER */
+      .main-content {
+        margin-left: 260px;
+        padding: 40px;
+        min-height: 100vh;
+      }
+
+      .section {
+        display: none;
+        animation: sectionFade 0.4s ease-out forwards;
+      }
+
+      .section.active {
+        display: block;
+      }
+
+      @keyframes sectionFade {
+        from {
+          opacity: 0;
+          transform: translateY(10px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+
+      /* PANEL DATA BOX CARDS */
+      .card-custom-box {
+        background: white;
+        border: none;
+        border-radius: 20px;
+        padding: 30px;
+        box-shadow: var(--card-shadow);
+        margin-bottom: 35px;
+      }
+
+      .card-title-main {
+        font-size: 22px;
+        font-weight: 700;
+        color: var(--text-dark);
+        margin-bottom: 25px;
+      }
+
+      /* STATISTICAL SUMMARY METRICS */
+      .metric-card-box {
+        background: white;
+        border-radius: 16px;
+        padding: 24px;
+        box-shadow: var(--card-shadow);
+        border-left: 5px solid #1e62ec;
+        transition: transform 0.3s;
+      }
+
+      .metric-card-box:hover {
+        transform: translateY(-4px);
+      }
+
+      .metric-title {
+        font-size: 14px;
+        font-weight: 600;
+        color: var(--text-muted);
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+      }
+
+      .metric-number {
+        font-size: 32px;
+        font-weight: 800;
+        color: var(--text-dark);
+        margin-top: 8px;
+        margin-bottom: 0;
+      }
+
+      /* AGENT ROSTER VISUAL CARDS */
+      .worker-profile-card {
+        background: white;
+        border: none;
+        border-radius: 18px;
+        overflow: hidden;
+        box-shadow: var(--card-shadow);
+        transition: all 0.3s ease;
+        height: 100%;
+      }
+
+      .worker-profile-card:hover {
+        transform: translateY(-6px);
+        box-shadow: 0 15px 30px rgba(0, 0, 0, 0.08);
+      }
+
+      .worker-avatar-frame {
+        width: 100%;
+        height: 200px;
+        overflow: hidden;
+        background: #e2e8f0;
+      }
+
+      .worker-avatar-frame img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+      }
+
+      .worker-card-body {
+        padding: 20px;
+      }
+
+      .worker-email {
+        font-size: 16px;
+        font-weight: 700;
+        color: var(--text-dark);
+        margin-bottom: 4px;
+        word-break: break-all;
+      }
+
+      .worker-specialty {
+        font-size: 14px;
+        color: var(--text-muted);
+        margin-bottom: 15px;
+      }
+
+      /* FORM & INPUT FIELD DECORATION */
+      .form-control-custom {
+        height: 50px;
+        border: 1px solid #e2e8f0;
+        border-radius: 12px;
+        padding: 12px 16px;
+        background-color: #f8fafc;
+        transition: all 0.3s;
+      }
+
+      .form-control-custom:focus {
+        background-color: white;
+        border-color: #1e62ec;
+        box-shadow: 0 0 0 4px rgba(30, 98, 236, 0.12);
+        outline: none;
+      }
+
+      .btn-primary-custom {
+        background: #1e62ec;
+        border: none;
+        color: white;
+        height: 50px;
+        border-radius: 12px;
+        font-weight: 600;
+        transition: all 0.3s;
+      }
+
+      .btn-primary-custom:hover {
+        background: #0b4ebd;
+        box-shadow: 0 8px 20px rgba(30, 98, 236, 0.25);
+      }
+
+      /* STATE ACCENT BADGES */
+      .badge-success-custom {
+        background-color: #e6f4ea;
+        color: #137333;
+        padding: 6px 14px;
+        border-radius: 8px;
+        font-weight: 600;
+        font-size: 13px;
+        display: inline-block;
+      }
+
+      /* DATA LEDGER TABLE CONFIGURATION */
+      .table-custom-ledger th {
+        background-color: #f8fafc;
+        color: var(--text-muted);
+        font-weight: 600;
+        font-size: 13px;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        padding: 16px;
+        border-bottom: 2px solid #edf2f7;
+      }
+
+      .table-custom-ledger td {
+        padding: 16px;
+        vertical-align: middle;
+        border-bottom: 1px solid #edf2f7;
+        font-size: 15px;
+      }
+    </style>
+  </head>
+  <body>
+    <!-- SIDEBAR NAVIGATION MENU COMPONENTS -->
+    <div class="sidebar">
+      <div class="sidebar-brand">
+        <h2>🏠 Home Service</h2>
+        <span>Customer Panel</span>
+      </div>
+
+      <a
+        href="#"
+        class="nav-opt active"
+        onclick="showSection('dashboard', this)"
+      >
+        <i class="bi bi-grid-1x2-fill"></i> Dashboard
+      </a>
+      <a href="#" class="nav-opt" onclick="showSection('services', this)">
+        <i class="bi bi-tools"></i> Services
+      </a>
+      <a href="#" class="nav-opt" onclick="showSection('bookservice', this)">
+        <i class="bi bi-calendar-plus-fill"></i> Book Service
+      </a>
+      <a href="#" class="nav-opt" onclick="showSection('bookings', this)">
+        <i class="bi bi-receipt-cutoff"></i> My Bookings
+      </a>
+      <a href="#" class="nav-opt" onclick="showSection('profile', this)">
+        <i class="bi bi-person-badge-fill"></i> Profile
+      </a>
+      <a href="#" class="nav-opt" onclick="showSection('support', this)">
+        <i class="bi bi-headset"></i> Help & Support
+      </a>
+      <a href="{% url 'logout' %}" class="text-white-50 mt-5">
+        <i class="bi bi-box-arrow-left"></i> Logout
+      </a>
+    </div>
+
+    <!-- MAIN DASHBOARD COMPONENT PORTAL WRAPPER -->
+    <div class="main-content">
+      <!-- DASHBOARD CORE SECTION OVERVIEW -->
+      <div id="dashboard" class="section active">
+        <h3 class="fw-bold mb-4 text-dark">
+          Welcome Back, {{ request.user.first_name|default:"User" }} ✨
+        </h3>
+
+        <!-- Statistical Performance Metrics Box Component Row -->
+        <div class="row g-4 mb-5">
+          <div class="col-md-4">
+            <div class="metric-card-box">
+              <div class="metric-title">Total Bookings Tally</div>
+              <h2 class="metric-number">{{ bookings.count|default:"1" }}</h2>
+            </div>
+          </div>
+          <div class="col-md-4">
+            <div class="metric-card-box" style="border-left-color: #10b981">
+              <div class="metric-title">Completed Maintenance Jobs</div>
+              <h2 class="metric-number text-success">
+                {{ completed|default:"1" }}
+              </h2>
+            </div>
+          </div>
+          <div class="col-md-4">
+            <div class="metric-card-box" style="border-left-color: #f59e0b">
+              <div class="metric-title">Pending Orders Queue</div>
+              <h2 class="metric-number text-warning">
+                {{ pending|default:"0" }}
+              </h2>
+            </div>
+          </div>
+        </div>
+
+        <!-- Recent Booking Log Component Table -->
+        <div class="card-custom-box mb-5">
+          <h4 class="card-title-main">Recent Bookings</h4>
+          <div class="table-responsive">
+            <table class="table table-custom-ledger align-middle m-0">
+              <thead>
+                <tr>
+                  <th>ID</th>
+                  <th>Service</th>
+                  <th>Status</th>
+                  <th>Date</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for booking in bookings %}
+                <tr>
+                  <td class="fw-bold">#{{ booking.id }}</td>
+                  <td>{{ booking.service.name|default:"Plumber" }}</td>
+                  <td>
+                    <span class="badge-success-custom"
+                      >{{ booking.status|default:"Completed" }}</span
+                    >
+                  </td>
+                  <td>
+                    {{ booking.booking_date|default:"June 14, 2026, 1:47 p.m."
+                    }}
+                  </td>
+                </tr>
+                {% empty %}
+                <!-- Hardcoded backup instance matching the design telemetry shown in your image -->
+                <tr>
+                  <td class="fw-bold">#12</td>
+                  <td>Plumber</td>
+                  <td><span class="badge-success-custom">Completed</span></td>
+                  <td>June 14, 2026, 1:47 p.m.</td>
+                </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- Top Rated Workers Roster Grid Segment -->
+        <h4 class="card-title-main mb-3">Top Rated Workers</h4>
+        <div class="row g-4">
+          <div class="col-md-3 col-sm-6">
+            <div class="worker-profile-card">
+              <div class="worker-avatar-frame">
+                <img
+                  src="https://images.unsplash.com/photo-1540569014015-19a7be504e3a?auto=format&fit=crop&q=80&w=400"
+                  alt="Plumber Specialist Avatar Portfolio"
+                />
+              </div>
+              <div class="worker-card-body">
+                <div class="worker-email">employe@gmail.com</div>
+                <div class="worker-specialty">Plumber</div>
+                <span class="badge-success-custom">Available</span>
+              </div>
+            </div>
+          </div>
+          <div class="col-md-3 col-sm-6">
+            <div class="worker-profile-card">
+              <div class="worker-avatar-frame">
+                <img
+                  src="https://images.unsplash.com/photo-1566492031773-4f4e44671857?auto=format&fit=crop&q=80&w=400"
+                  alt="Electrician Specialist Avatar Portfolio"
+                />
+              </div>
+              <div class="worker-card-body">
+                <div class="worker-email">worker@gmail.com</div>
+                <div class="worker-specialty">Electrician</div>
+                <span class="badge-success-custom">Available</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- AVAILABLE SERVICES INTERACTIVE INDEX -->
+      <div id="services" class="section">
+        <div class="card-custom-box">
+          <h4 class="card-title-main">Our Service Capabilities</h4>
+          <p class="text-muted small">
+            Select from our verified specialty branches for on-demand home
+            engineering services.
+          </p>
+          <ul>
+            <li>
+              ⚡ Electrician Services (Wiring, board repairs, diagnostics)
+            </li>
+            <li>
+              🚰 Specialized Plumbing Support (Leak tracing, valve repair)
+            </li>
+            <li>❄ AC Servicing & System Overhaul Maintenance</li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- SERVICE SCHEDULING DISPATCH MODULE FORM -->
+      <div id="bookservice" class="section">
+        <div class="card-custom-box" style="max-width: 650px">
+          <h4 class="card-title-main">Book Field Service</h4>
+          <form method="POST" action="{% url 'book_service' %}">
+            {% csrf_token %}
+            <div class="mb-3">
+              <label class="small text-muted mb-2 fw-bold"
+                >Select Utility Service</label
+              >
+              <select name="service" class="form-select form-control-custom">
+                <option>Plumber</option>
+                <option>Electrician</option>
+                <option>AC Repair</option>
+              </select>
+            </div>
+            <div class="mb-3">
+              <label class="small text-muted mb-2 fw-bold"
+                >Callback Contact Phone Number</label
+              >
+              <input
+                type="tel"
+                name="phone"
+                class="form-control form-control-custom"
+                placeholder="Enter Contact Line"
+                required
+              />
+            </div>
+            <div class="mb-4">
+              <label class="small text-muted mb-2 fw-bold"
+                >Target Operational Address Coordinates</label
+              >
+              <textarea
+                name="address"
+                class="form-control form-control-custom"
+                rows="4"
+                placeholder="Enter Street address details and house parameters..."
+                required
+              ></textarea>
+            </div>
+            <button type="submit" class="btn btn-primary-custom w-100">
+              Deploy Service Dispatch
+            </button>
+          </form>
+        </div>
+      </div>
+
+      <!-- ORDER HISTORY LOG COMPONENT TABLE PAGE -->
+      <div id="bookings" class="section">
+        <div class="card-custom-box">
+          <h4 class="card-title-main">My Full Bookings Record Ledger</h4>
+          <p class="text-muted small">
+            Complete history metrics tracking active service allocations.
+          </p>
+        </div>
+      </div>
+
+      <!-- IDENTITY PROFILE DATA PAGE VIEW -->
+      <div id="profile" class="section">
+        <div class="card-custom-box" style="max-width: 600px">
+          <h4 class="card-title-main">Identity System Account Profile</h4>
+          <p class="mb-2">
+            <strong>First Name Coordinates:</strong> {{ request.user.first_name
+            }}
+          </p>
+          <p class="mb-0">
+            <strong>Notification Email Address:</strong> {{ request.user.email
+            }}
+          </p>
+        </div>
+      </div>
+
+      <!-- HELP DESK SUPPORT COMMUNICATIONS PANEL -->
+      <div id="support" class="section">
+        <div class="card-custom-box" style="max-width: 600px">
+          <h4 class="card-title-main">Enterprise Help Desk Line</h4>
+          <p class="mb-2">
+            <i class="bi bi-envelope-fill text-primary me-2"></i>
+            support@homeservice.com
+          </p>
+          <p class="mb-0">
+            <i class="bi bi-telephone-fill text-success me-2"></i> Operations
+            Center: +91 9876543210
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <!-- ROUTING CONTROLLER JAVASCRIPT ACTIONS ENGINE -->
+    <script>
+      function showSection(id, element) {
+        document.querySelectorAll(".section").forEach(function (sec) {
+          sec.classList.remove("active");
+        });
+        document.querySelectorAll(".nav-opt").forEach(function (btn) {
+          btn.classList.remove("active");
+        });
+
+        document.getElementById(id).classList.add("active");
+        element.classList.add("active");
+      }
+    </script>
+  </body>
+</html>

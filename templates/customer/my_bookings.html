@@ -1,0 +1,182 @@
+{% extends 'customer/base.html' %} {% block content %}
+
+<div class="container mt-4">
+  <table class="table table-bordered table-hover align-middle">
+    <thead class="table-dark">
+      <tr>
+        <th>ID</th>
+
+        <!-- 👤 CUSTOMER INFO -->
+        <th>Customer</th>
+        <th>Phone</th>
+
+        <th>Service</th>
+        <th>Address</th>
+
+        <!-- 💳 PAYMENT -->
+        <th>Payment</th>
+
+        <th>Amount</th>
+        <th>Booking Date</th>
+
+        <!-- 🔐 OTP -->
+        <th>OTP Status</th>
+
+        <!-- 📌 STATUS -->
+        <th>Status</th>
+
+        <!-- ⚙️ ACTION -->
+        <th>Action</th>
+      </tr>
+    </thead>
+
+    <tbody>
+      {% for booking in bookings %}
+      <tr>
+        <!-- 👤 CUSTOMER -->
+        <td>
+          <strong>{{ booking.customer.user.username }}</strong>
+        </td>
+
+        <!-- 📞 PHONE -->
+        <td>{{ booking.customer.phone }}</td>
+
+        <!-- 🔧 SERVICE -->
+        <td>
+          <span class="badge bg-primary"> {{ booking.service.name }} </span>
+        </td>
+
+        <!-- 📍 ADDRESS -->
+        <td>{{ booking.address }}</td>
+
+        <!-- 💳 PAYMENT -->
+        <td>
+          {% if booking.payment_status == "Paid" %}
+          <span class="badge bg-success">Paid</span>
+          {% elif booking.payment_status == "Pending" %}
+          <span class="badge bg-warning text-dark">Pending</span>
+          {% else %}
+          <span class="text-muted">-</span>
+          {% endif %}
+        </td>
+
+        <!-- 💰 AMOUNT -->
+        <td>₹{{ booking.amount }}</td>
+
+        <!-- 📅 DATE -->
+        <td>{{ booking.booking_date|date:"d M Y" }}</td>
+
+        <!-- 🔐 OTP STATUS -->
+        <td>
+          {% if booking.status == "Completed" %}
+          <span class="badge bg-success">Verified ✔</span>
+
+          {% elif booking.otp %}
+          <button
+            class="btn btn-warning btn-sm"
+            data-bs-toggle="modal"
+            data-bs-target="#otpModal{{ booking.id }}"
+          >
+            View OTP
+          </button>
+
+          <!-- OTP MODAL -->
+          <div class="modal fade" id="otpModal{{ booking.id }}" tabindex="-1">
+            <div class="modal-dialog modal-dialog-centered">
+              <div class="modal-content">
+                <div class="modal-header">
+                  <h5 class="modal-title">Booking OTP</h5>
+                  <button
+                    type="button"
+                    class="btn-close"
+                    data-bs-dismiss="modal"
+                  ></button>
+                </div>
+
+                <div class="modal-body text-center">
+                  <h2 class="text-primary fw-bold">{{ booking.otp }}</h2>
+                  <p class="text-danger">
+                    Share this OTP with worker after completion.
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {% else %}
+          <span class="text-muted">Not Generated</span>
+          {% endif %}
+        </td>
+
+        <!-- 📌 STATUS -->
+        <td>
+          {% if booking.status == "Pending" %}
+          <span class="badge bg-warning text-dark">Pending</span>
+
+          {% elif booking.status == "Assigned" %}
+          <span class="badge bg-info">Assigned</span>
+
+          {% elif booking.status == "On The Way" %}
+          <span class="badge bg-primary">On The Way</span>
+
+          {% elif booking.status == "Working" %}
+          <span class="badge bg-secondary">Working</span>
+
+          {% elif booking.status == "Completed" %}
+          <span class="badge bg-success">Completed</span>
+
+          {% elif booking.status == "Cancelled" %}
+          <span class="badge bg-danger">Cancelled</span>
+
+          {% elif booking.status == "Waiting Payment" %}
+          <span class="badge bg-warning text-dark">Waiting Payment</span>
+
+          {% else %}
+          <span class="text-muted">--</span>
+          {% endif %}
+        </td>
+
+        <!-- ⚙️ ACTION -->
+        <td>
+          {% if booking.status == "Pending" %}
+          <a
+            href="{% url 'cancel_booking' booking.id %}"
+            class="btn btn-danger btn-sm"
+          >
+            Cancel
+          </a>
+          {% endif %} {% if booking.status == "Waiting Payment" %}
+          <a
+            href="{% url 'pay_now' booking.id %}"
+            class="btn btn-success btn-sm"
+          >
+            Pay Now
+          </a>
+          {% endif %} {% if booking.worker %}
+          <a
+            href="{% url 'track_worker' booking.id %}"
+            class="btn btn-primary btn-sm"
+          >
+            Track
+          </a>
+          {% endif %} {% if booking.status == "Completed" %}
+          <a
+            href="{% url 'add_review' booking.id %}"
+            class="btn btn-info btn-sm"
+          >
+            Review
+          </a>
+          {% endif %}
+        </td>
+      </tr>
+
+      {% empty %}
+      <tr>
+        <td colspan="10" class="text-center py-4">No bookings found.</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+
+{% endblock %}

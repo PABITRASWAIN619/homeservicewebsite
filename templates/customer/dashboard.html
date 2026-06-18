@@ -1,0 +1,584 @@
+{% extends 'customer/base.html' %} {% load static %} {% block content %}
+
+<!-- Leaflet.js CSS Integration for the Live Tracking Map -->
+<link
+  rel="stylesheet"
+  href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+/>
+
+<style>
+  :root {
+    --primary-blue: #1e62ec;
+    --gradient-blue: linear-gradient(135deg, #1e62ec 0%, #0b4ebd 100%);
+    --bg-light: #f4f7fc;
+    --text-dark: #1e293b;
+    --text-muted: #64748b;
+    --card-shadow:
+      0 10px 25px rgba(30, 98, 236, 0.04), 0 1px 3px rgba(0, 0, 0, 0.02);
+  }
+
+  body {
+    background-color: var(--bg-light);
+    color: var(--text-dark);
+    font-family: "Segoe UI", Roboto, sans-serif;
+  }
+
+  /* HERO HEADER DECORATION */
+  .hero-section {
+    background: var(--gradient-blue);
+    color: white;
+    border-radius: 24px;
+    padding: 50px 40px;
+    margin-bottom: 30px;
+    box-shadow: 0 15px 30px rgba(30, 98, 236, 0.15);
+    position: relative;
+    overflow: hidden;
+  }
+
+  .hero-section::before {
+    content: "";
+    position: absolute;
+    width: 250px;
+    height: 250px;
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 50%;
+    top: -50px;
+    right: -50px;
+  }
+
+  .hero-section h2 {
+    font-weight: 800;
+    font-size: 32px;
+    letter-spacing: -0.5px;
+  }
+
+  .hero-section p {
+    color: rgba(255, 255, 255, 0.85);
+    font-size: 16px;
+    max-width: 600px;
+    margin: 15px 0 25px 0;
+    line-height: 1.6;
+  }
+
+  .hero-section img {
+    max-height: 200px;
+    filter: drop-shadow(0 10px 15px rgba(0, 0, 0, 0.2));
+  }
+
+  /* STATISTICAL & OVERVIEW CARDS */
+  .stat-card {
+    background: white;
+    border: none;
+    border-radius: 20px;
+    box-shadow: var(--card-shadow);
+    transition: all 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
+  }
+
+  .stat-card:hover {
+    transform: translateY(-6px);
+    box-shadow: 0 15px 30px rgba(30, 98, 236, 0.08);
+  }
+
+  .stat-card h4 {
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--text-dark);
+  }
+
+  .stat-card h6 {
+    font-size: 13px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: var(--text-muted);
+    font-weight: 600;
+    margin-bottom: 10px;
+  }
+
+  .stat-card h2 {
+    font-size: 36px;
+    font-weight: 800;
+    color: var(--primary-blue);
+    margin: 0;
+  }
+
+  /* POPULAR UTILITY SERVICE TILES */
+  .service-card {
+    background: white;
+    border: none;
+    border-radius: 18px;
+    overflow: hidden;
+    box-shadow: var(--card-shadow);
+    transition: all 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
+    cursor: pointer;
+    height: 100%;
+  }
+
+  .service-card:hover {
+    transform: scale(1.05);
+    box-shadow: 0 12px 25px rgba(30, 98, 236, 0.1);
+  }
+
+  .service-img-placeholder {
+    width: 100%;
+    height: 110px;
+    background-size: cover;
+    background-position: center;
+  }
+
+  .service-card h6 {
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--text-dark);
+    margin: 12px 0 0 0;
+  }
+
+  /* VERIFIED WORKER COMPONENT BLOCKS */
+  .worker-card {
+    background: white;
+    border: none;
+    border-radius: 20px;
+    overflow: hidden;
+    box-shadow: var(--card-shadow);
+    transition: all 0.3s ease;
+    height: 100%;
+  }
+
+  .worker-card:hover {
+    transform: translateY(-6px);
+    box-shadow: 0 15px 30px rgba(0, 0, 0, 0.08);
+  }
+
+  .worker-card-body {
+    padding: 20px;
+  }
+
+  .worker-card h5 {
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--text-dark);
+    margin-bottom: 4px;
+  }
+
+  .worker-card p {
+    font-size: 14px;
+    color: var(--text-muted);
+    margin-bottom: 15px;
+  }
+
+  /* MAP PANEL WRAPPER */
+  #map {
+    border: 1px solid #e2e8f0;
+    box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.03);
+    background-color: #edf2f7;
+  }
+
+  /* ACCENT BADGE MODULES */
+  .badge-status {
+    padding: 6px 14px;
+    border-radius: 8px;
+    font-weight: 600;
+    font-size: 12px;
+  }
+  .badge-completed {
+    background-color: #e6f4ea;
+    color: #137333;
+  }
+  .badge-pending {
+    background-color: #fef3c7;
+    color: #d97706;
+  }
+  .badge-assigned {
+    background-color: #e0f2fe;
+    color: #0369a1;
+  }
+
+  /* DATA LEDGER GRID TABLES */
+  .table-custom th {
+    background-color: #f8fafc;
+    color: var(--text-muted);
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    font-weight: 600;
+    padding: 16px;
+    border-bottom: 2px solid #edf2f7;
+  }
+  .table-custom td {
+    padding: 16px;
+    border-bottom: 1px solid #edf2f7;
+    font-size: 15px;
+    vertical-align: middle;
+  }
+
+  /* BUTTON ELEMENT TRANSLATIONS */
+  .btn-lg {
+    padding: 12px 30px;
+    font-size: 15px;
+    font-weight: 600;
+    border-radius: 12px;
+  }
+
+  /* SYSTEM FOOTER GRID architecture */
+  .footer-box {
+    background: #0f172a;
+    color: #94a3b8;
+    border-radius: 24px;
+    padding: 50px 40px 30px 40px;
+    margin-top: 60px;
+  }
+
+  .footer-box h4,
+  .footer-box h5 {
+    color: white;
+    font-weight: 700;
+    margin-bottom: 20px;
+  }
+
+  .footer-box p {
+    font-size: 14px;
+    margin-bottom: 12px;
+    transition: color 0.2s;
+  }
+
+  .footer-box p:hover {
+    color: white;
+    cursor: pointer;
+  }
+</style>
+
+<!-- HERO SECTION -->
+<div class="hero-section">
+  <div class="row align-items-center">
+    <div class="col-md-8">
+      <h2>Welcome Back, {{ request.user.username }} 👋</h2>
+      <p>
+        Book trusted professionals for home services, track assigned field
+        partners in real time, and manage your active ledger accounts
+        seamlessly.
+      </p>
+      <a
+        href="{% url 'book_service' %}"
+        class="btn btn-light btn-lg text-primary shadow-sm"
+      >
+        <i class="bi bi-calendar-plus me-2"></i>Book a New Service
+      </a>
+    </div>
+    <div class="col-md-4 text-center d-none d-md-block">
+      <img
+        src="https://cdn-icons-png.flaticon.com/512/3135/3135715.png"
+        class="img-fluid"
+        alt="Dashboard Illustration"
+      />
+    </div>
+  </div>
+</div>
+
+<!-- PROFILE + LOCATION MODULARS -->
+<div class="row mb-4 g-4">
+  <div class="col-md-6">
+    <div class="card stat-card p-4 h-100">
+      <h4 class="mb-3">
+        <i class="bi bi-person-circle text-primary me-2"></i>Customer Account
+        Profile
+      </h4>
+      <hr class="text-muted opacity-25" />
+      <div class="mb-4">
+        <p class="mb-2">
+          <strong>Account Nickname:</strong> {{ request.user.username }}
+        </p>
+        <p class="mb-0">
+          <strong>Registered Notification Email:</strong> {{ request.user.email
+          }}
+        </p>
+      </div>
+      <a
+        href="{% url 'edit_profile' %}"
+        class="btn btn-primary btn-lg w-100 mt-auto"
+      >
+        <i class="bi bi-pencil-square me-2"></i>Modify Account Parameters
+      </a>
+    </div>
+  </div>
+
+  <div class="col-md-6">
+    <div class="card stat-card p-4 h-100">
+      <h4 class="mb-2">
+        <i class="bi bi-geo-alt-fill text-success me-2"></i>Live Track Dispatch
+        coordinates
+      </h4>
+      <p class="text-muted small">
+        Synchronize telemetry properties for immediate dispatcher matching
+        assignment routines.
+      </p>
+      <button
+        onclick="getLocation()"
+        class="btn btn-success w-100 py-2 fw-semibold"
+      >
+        📍 Broadcast Current Geo-Coordinates
+      </button>
+      <div id="map" class="mt-3 rounded-3" style="height: 210px"></div>
+    </div>
+  </div>
+</div>
+
+<!-- DATA STATISTICS ROW COUNTER MODULES -->
+<div class="row mb-5 g-4">
+  <div class="col-6 col-md-3">
+    <div class="card stat-card text-center p-4">
+      <h6>Total Bookings Tally</h6>
+      <h2>{{ bookings.count }}</h2>
+    </div>
+  </div>
+  <div class="col-6 col-md-3">
+    <div
+      class="card stat-card text-center p-4"
+      style="border-left-color: #10b981"
+    >
+      <h6>Completed Jobs</h6>
+      <h2 class="text-success">{{ completed_jobs }}</h2>
+    </div>
+  </div>
+  <div class="col-6 col-md-3">
+    <div
+      class="card stat-card text-center p-4"
+      style="border-left-color: #f59e0b"
+    >
+      <h6>Pending Jobs Queue</h6>
+      <h2 class="text-warning">{{ pending_jobs }}</h2>
+    </div>
+  </div>
+  <div class="col-6 col-md-3">
+    <div
+      class="card stat-card text-center p-4"
+      style="border-left-color: #6366f1"
+    >
+      <h6>Saved Local Addresses</h6>
+      <h2 style="color: #6366f1">1</h2>
+    </div>
+  </div>
+</div>
+
+<!-- SPECIALTY UTILITY HOVER BLOCKS -->
+<h4 class="fw-bold mb-3 text-dark">Popular Service Categories</h4>
+<div class="row mb-5 g-3">
+  <div class="col-6 col-md-2">
+    <div class="card service-card text-center p-0">
+      <div
+        class="service-img-placeholder"
+        style="
+          background-image: url(&quot;https://images.unsplash.com/photo-1621905251189-08b45d6a269e?auto=format&fit=crop&q=80&w=200&quot;);
+        "
+      ></div>
+      <div class="p-3"><h6>Electrician</h6></div>
+    </div>
+  </div>
+  <div class="col-6 col-md-2">
+    <div class="card service-card text-center p-0">
+      <div
+        class="service-img-placeholder"
+        style="
+          background-image: url(&quot;https://images.unsplash.com/photo-1504328345606-18bbc8c9d7d1?auto=format&fit=crop&q=80&w=200&quot;);
+        "
+      ></div>
+      <div class="p-3"><h6>Plumber</h6></div>
+    </div>
+  </div>
+  <div class="col-6 col-md-2">
+    <div class="card service-card text-center p-0">
+      <div
+        class="service-img-placeholder"
+        style="
+          background-image: url(&quot;https://images.unsplash.com/photo-1621905252507-b354bc25edac?auto=format&fit=crop&q=80&w=200&quot;);
+        "
+      ></div>
+      <div class="p-3"><h6>AC Repair</h6></div>
+    </div>
+  </div>
+  <div class="col-6 col-md-2">
+    <div class="card service-card text-center p-0">
+      <div
+        class="service-img-placeholder"
+        style="
+          background-image: url(&quot;https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?auto=format&fit=crop&q=80&w=200&quot;);
+        "
+      ></div>
+      <div class="p-3"><h6>Mobile Repair</h6></div>
+    </div>
+  </div>
+  <div class="col-6 col-md-2">
+    <div class="card service-card text-center p-0">
+      <div
+        class="service-img-placeholder"
+        style="
+          background-image: url(&quot;https://images.unsplash.com/photo-1533090161767-e6ffed986c88?auto=format&fit=crop&q=80&w=200&quot;);
+        "
+      ></div>
+      <div class="p-3"><h6>Carpenter</h6></div>
+    </div>
+  </div>
+  <div class="col-6 col-md-2">
+    <div class="card service-card text-center p-0">
+      <div
+        class="service-img-placeholder"
+        style="
+          background-image: url(&quot;https://images.unsplash.com/photo-1589939705384-5185137a7f0f?auto=format&fit=crop&q=80&w=200&quot;);
+        "
+      ></div>
+      <div class="p-3"><h6>Painter</h6></div>
+    </div>
+  </div>
+</div>
+
+<!-- ORDER HISTORY RECENT RECORD TABLE LEDGER -->
+<div class="card stat-card p-4 mb-5">
+  <h4 class="fw-bold text-dark mb-3">
+    <i class="bi bi-clock-history text-primary me-2"></i>Recent Operational
+    Requests
+  </h4>
+  <div class="table-responsive">
+    <table class="table table-hover table-custom align-middle m-0">
+      <thead>
+        <tr>
+          <th>Order Ticket</th>
+          <th>Domain Service</th>
+          <th>Status state</th>
+          <th>Deployment Timestamp</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for booking in bookings|slice:":5" %}
+        <tr>
+          <td class="fw-bold text-primary">#{{ booking.id }}</td>
+          <td>{{ booking.service.name }}</td>
+          <td>
+            {% if booking.status == "Completed" %}
+            <span class="badge-status badge-completed">Completed</span>
+            {% elif booking.status == "Pending" %}
+            <span class="badge-status badge-pending">Pending</span>
+            {% else %}
+            <span class="badge-status badge-assigned"
+              >{{ booking.status }}</span
+            >
+            {% endif %}
+          </td>
+          <td class="text-secondary">{{ booking.booking_date }}</td>
+        </tr>
+        {% empty %}
+        <tr>
+          <td colspan="4" class="text-center text-muted py-4">
+            No active household field orders submitted.
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- HIGHLY RATED ASSIGNED TRADE PARTNERS -->
+<h4 class="fw-bold mb-3 text-dark">Top Rated Certified Trade Partners</h4>
+<div class="row mb-5 g-4">
+  {% for worker in top_workers %}
+  <div class="col-md-3 col-sm-6">
+    <div class="card worker-card">
+      <div style="height: 200px; overflow: hidden; background-color: #f1f5f9">
+        <img
+          src="{{ worker.profile_image.url }}"
+          class="w-100 h-100"
+          style="object-fit: cover"
+          alt="Partner Identity Document Photo"
+        />
+      </div>
+      <div class="worker-card-body">
+        <h5>{{ worker.user.username }}</h5>
+        <p class="text-muted small mb-3">
+          <i class="bi bi-patch-check-fill text-primary me-1"></i>Certified {{
+          worker.service_type }}
+        </p>
+        <span class="badge-status badge-completed w-100 text-center d-block"
+          >Active Duty Available</span
+        >
+      </div>
+    </div>
+  </div>
+  {% empty %}
+  <div class="col-12">
+    <p class="text-muted small">
+      No verified worker profiles currently mapped to local zones.
+    </p>
+  </div>
+  {% endfor %}
+</div>
+
+<!-- ENTERPRISE INTEGRATED SYSTEM FOOTER -->
+<div class="footer-box">
+  <div class="row g-4">
+    <div class="col-md-4">
+      <h4>Home Service App Engine</h4>
+      <p class="text-muted pr-md-4">
+        Matching professional trade engineering dispatchers with enterprise and
+        residential asset managers seamlessly.
+      </p>
+    </div>
+    <div class="col-md-4">
+      <h5>Platform Map Directory</h5>
+      <p>About Corporate Metrics</p>
+      <p>Field Service Offerings</p>
+      <p>Operational Boundaries</p>
+    </div>
+    <div class="col-md-4">
+      <h5>Technical Support Line</h5>
+      <p>
+        <i class="bi bi-envelope-at me-2 text-primary"></i
+        >support@homeservice.com
+      </p>
+      <p>
+        <i class="bi bi-telephone-outbound me-2 text-success"></i>+91 9876543210
+        (24x7 Ingestion Desk)
+      </p>
+    </div>
+  </div>
+  <hr class="border-secondary my-4" />
+  <div class="text-center small text-muted">
+    © 2026 Home Service Platform Core Enterprise Services Engine. All Rights
+    Reserved.
+  </div>
+</div>
+
+<!-- Leaflet.js Map Telemetry Scripts Infrastructure -->
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script>
+  let mapInstance = L.map("map").setView([20.5937, 78.9629], 5); // Default centering on India
+  L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+    maxZoom: 19,
+    attribution: "© OpenStreetMap coordinates",
+  }).addTo(mapInstance);
+
+  function getLocation() {
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(
+        function (position) {
+          let latitudeCoord = position.coords.latitude;
+          let longitudeCoord = position.coords.longitude;
+
+          mapInstance.setView([latitudeCoord, longitudeCoord], 14);
+          L.marker([latitudeCoord, longitudeCoord])
+            .addTo(mapInstance)
+            .bindPopup(
+              "Your Asset Maintenance Location coordinates synchronized.",
+            )
+            .openPopup();
+        },
+        function () {
+          alert("Geolocation capture rejected by client parameters.");
+        },
+      );
+    } else {
+      alert(
+        "Browser subsystem does not support operational geolocation pipelines.",
+      );
+    }
+  }
+</script>
+
+{% endblock %}

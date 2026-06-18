@@ -1,0 +1,56 @@
+<!doctype html>
+<html>
+  <head>
+    <title>Workers</title>
+
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+  </head>
+
+  <body class="bg-light">
+    <div class="container mt-5">
+      <h2 class="mb-4">Worker Management</h2>
+
+      <table class="table table-bordered table-hover bg-white">
+        <thead class="table-dark">
+          <tr>
+            <th>ID</th>
+            <th>Email</th>
+            <th>Phone</th>
+            <th>Service</th>
+            <th>Experience</th>
+            <th>Status</th>
+          </tr>
+        </thead>
+
+        <tbody>
+          {% for worker in workers %}
+
+          <tr>
+            <td>{{ worker.id }}</td>
+
+            <td>{{ worker.user.email }}</td>
+
+            <td>{{ worker.phone }}</td>
+
+            <td>{{ worker.service_type }}</td>
+
+            <td>{{ worker.experience }}</td>
+
+            <td>
+              {% if worker.is_approved %}
+              <span class="badge bg-success"> Approved </span>
+              {% else %}
+              <span class="badge bg-warning"> Pending </span>
+              {% endif %}
+            </td>
+          </tr>
+
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </body>
+</html>

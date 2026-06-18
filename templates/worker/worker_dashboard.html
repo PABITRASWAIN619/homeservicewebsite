@@ -1,0 +1,395 @@
+{% extends 'worker/base.html' %} {% block content %}
+
+<link
+  rel="stylesheet"
+  href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+/>
+
+<style>
+  :root {
+    --primary-emerald: #10b981;
+    --gradient-teal: linear-gradient(135deg, #10b981 0%, #059669 100%);
+    --bg-light: #f8fafc;
+    --text-dark: #0f172a;
+    --text-muted: #64748b;
+    --card-shadow:
+      0 10px 25px rgba(16, 185, 129, 0.04), 0 1px 3px rgba(0, 0, 0, 0.02);
+  }
+
+  body {
+    background-color: var(--bg-light);
+    color: var(--text-dark);
+    font-family: "Segoe UI", Roboto, sans-serif;
+  }
+
+  /* WORKER METRIC PROFILE BLOCK */
+  .profile-card {
+    background: white;
+    border: none;
+    border-radius: 20px;
+    box-shadow: var(--card-shadow);
+    overflow: hidden;
+  }
+
+  .profile-header-banner {
+    background: var(--gradient-teal);
+    padding: 24px 30px;
+    color: white;
+  }
+
+  /* REFINED NUMERIC METRICS CARDS */
+  .metric-box-card {
+    background: white;
+    border: none;
+    border-radius: 16px;
+    padding: 24px;
+    box-shadow: var(--card-shadow);
+    border-left: 5px solid #10b981;
+    transition: transform 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
+  }
+
+  .metric-box-card:hover {
+    transform: translateY(-4px);
+  }
+
+  .metric-box-title {
+    font-size: 13px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: var(--text-muted);
+  }
+
+  .metric-box-number {
+    font-size: 32px;
+    font-weight: 800;
+    color: var(--text-dark);
+    margin-top: 6px;
+    margin-bottom: 0;
+  }
+
+  /* DYNAMIC LEDGER TABLE CONFIGURATION */
+  .table-custom-worker th {
+    background-color: #f1f5f9 !important;
+    color: var(--text-muted);
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    font-weight: 600;
+    padding: 16px;
+    border-bottom: 2px solid #e2e8f0 !important;
+  }
+
+  .table-custom-worker td {
+    padding: 18px 16px;
+    border-bottom: 1px solid #e2e8f0;
+    font-size: 15px;
+    vertical-align: middle;
+  }
+
+  /* ACTION CONTROLS CHIPS */
+  .btn-action-pill {
+    padding: 6px 14px;
+    font-size: 13px;
+    font-weight: 600;
+    border-radius: 8px;
+    transition: all 0.2s ease;
+  }
+
+  .btn-action-pill:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
+  }
+
+  /* ACCENT BADGE MODULE MATRIX */
+  .badge-state {
+    padding: 6px 12px;
+    border-radius: 6px;
+    font-weight: 600;
+    font-size: 12px;
+    display: inline-block;
+  }
+  .state-pending {
+    background-color: #fef3c7;
+    color: #d97706;
+  }
+  .state-assigned {
+    background-color: #e0f2fe;
+    color: #0369a1;
+  }
+  .state-ontheway {
+    background-color: #e0f8ff;
+    color: #0284c7;
+  }
+  .state-working {
+    background-color: #f1f5f9;
+    color: #475569;
+  }
+  .state-completed {
+    background-color: #e6f4ea;
+    color: #137333;
+  }
+
+  #map-container {
+    border: 1px solid #e2e8f0;
+    background-color: #edf2f7;
+  }
+</style>
+
+<div class="container mt-4 pb-5">
+  <div class="row g-4 mb-4">
+    <div class="col-md-5">
+      <div class="card profile-card h-100">
+        <div class="profile-header-banner">
+          <h4 class="m-0 fw-bold">
+            <i class="bi bi-person-badge-fill me-2"></i>Worker Console
+          </h4>
+        </div>
+        <div class="card-body p-4">
+          <p class="mb-2">
+            <strong class="text-secondary">Identity Username:</strong> {{
+            worker.user.username }}
+          </p>
+          <p class="mb-2">
+            <strong class="text-secondary">Contact Phone:</strong> {{
+            worker.phone }}
+          </p>
+          <p class="mb-2">
+            <strong class="text-secondary">Assigned Domain Specialty:</strong>
+            <span class="badge bg-dark text-white px-2 py-1"
+              >{{ worker.service_type }}</span
+            >
+          </p>
+          <p class="mb-2">
+            <strong class="text-secondary">Validated Field Experience:</strong>
+            {{ worker.experience }}
+          </p>
+          <p class="mb-2">
+            <strong class="text-secondary">Approval Status:</strong>
+            {% if worker.is_approved %}
+            <span class="badge bg-success">Approved Partner</span>
+            {% else %}
+            <span class="badge bg-warning text-dark">Verification Pending</span>
+            {% endif %}
+          </p>
+          <p class="mb-2">
+            <strong class="text-secondary">Telemetry Last Seen:</strong>
+            <span class="text-primary small fw-medium"
+              >{{ worker.last_seen }}</span
+            >
+          </p>
+          <p class="mb-0">
+            <strong class="text-secondary">Telemetry Coordinates:</strong>
+            <span id="lat" class="fw-bold text-dark"
+              >{{ worker.latitude|default:"20.5937" }}</span
+            >,
+            <span id="lng" class="fw-bold text-dark"
+              >{{ worker.longitude|default:"78.9629" }}</span
+            >
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-md-7">
+      <div class="card profile-card h-100">
+        <div class="p-3 bg-light border-bottom fw-bold text-dark">
+          <i class="bi bi-geo-alt-fill text-danger me-2"></i>Live Real-Time
+          Fleet Tracking Radar
+        </div>
+        <div class="card-body p-0">
+          <div id="map-container" style="height: 290px"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="row g-4 mb-5">
+    <div class="col-md-4">
+      <div class="metric-box-card">
+        <div class="metric-box-title">Total Allocated Tickets</div>
+        <h2 class="metric-box-number">{{ total_jobs }}</h2>
+      </div>
+    </div>
+    <div class="col-md-4">
+      <div class="metric-box-card" style="border-left-color: #0ea5e9">
+        <div class="metric-box-title">Active Assigned Queue</div>
+        <h2 class="metric-box-number text-info">{{ assigned_jobs }}</h2>
+      </div>
+    </div>
+    <div class="col-md-4">
+      <div class="metric-box-card" style="border-left-color: #10b981">
+        <div class="metric-box-title">Gross Cleared Earnings Tally</div>
+        <h2 class="metric-box-number text-success">₹{{ total_earnings }}</h2>
+      </div>
+    </div>
+  </div>
+
+  <div class="card profile-card">
+    <div class="p-4 bg-white border-bottom">
+      <h4 class="fw-bold m-0 text-dark">
+        <i class="bi bi-list-task text-success me-2"></i>My Job Dispatches
+      </h4>
+    </div>
+    <div class="card-body p-0">
+      <div class="table-responsive">
+        <table class="table table-custom-worker table-hover align-middle m-0">
+          <thead>
+            <tr>
+              <th>Domain Service</th>
+              <th>Status State Badge</th>
+              <th>Order Amount Metric</th>
+              <th style="min-width: 280px">
+                Contextual Field Actions Pipeline
+              </th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for booking in bookings %}
+            <tr>
+              <td class="fw-bold text-dark">{{ booking.service.name }}</td>
+              <td>
+                {% if booking.status == 'Pending' %}<span
+                  class="badge-state state-pending"
+                  >Pending</span
+                >
+                {% elif booking.status == 'Assigned' %}<span
+                  class="badge-state state-assigned"
+                  >Assigned</span
+                >
+                {% elif booking.status == 'On The Way' %}<span
+                  class="badge-state state-ontheway"
+                  >On The Way</span
+                >
+                {% elif booking.status == 'Working' %}<span
+                  class="badge-state state-working"
+                  >Working</span
+                >
+                {% else %}<span class="badge-state state-completed"
+                  >Completed</span
+                >{% endif %}
+              </td>
+              <td class="fw-bold text-success">₹{{ booking.amount }}</td>
+              <td>
+                <div class="d-flex gap-1 flex-wrap">
+                  {% if booking.status == 'Pending' %}
+                  <a
+                    href="{% url 'accept_job' booking.id %}"
+                    class="btn btn-success btn-action-pill btn-sm"
+                    >Accept Dispatch</a
+                  >
+                  <a
+                    href="{% url 'reject_job' booking.id %}"
+                    class="btn btn-danger btn-action-pill btn-sm"
+                    >Reject Ticket</a
+                  >
+
+                  {% elif booking.status == 'Assigned' %}
+                  <a
+                    href="{% url 'update_status' booking.id 'On The Way' %}"
+                    class="btn btn-info btn-action-pill text-white btn-sm"
+                    ><i class="bi bi-truck me-1"></i>Mark On The Way</a
+                  >
+
+                  {% elif booking.status == 'On The Way' %}
+                  <a
+                    href="{% url 'update_status' booking.id 'Working' %}"
+                    class="btn btn-warning btn-action-pill text-dark btn-sm"
+                    ><i class="bi bi-hammer me-1"></i>Commence Work</a
+                  >
+
+                  {% elif booking.status == 'Working' %}
+                  <a
+                    href="{% url 'update_status' booking.id 'Completed' %}"
+                    class="btn btn-success btn-action-pill btn-sm"
+                    ><i class="bi bi-check-circle me-1"></i>Finalize
+                    Execution</a
+                  >
+
+                  {% else %}
+                  <span class="text-muted small fw-medium"
+                    ><i class="bi bi-archive me-1"></i>Ticket Closed &
+                    Archived</span
+                  >
+                  {% endif %}
+                </div>
+              </td>
+            </tr>
+            {% empty %}
+            <tr>
+              <td colspan="4" class="text-center text-muted py-5">
+                <i
+                  class="bi bi-folder-x display-6 d-block mb-2 text-secondary"
+                ></i
+                >No jobs currently assigned to your profile coordinates.
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script>
+  // Initialise Leaflet Map Container Framework Map
+  let workerRadarMap = L.map("map-container").setView([20.5937, 78.9629], 5); // Fallback base matching global setup
+  L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+    maxZoom: 19,
+    attribution: "© OpenStreetMap core tracking radar",
+  }).addTo(workerRadarMap);
+
+  let realTimeMarkerInstance = null;
+
+  function sendLocation() {
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(function (position) {
+        const currentLatVal = position.coords.latitude;
+        const currentLngVal = position.coords.longitude;
+
+        // Sync directly into UI view matrix hooks text strings
+        document.getElementById("lat").innerText = currentLatVal.toFixed(4);
+        document.getElementById("lng").innerText = currentLngVal.toFixed(4);
+
+        // Pan map canvas instantly to the current client layout footprint
+        workerRadarMap.setView([currentLatVal, currentLngVal], 15);
+
+        // Redraw or spawn marker tracking properties dynamically
+        if (realTimeMarkerInstance) {
+          realTimeMarkerInstance.setLatLng([currentLatVal, currentLngVal]);
+        } else {
+          realTimeMarkerInstance = L.marker([currentLatVal, currentLngVal])
+            .addTo(workerRadarMap)
+            .bindPopup("Your Broadcast Field Dispatch Station Core Active.")
+            .openPopup();
+        }
+
+        // Post telemetry context properties directly onto database targets
+        fetch("/api/update-location/", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "X-CSRFToken": "{{ csrf_token|default:'' }}", // Pass standard Django defense parameters securely if mapped
+          },
+          body: JSON.stringify({
+            worker_id: "{{ worker.id }}",
+            latitude: currentLatVal,
+            longitude: currentLngVal,
+          }),
+        }).catch((err) =>
+          console.log(
+            "Telemetry Sync logging bypass. Tracking active locally.",
+          ),
+        );
+      });
+    }
+  }
+
+  // Interval trigger loop updates database positions securely every 5 seconds
+  setInterval(sendLocation, 5000);
+  sendLocation();
+</script>
+
+{% endblock %}

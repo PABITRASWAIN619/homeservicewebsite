@@ -1,0 +1,78 @@
+{% extends "admin/base.html" %} {% load static %} {% block content %}
+
+<div class="main">
+  <h3 class="mb-3">👤 Admin Profile</h3>
+
+  <div class="table-box">
+    <div class="row">
+      <!-- ================= LEFT SIDE ================= -->
+      <div class="col-md-6">
+        <h5>Account Info</h5>
+
+        <p><b>Username:</b> {{ request.user.username }}</p>
+        <p><b>Email:</b> {{ request.user.email }}</p>
+        <p><b>Joined:</b> {{ request.user.date_joined|date:"d M Y" }}</p>
+        <p><b>Last Login:</b> {{ request.user.last_login|date:"d M Y H:i" }}</p>
+      </div>
+
+      <!-- ================= RIGHT SIDE ================= -->
+      <div class="col-md-6">
+        <h5>System Overview</h5>
+
+        <p><b>Total Workers:</b> {{ total_workers }}</p>
+        <p><b>Total Customers:</b> {{ total_customers }}</p>
+        <p><b>Total Bookings:</b> {{ total_bookings }}</p>
+        <p><b>Pending Bookings:</b> {{ pending_bookings }}</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ================= STYLES ================= -->
+<style>
+  body {
+    margin: 0;
+    font-family: "Segoe UI", Arial;
+    background: #f4f6f9;
+  }
+
+  .main {
+    padding: 20px;
+  }
+
+  .table-box {
+    background: white;
+    padding: 20px;
+    border-radius: 14px;
+    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.08);
+  }
+
+  h3,
+  h5 {
+    color: #1f2937;
+  }
+
+  p {
+    font-size: 14px;
+    margin-bottom: 10px;
+  }
+
+  .row {
+    display: flex;
+    flex-wrap: wrap;
+  }
+
+  .col-md-6 {
+    flex: 1;
+    min-width: 250px;
+    padding: 10px;
+  }
+
+  @media (max-width: 768px) {
+    .table-box {
+      padding: 15px;
+    }
+  }
+</style>
+
+{% endblock %}

@@ -1,0 +1,202 @@
+{% extends 'customer/base.html' %} {% block content %}
+
+<style>
+  :root {
+    --primary-gradient: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+    --surface-card: #ffffff;
+    --text-main: #2d3748;
+    --border-color: #cbd5e1;
+    --star-color-empty: #cbd5e1;
+    --star-color-active: #ffb100;
+  }
+
+  .review-container {
+    max-width: 600px;
+    margin: 3rem auto;
+  }
+
+  .review-card {
+    background: var(--surface-card);
+    border-radius: 16px;
+    border: none;
+    box-shadow:
+      0 10px 25px rgba(0, 0, 0, 0.05),
+      0 4px 12px rgba(0, 0, 0, 0.03);
+    overflow: hidden;
+  }
+
+  .review-header {
+    background: var(--primary-gradient);
+    color: #ffffff;
+    padding: 1.5rem 2rem;
+    border: none;
+  }
+
+  .review-header h4 {
+    margin: 0;
+    font-weight: 600;
+    font-size: 1.25rem;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .review-body {
+    padding: 2.5rem 2rem;
+  }
+
+  /* Interactive Star Rating Layout */
+  .rating-wrapper {
+    display: flex;
+    flex-direction: row-reverse;
+    justify-content: flex-end;
+    gap: 8px;
+    margin-bottom: 1.5rem;
+  }
+
+  .rating-wrapper input {
+    display: none;
+  }
+
+  .rating-wrapper label {
+    font-size: 2.5rem;
+    color: var(--star-color-empty);
+    cursor: pointer;
+    transition:
+      transform 0.1s ease,
+      color 0.2s ease;
+  }
+
+  /* Hover & Selection Magic */
+  .rating-wrapper label:hover,
+  .rating-wrapper label:hover ~ label,
+  .rating-wrapper input:checked ~ label {
+    color: var(--star-color-active);
+  }
+
+  .rating-wrapper label:active {
+    transform: scale(0.9);
+  }
+
+  /* Hide the raw, ugly default Django numeric field but keep it functional */
+  .hide-django-rating {
+    display: none !important;
+  }
+
+  /* Modern Styling for Textareas & Fields */
+  .django-form-wrapper p {
+    margin-bottom: 1.5rem;
+  }
+
+  .django-form-wrapper label {
+    display: block;
+    font-weight: 600;
+    color: var(--text-main);
+    margin-bottom: 0.5rem;
+    font-size: 0.9rem;
+  }
+
+  .django-form-wrapper textarea,
+  .django-form-wrapper input[type="text"] {
+    width: 100%;
+    padding: 12px 16px;
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    color: var(--text-main);
+    font-size: 0.95rem;
+    transition: all 0.2s ease;
+    background-color: #f8fafc;
+  }
+
+  .django-form-wrapper textarea:focus,
+  .django-form-wrapper input[type="text"]:focus {
+    outline: none;
+    background-color: #ffffff;
+    border-color: #2a5298;
+    box-shadow: 0 0 0 4px rgba(42, 82, 152, 0.1);
+  }
+
+  .btn-submit {
+    background: var(--primary-gradient);
+    color: white;
+    border: none;
+    font-weight: 600;
+    padding: 14px 24px;
+    border-radius: 8px;
+    width: 100%;
+    transition: all 0.2s ease;
+    box-shadow: 0 4px 6px rgba(42, 82, 152, 0.15);
+  }
+
+  .btn-submit:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 6px 12px rgba(42, 82, 152, 0.25);
+  }
+</style>
+
+<div class="container review-container">
+  <div class="card review-card">
+    <div class="card-header review-header">
+      <h4><i class="bi bi-star-half"></i> Share Your Experience</h4>
+    </div>
+
+    <div class="card-body review-body">
+      <form method="post" id="reviewForm">
+        {% csrf_token %}
+
+        <div class="mb-2">
+          <label class="fw-bold text-dark mb-2" style="font-size: 0.9rem"
+            >How would you rate the service?</label
+          >
+          <div class="rating-wrapper">
+            <input type="radio" name="visual_star" id="star5" value="5" />
+            <label for="star5" class="bi bi-star-fill"></label>
+
+            <input type="radio" name="visual_star" id="star4" value="4" />
+            <label for="star4" class="bi bi-star-fill"></label>
+
+            <input type="radio" name="visual_star" id="star3" value="3" />
+            <label for="star3" class="bi bi-star-fill"></label>
+
+            <input type="radio" name="visual_star" id="star2" value="2" />
+            <label for="star2" class="bi bi-star-fill"></label>
+
+            <input type="radio" name="visual_star" id="star1" value="1" />
+            <label for="star1" class="bi bi-star-fill"></label>
+          </div>
+        </div>
+
+        <div class="django-form-wrapper">{{ form.as_p }}</div>
+
+        <button type="submit" class="btn btn-submit mt-3">
+          <i class="bi bi-send-fill me-1"></i> Submit Review
+        </button>
+      </form>
+    </div>
+  </div>
+</div>
+
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    // 1. Automatically find your Django form rating input (whether it's an input or select box)
+    const djangoRatingInput = document.querySelector('[id*="rating"]');
+
+    if (djangoRatingInput) {
+      // Hide the text entry or basic dropdown field safely away from view
+      djangoRatingInput.parentElement.classList.add("hide-django-rating");
+
+      // 2. Add an event listener to our beautiful interactive stars
+      const visualStars = document.querySelectorAll(
+        'input[name="visual_star"]',
+      );
+      visualStars.forEach((star) => {
+        star.addEventListener("change", function () {
+          // Sync whatever star is clicked directly back into Django's input field
+          djangoRatingInput.value = this.value;
+        });
+      });
+    }
+  });
+</script>
+
+{% endblock %}

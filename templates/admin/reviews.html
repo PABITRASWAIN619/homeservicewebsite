@@ -1,0 +1,61 @@
+{% extends "admin/base.html" %} {% block content %}
+
+<div class="container-fluid mt-4">
+  <h3 class="mb-4">⭐ Customer Reviews & Ratings</h3>
+
+  <div class="table-responsive">
+    <table class="table table-bordered table-hover">
+      <thead class="table-dark">
+        <tr>
+          <th>Booking</th>
+          <th>Customer</th>
+          <th>Worker</th>
+          <th>Rating</th>
+          <th>Review</th>
+          <th>Date</th>
+        </tr>
+      </thead>
+
+      <tbody>
+        {% for review in reviews %}
+
+        <tr>
+          <td>#{{ review.booking.id }}</td>
+
+          <td>{{ review.booking.customer.user.username }}</td>
+
+          <td>{{ review.booking.worker.user.username }}</td>
+
+          <td>
+            {% if review.rating >= 4 %}
+            <span class="badge bg-success"> ⭐ {{ review.rating }}/5 </span>
+
+            {% elif review.rating == 3 %}
+            <span class="badge bg-warning text-dark">
+              ⭐ {{ review.rating }}/5
+            </span>
+
+            {% else %}
+            <span class="badge bg-danger"> ⭐ {{ review.rating }}/5 </span>
+
+            {% endif %}
+          </td>
+
+          <td>{{ review.comment }}</td>
+
+          <td>{{ review.created_at|date:"d M Y H:i" }}</td>
+        </tr>
+
+        {% empty %}
+
+        <tr>
+          <td colspan="6" class="text-center">No reviews found</td>
+        </tr>
+
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+
+{% endblock %}

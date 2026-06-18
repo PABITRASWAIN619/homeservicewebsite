@@ -1,0 +1,388 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>{% block title %}Worker Partner Panel{% endblock %}</title>
+
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css"
+      rel="stylesheet"
+    />
+
+    <style>
+      :root {
+        --primary-emerald: #10b981;
+        --sidebar-bg: linear-gradient(180deg, #0f172a 0%, #1e293b 100%);
+        --bg-light: #f4f7fc;
+        --text-dark: #0f172a;
+        --text-muted: #94a3b8;
+        --sidebar-width: 280px;
+        --navbar-height: 75px;
+      }
+
+      * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+
+      body {
+        background-color: var(--bg-light);
+        color: var(--text-dark);
+        font-family: "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+        min-height: 100vh;
+        overflow-x: hidden;
+      }
+
+      /* MODERN SIDEBAR LAYOUT */
+      .sidebar {
+        position: fixed;
+        left: 0;
+        top: 0;
+        width: var(--sidebar-width);
+        height: 100vh;
+        background: var(--sidebar-bg);
+        padding: 30px 18px;
+        z-index: 1040;
+        box-shadow: 4px 0 25px rgba(15, 23, 42, 0.15);
+        display: flex;
+        flex-direction: column;
+        transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      }
+
+      .sidebar-brand {
+        padding-left: 14px;
+        margin-bottom: 35px;
+        position: relative;
+      }
+
+      .sidebar-brand h3 {
+        color: white;
+        font-size: 22px;
+        font-weight: 800;
+        letter-spacing: -0.5px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        margin: 0;
+      }
+
+      .sidebar-brand span {
+        font-size: 11px;
+        color: var(--primary-emerald);
+        text-transform: uppercase;
+        font-weight: 700;
+        letter-spacing: 1.5px;
+        display: block;
+        margin-top: 4px;
+      }
+
+      /* NAVIGATION LINKS */
+      .sidebar-nav {
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+        flex-grow: 1;
+        overflow-y: auto;
+      }
+
+      /* Custom scrollbar behavior for tiny screens inside sidebar */
+      .sidebar-nav::-webkit-scrollbar {
+        width: 4px;
+      }
+      .sidebar-nav::-webkit-scrollbar-thumb {
+        background: rgba(255, 255, 255, 0.1);
+        border-radius: 10px;
+      }
+
+      .sidebar a {
+        display: flex;
+        align-items: center;
+        gap: 14px;
+        color: rgba(255, 255, 255, 0.7);
+        text-decoration: none;
+        padding: 12px 18px;
+        border-radius: 12px;
+        font-weight: 500;
+        font-size: 15px;
+        transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+      }
+
+      .sidebar a i {
+        font-size: 18px;
+        transition: transform 0.25s ease;
+      }
+
+      .sidebar a:hover {
+        background: rgba(255, 255, 255, 0.08);
+        color: white;
+        transform: translateX(4px);
+      }
+
+      .sidebar a:hover i {
+        transform: scale(1.15);
+      }
+
+      .sidebar a.active-link {
+        background: linear-gradient(135deg, rgba(16, 185, 129, 0.15) 0%, rgba(16, 185, 129, 0.05) 100%);
+        color: var(--primary-emerald);
+        font-weight: 600;
+        border-left: 4px solid var(--primary-emerald);
+        padding-left: 14px;
+      }
+
+      .sidebar .logout-link {
+        color: #f87171;
+        margin-top: auto;
+        border-top: 1px solid rgba(255, 255, 255, 0.08);
+        padding-top: 20px;
+        border-radius: 0;
+      }
+
+      .sidebar .logout-link:hover {
+        background: rgba(248, 113, 113, 0.1);
+        color: #f87171;
+      }
+
+      /* MAIN CONTENT AREA DESIGN */
+      .main-content {
+        margin-left: var(--sidebar-width);
+        min-height: 100vh;
+        display: flex;
+        flex-direction: column;
+        transition: margin-left 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      }
+
+      /* TOP BAR HEADER CONSOLE */
+      .top-navbar {
+        background: white;
+        height: var(--navbar-height);
+        padding: 0 40px;
+        display: flex;
+        align-items: center;
+        justify-content: justify-content: space-between; /* Adjusted to keep menu button and profile on opposite sides */
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.02);
+        border-bottom: 1px solid #f1f5f9;
+        position: sticky;
+        top: 0;
+        z-index: 1030;
+      }
+
+      /* MOBILE MENU HAMBURGER BUTTON */
+      .menu-toggle-btn {
+        display: none;
+        background: transparent;
+        border: none;
+        font-size: 24px;
+        color: var(--text-dark);
+        cursor: pointer;
+        padding: 4px 8px;
+        border-radius: 8px;
+        transition: background-color 0.2s;
+      }
+
+      .menu-toggle-btn:hover {
+        background-color: #f1f5f9;
+      }
+
+      .worker-profile-badge {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding: 6px 16px;
+        background: #f8fafc;
+        border-radius: 30px;
+        border: 1px solid #edf2f7;
+        margin-left: auto; /* Keeps profile badge stuck to the right */
+      }
+
+      .avatar-circle {
+        width: 35px;
+        height: 35px;
+        border-radius: 50%;
+        background: var(--primary-emerald);
+        color: white;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 700;
+        font-size: 14px;
+      }
+
+      .content-body {
+        padding: 40px;
+        flex-grow: 1;
+      }
+
+      /* MOBILE DARK OVERLAY BACKGROUND SCREEN */
+      .sidebar-backdrop {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100vw;
+        height: 100vh;
+        background: rgba(15, 23, 42, 0.6);
+        backdrop-filter: blur(4px);
+        z-index: 1035;
+      }
+
+      /* MEDIA QUERIES FOR RESPONSIVE BEHAVIOR */
+      @media (max-width: 992px) {
+        .menu-toggle-btn {
+          display: block;
+        }
+
+        .sidebar {
+          transform: translateX(-100%); /* Hides sidebar off-screen by default */
+        }
+
+        .sidebar.show-sidebar {
+          transform: translateX(0); /* Slides sidebar overlay into view */
+        }
+
+        .main-content {
+          margin-left: 0 !important; /* Full width tracking body workspace */
+        }
+
+        .top-navbar {
+          padding: 0 20px;
+        }
+
+        .content-body {
+          padding: 24px 16px; /* Optimized padding context for mobile app cards */
+        }
+
+        .sidebar-backdrop.show-backdrop {
+          display: block;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <!-- Mobile Backdrop -->
+    <div class="sidebar-backdrop" id="sidebarBackdrop"></div>
+
+    <!-- Sidebar -->
+    <div class="sidebar" id="sidebarPanel">
+      <div
+        class="sidebar-brand d-flex align-items-center justify-content-between"
+      >
+        <div>
+          <h3>
+            <i class="bi bi-house-gear-fill"></i>
+            Home Service
+          </h3>
+          <span>Partner Panel</span>
+        </div>
+
+        <button
+          class="btn text-white fs-4 d-lg-none p-0 border-0"
+          id="closeSidebarBtn"
+        >
+          <i class="bi bi-x-lg"></i>
+        </button>
+      </div>
+
+      <div class="sidebar-nav">
+        <a href="{% url 'worker_dashboard' %}" class="nav-item">
+          <i class="bi bi-grid-1x2-fill"></i>
+          Dashboard
+        </a>
+
+        <a href="{% url 'assign_jobs' %}" class="nav-item">
+          <i class="bi bi-clipboard-check-fill"></i>
+          Assigned Jobs
+        </a>
+
+        <a href="{% url 'completed_jobs' %}" class="nav-item">
+          <i class="bi bi-check-circle-fill"></i>
+          Completed Jobs
+        </a>
+
+        <a href="{% url 'earnings' %}" class="nav-item">
+          <i class="bi bi-wallet2"></i>
+          Earnings
+        </a>
+
+        <a href="{% url 'reviews' %}" class="nav-item">
+          <i class="bi bi-star-fill"></i>
+          Reviews
+        </a>
+
+        <a href="{% url 'worker_profile' %}" class="nav-item">
+          <i class="bi bi-person-bounding-box"></i>
+          Profile
+        </a>
+
+        <a href="{% url 'worker_support' %}" class="nav-item">
+          <i class="bi bi-chat-left-dots-fill"></i>
+          Support
+        </a>
+
+        <a href="{% url 'logout' %}" class="logout-link">
+          <i class="bi bi-box-arrow-left"></i>
+          Logout
+        </a>
+      </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="main-content">
+      <div class="top-navbar">
+        <button class="menu-toggle-btn" id="menuToggleBtn">
+          <i class="bi bi-list"></i>
+        </button>
+
+        <div class="worker-profile-badge shadow-sm">
+          <div class="avatar-circle">
+            {{ request.user.username|slice:":1"|upper }}
+          </div>
+
+          <div>
+            <div class="fw-bold">{{ request.user.username }}</div>
+
+            <small class="text-muted"> Active Field Agent </small>
+          </div>
+        </div>
+      </div>
+
+      <div class="content-body">{% block content %} {% endblock %}</div>
+    </div>
+
+    <script>
+      document.addEventListener("DOMContentLoaded", function () {
+        const menuToggleBtn = document.getElementById("menuToggleBtn");
+
+        const closeSidebarBtn = document.getElementById("closeSidebarBtn");
+
+        const sidebarPanel = document.getElementById("sidebarPanel");
+
+        const sidebarBackdrop = document.getElementById("sidebarBackdrop");
+
+        menuToggleBtn.addEventListener("click", function () {
+          sidebarPanel.classList.add("show-sidebar");
+          sidebarBackdrop.classList.add("show-backdrop");
+        });
+
+        closeSidebarBtn.addEventListener("click", function () {
+          sidebarPanel.classList.remove("show-sidebar");
+          sidebarBackdrop.classList.remove("show-backdrop");
+        });
+
+        sidebarBackdrop.addEventListener("click", function () {
+          sidebarPanel.classList.remove("show-sidebar");
+          sidebarBackdrop.classList.remove("show-backdrop");
+        });
+      });
+    </script>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  </body>
+</html>

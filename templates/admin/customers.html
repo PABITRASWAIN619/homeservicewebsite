@@ -1,0 +1,133 @@
+{% extends "admin/base.html" %} {% block content %}
+
+<style>
+  .page-title {
+    font-weight: 700;
+    margin-bottom: 20px;
+    color: #1f2937;
+  }
+
+  .table-box {
+    background: #fff;
+    padding: 20px;
+    border-radius: 15px;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
+  }
+
+  .table th {
+    background: #1e3c72 !important;
+    color: white !important;
+    text-align: center;
+    vertical-align: middle;
+  }
+
+  .table td {
+    vertical-align: middle;
+    text-align: center;
+  }
+
+  .badge-active {
+    background: #16a34a;
+    color: white;
+    padding: 6px 10px;
+    border-radius: 8px;
+  }
+
+  .badge-inactive {
+    background: #dc2626;
+    color: white;
+    padding: 6px 10px;
+    border-radius: 8px;
+  }
+
+  .customer-name {
+    font-weight: 600;
+    color: #111827;
+  }
+
+  .email-text {
+    font-size: 13px;
+    color: #6b7280;
+  }
+
+  @media (max-width: 768px) {
+    .table-box {
+      overflow-x: auto;
+    }
+
+    .table {
+      min-width: 1200px;
+    }
+  }
+</style>
+
+<div class="container-fluid">
+  <h3 class="page-title">👥 Customers Management</h3>
+
+  <div class="table-box">
+    <div class="table-responsive">
+      <table class="table table-bordered table-hover">
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>Customer</th>
+            <th>Email</th>
+            <th>Phone</th>
+            <th>Pincode</th>
+            <th>Location</th>
+            <th>Total Bookings</th>
+            <th>Last Service</th>
+            <th>Joined</th>
+            <th>Status</th>
+          </tr>
+        </thead>
+
+        <tbody>
+          {% for c in customers %}
+          <tr>
+            <td>#{{ c.id }}</td>
+
+            <td class="customer-name">{{ c.user.username }}</td>
+
+            <td class="email-text">{{ c.user.email }}</td>
+
+            <td>{{ c.phone|default:"Not Available" }}</td>
+
+            <td>{{ c.pincode|default:"-" }}</td>
+
+            <td>
+              {% if c.latitude and c.longitude %} 📍 {{ c.latitude }}, {{
+              c.longitude }} {% else %} Not Available {% endif %}
+            </td>
+
+            <td>
+              <span class="badge bg-primary"> {{ c.booking_set.count }} </span>
+            </td>
+
+            <td>
+              {% if c.booking_set.last %} {{ c.booking_set.last.service.name }}
+              {% else %} No Booking {% endif %}
+            </td>
+
+            <td>{{ c.user.date_joined|date:"d M Y" }}</td>
+
+            <td>
+              {% if c.user.is_active %}
+              <span class="badge-active"> Active </span>
+              {% else %}
+              <span class="badge-inactive"> Inactive </span>
+              {% endif %}
+            </td>
+          </tr>
+          {% empty %}
+          <tr>
+            <td colspan="10">No Customers Found</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+{% endblock %}

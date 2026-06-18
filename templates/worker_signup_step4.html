@@ -1,0 +1,449 @@
+{% load static %}
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Worker Signup - Step 4</title>
+
+    <link
+      href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght=400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css"
+    />
+
+    <style>
+      :root {
+        --primary-sky: #38bdf8;
+        --royal-purple: #6366f1;
+        --error-rose: #f43f5e;
+        --success-emerald: #10b981;
+        --gradient-premium: linear-gradient(
+          135deg,
+          #0f172a 0%,
+          #1e1b4b 50%,
+          #311042 100%
+        );
+        --card-bg: rgba(17, 24, 39, 0.75);
+        --input-bg: #0b1220;
+        --border-color: #334155;
+        --text-muted: #94a3b8;
+      }
+
+      * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+
+      body {
+        font-family: "Plus Jakarta Sans", sans-serif;
+        background: var(--gradient-premium) !important;
+        background-attachment: fixed !important;
+        min-height: 100vh;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        padding: 20px;
+      }
+
+      .card {
+        width: 100%;
+        max-width: 460px;
+        background: var(--card-bg);
+        backdrop-filter: blur(16px);
+        -webkit-backdrop-filter: blur(16px);
+        padding: 40px 30px;
+        border-radius: 24px;
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+      }
+
+      .step-progress-tracker {
+        display: flex;
+        justify-content: center;
+        gap: 6px;
+        margin-bottom: 25px;
+      }
+
+      .progress-bar-segment {
+        height: 4px;
+        width: 40px;
+        border-radius: 2px;
+        background: rgba(255, 255, 255, 0.1);
+      }
+
+      .progress-bar-segment.completed {
+        background: var(--success-emerald);
+      }
+      .progress-bar-segment.active {
+        background: linear-gradient(
+          90deg,
+          var(--primary-sky),
+          var(--royal-purple)
+        );
+        box-shadow: 0 0 10px rgba(56, 189, 248, 0.4);
+      }
+
+      h2 {
+        text-align: center;
+        color: #ffffff;
+        font-size: 26px;
+        font-weight: 700;
+        letter-spacing: -0.5px;
+        margin-bottom: 8px;
+      }
+      .subtitle-desc {
+        text-align: center;
+        color: var(--text-muted);
+        font-size: 14px;
+        margin-bottom: 30px;
+      }
+
+      /* Email Info Banner Badge */
+      .email-badge-info {
+        background: rgba(56, 189, 248, 0.08);
+        border: 1px dashed rgba(56, 189, 248, 0.3);
+        border-radius: 12px;
+        padding: 12px 16px;
+        margin-bottom: 24px;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+      }
+      .email-badge-info i {
+        color: var(--primary-sky);
+        font-size: 20px;
+      }
+      .email-badge-info div {
+        font-size: 13px;
+        color: #f1f5f9;
+      }
+      .email-badge-info span {
+        display: block;
+        font-weight: 600;
+        color: var(--primary-sky);
+        margin-top: 2px;
+      }
+
+      .input-box {
+        margin-bottom: 20px;
+        position: relative;
+      }
+      .input-box label {
+        display: block;
+        color: #f1f5f9;
+        font-size: 12px;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.75px;
+        margin-bottom: 8px;
+        padding-left: 4px;
+      }
+      .input-wrapper {
+        position: relative;
+        display: flex;
+        align-items: center;
+      }
+
+      .input-wrapper i.input-icon {
+        position: absolute;
+        left: 14px;
+        color: var(--text-muted);
+        font-size: 18px;
+        pointer-events: none;
+        z-index: 5;
+      }
+
+      .input-box input {
+        width: 100%;
+        padding: 14px 16px 14px 44px;
+        border-radius: 12px;
+        border: 1px solid var(--border-color);
+        background: var(--input-bg);
+        color: white;
+        font-size: 15px;
+        outline: none;
+        transition: all 0.25s ease;
+      }
+
+      .input-box input[type="file"] {
+        padding: 12px 14px 12px 44px;
+        font-size: 14px;
+        color: var(--text-muted);
+        cursor: pointer;
+      }
+      .input-box input[type="file"]::file-selector-button {
+        background: var(--border-color);
+        border: none;
+        color: white;
+        padding: 4px 10px;
+        border-radius: 6px;
+        margin-right: 10px;
+        cursor: pointer;
+        font-weight: 600;
+        font-size: 12px;
+      }
+
+      .input-box input:focus {
+        border-color: var(--primary-sky);
+        box-shadow: 0 0 0 4px rgba(56, 189, 248, 0.15);
+        background: #0f172a;
+      }
+
+      .eye-toggle-btn {
+        position: absolute;
+        right: 14px;
+        background: none;
+        border: none;
+        color: var(--text-muted);
+        font-size: 18px;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        z-index: 10;
+      }
+
+      .input-box.is-invalid-field input {
+        border-color: var(--error-rose) !important;
+        box-shadow: 0 0 0 4px rgba(244, 63, 94, 0.15) !important;
+      }
+
+      .field-error-feedback {
+        color: var(--error-rose);
+        font-size: 12px;
+        font-weight: 500;
+        margin-top: 6px;
+        display: none;
+        align-items: center;
+        gap: 6px;
+      }
+
+      button[type="submit"] {
+        width: 100%;
+        padding: 14px;
+        background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+        border: none;
+        color: white;
+        border-radius: 12px;
+        font-size: 16px;
+        font-weight: 600;
+        cursor: pointer;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        box-shadow: 0 4px 15px rgba(16, 185, 129, 0.3);
+        transition: all 0.3s ease;
+        margin-top: 15px;
+      }
+
+      button[type="submit"]:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 25px rgba(16, 185, 129, 0.45);
+      }
+    </style>
+  </head>
+
+  <body>
+    <div class="card">
+      <div class="step-progress-tracker">
+        <div class="progress-bar-segment completed"></div>
+        <div class="progress-bar-segment completed"></div>
+        <div class="progress-bar-segment completed"></div>
+        <div class="progress-bar-segment active"></div>
+      </div>
+
+      <h2>Finalize Profile</h2>
+      <p class="subtitle-desc">
+        Step 4 of 4 – Account Security & Verification Documents
+      </p>
+
+      <div class="email-badge-info">
+        <i class="bi bi-person-check-fill"></i>
+        <div>
+          Account Identity Username (Email)
+          <span>{{ email }}</span>
+        </div>
+      </div>
+
+      <form
+        method="POST"
+        id="finalSignupForm"
+        enctype="multipart/form-data"
+        novalidate
+      >
+        {% csrf_token %}
+
+        <div class="input-box" id="passwordBox">
+          <label>Password</label>
+          <div class="input-wrapper">
+            <i class="bi bi-lock-fill input-icon"></i>
+            <input
+              type="password"
+              id="passwordInput"
+              name="password"
+              placeholder="Create strong password"
+              required
+            />
+            <button
+              type="button"
+              class="eye-toggle-btn"
+              onclick="toggleVisibility('passwordInput', 'passEyeIcon')"
+            >
+              <i class="bi bi-eye-fill" id="passEyeIcon"></i>
+            </button>
+          </div>
+          <div class="field-error-feedback" id="passwordError"></div>
+        </div>
+
+        <div class="input-box" id="confirmBox">
+          <label>Confirm Password</label>
+          <div class="input-wrapper">
+            <i class="bi bi-shield-lock-fill input-icon"></i>
+            <input
+              type="password"
+              id="confirmInput"
+              name="confirm_password"
+              placeholder="Retype password to confirm"
+              required
+            />
+            <button
+              type="button"
+              class="eye-toggle-btn"
+              onclick="toggleVisibility('confirmInput', 'confirmEyeIcon')"
+            >
+              <i class="bi bi-eye-fill" id="confirmEyeIcon"></i>
+            </button>
+          </div>
+          <div class="field-error-feedback" id="confirmError"></div>
+        </div>
+
+        <div class="input-box" id="aadhaarBox">
+          <label>Aadhaar Card Document (Image)</label>
+          <div class="input-wrapper">
+            <i class="bi bi-card-image input-icon"></i>
+            <input
+              type="file"
+              id="aadhaarInput"
+              name="aadhaar_image"
+              accept="image/*"
+              required
+            />
+          </div>
+          <div class="field-error-feedback" id="aadhaarError"></div>
+        </div>
+
+        <div class="input-box" id="panBox">
+          <label>PAN Card Document (Image)</label>
+          <div class="input-wrapper">
+            <i class="bi bi-credit-card-2-front-fill input-icon"></i>
+            <input
+              type="file"
+              id="panInput"
+              name="pan_image"
+              accept="image/*"
+              required
+            />
+          </div>
+          <div class="field-error-feedback" id="panError"></div>
+        </div>
+
+        <button type="submit">
+          Complete Registration <i class="bi bi-check-circle-fill"></i>
+        </button>
+      </form>
+    </div>
+
+    <script>
+      function toggleVisibility(inputId, eyeId) {
+        const inputField = document.getElementById(inputId);
+        const eyeIcon = document.getElementById(eyeId);
+        if (inputField.type === "password") {
+          inputField.type = "text";
+          eyeIcon.classList.replace("bi-eye-fill", "bi-eye-slash-fill");
+        } else {
+          inputField.type = "password";
+          eyeIcon.classList.replace("bi-eye-slash-fill", "bi-eye-fill");
+        }
+      }
+
+      document
+        .getElementById("finalSignupForm")
+        .addEventListener("submit", function (event) {
+          let isValid = true;
+          const password = document.getElementById("passwordInput").value;
+          const confirm = document.getElementById("confirmInput").value;
+          const widthAadhaar = document.getElementById("aadhaarInput").files[0];
+          const widthPan = document.getElementById("panInput").files[0];
+
+          if (password.length < 6) {
+            showError(
+              "passwordBox",
+              "passwordError",
+              "Password must be at least 6 characters.",
+            );
+            isValid = false;
+          } else {
+            showSuccess("passwordBox", "passwordError");
+          }
+
+          if (!confirm) {
+            showError(
+              "confirmBox",
+              "confirmError",
+              "Please confirm your password.",
+            );
+            isValid = false;
+          } else if (password !== confirm) {
+            showError("confirmBox", "confirmError", "Passwords do not match.");
+            isValid = false;
+          } else {
+            showSuccess("confirmBox", "confirmError");
+          }
+
+          if (!widthAadhaar) {
+            showError(
+              "aadhaarBox",
+              "aadhaarError",
+              "Please upload your Aadhaar document photo.",
+            );
+            isValid = false;
+          } else {
+            showSuccess("aadhaarBox", "aadhaarError");
+          }
+
+          if (!widthPan) {
+            showError(
+              "panBox",
+              "panError",
+              "Please upload your PAN card document photo.",
+            );
+            isValid = false;
+          } else {
+            showSuccess("panBox", "panError");
+          }
+
+          if (!isValid) event.preventDefault();
+        });
+
+      function showError(boxId, errorId, msg) {
+        const box = document.getElementById(boxId);
+        const err = document.getElementById(errorId);
+        box.classList.add("is-invalid-field");
+        err.innerHTML = `<i class="bi bi-exclamation-circle-fill"></i> ${msg}`;
+        err.style.display = "flex";
+      }
+
+      function showSuccess(boxId, errorId) {
+        const box = document.getElementById(boxId);
+        const err = document.getElementById(errorId);
+        box.classList.remove("is-invalid-field");
+        err.style.display = "none";
+      }
+    </script>
+  </body>
+</html>
