@@ -2,25 +2,30 @@ from pathlib import Path
 import os
 import dj_database_url
 
+# =========================
+# BASE DIRECTORY
+# =========================
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 # =========================
 # SECURITY
 # =========================
-
 SECRET_KEY = os.environ.get(
     "SECRET_KEY",
     "django-insecure-change-this-key-in-production"
 )
 
-DEBUG = os.environ.get("DEBUG", "True") == "True"
+DEBUG = os.environ.get("DEBUG", "False") == "True"
 
-ALLOWED_HOSTS = ["*"]
+ALLOWED_HOSTS = [
+    "localhost",
+    "127.0.0.1",
+    ".onrender.com"
+]
 
 # =========================
 # APPLICATIONS
 # =========================
-
 INSTALLED_APPS = [
     'django.contrib.admin',
     'django.contrib.auth',
@@ -30,14 +35,12 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
 
     'channels',
-
     'accounts.apps.AccountsConfig',
 ]
 
 # =========================
 # MIDDLEWARE
 # =========================
-
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'whitenoise.middleware.WhiteNoiseMiddleware',
@@ -53,22 +56,19 @@ MIDDLEWARE = [
 # =========================
 # AUTH BACKENDS
 # =========================
-
 AUTHENTICATION_BACKENDS = [
     'accounts.backends.EmailBackend',
     'django.contrib.auth.backends.ModelBackend',
 ]
 
 # =========================
-# URLS
+# ROOT URL
 # =========================
-
 ROOT_URLCONF = 'home_service.urls'
 
 # =========================
 # TEMPLATES
 # =========================
-
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
@@ -87,75 +87,55 @@ TEMPLATES = [
 # =========================
 # WSGI / ASGI
 # =========================
-
 WSGI_APPLICATION = 'home_service.wsgi.application'
-
-# Uncomment if using Channels
-# ASGI_APPLICATION = 'home_service.asgi.application'
+# ASGI_APPLICATION = 'home_service.asgi.application'  # if using channels
 
 # =========================
 # DATABASE
 # =========================
-
 DATABASES = {
     "default": dj_database_url.config(
-        default=f"sqlite:///{BASE_DIR / 'db.sqlite3'}"
+        default=f"sqlite:///{BASE_DIR / 'db.sqlite3'}",
+        conn_max_age=600
     )
 }
+
 
 # =========================
 # PASSWORD VALIDATION
 # =========================
-
 AUTH_PASSWORD_VALIDATORS = [
-    {
-        'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator'
-    },
-    {
-        'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator'
-    },
-    {
-        'NAME': 'django.contrib.auth.password_validation.CommonPasswordValidator'
-    },
-    {
-        'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator'
-    },
+    {'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator'},
+    {'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator'},
+    {'NAME': 'django.contrib.auth.password_validation.CommonPasswordValidator'},
+    {'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator'},
 ]
 
 # =========================
 # INTERNATIONALIZATION
 # =========================
-
 LANGUAGE_CODE = 'en-us'
-
 TIME_ZONE = 'Asia/Kolkata'
-
 USE_I18N = True
 USE_TZ = True
 
 # =========================
 # STATIC FILES
 # =========================
-
 STATIC_URL = '/static/'
-
 STATIC_ROOT = BASE_DIR / 'staticfiles'
 
-STATICFILES_STORAGE = (
-    'whitenoise.storage.CompressedManifestStaticFilesStorage'
-)
+STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
 # =========================
 # MEDIA FILES
 # =========================
-
 MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'media'
 
 # =========================
 # LOGIN SETTINGS
 # =========================
-
 LOGIN_URL = '/login/'
 LOGIN_REDIRECT_URL = '/customer-dashboard/'
 LOGOUT_REDIRECT_URL = '/login/'
@@ -163,7 +143,6 @@ LOGOUT_REDIRECT_URL = '/login/'
 # =========================
 # SESSION SETTINGS
 # =========================
-
 SESSION_ENGINE = 'django.contrib.sessions.backends.db'
 SESSION_COOKIE_NAME = 'sessionid'
 SESSION_COOKIE_AGE = 86400
@@ -172,13 +151,11 @@ SESSION_SAVE_EVERY_REQUEST = True
 # =========================
 # DEFAULT PRIMARY KEY
 # =========================
-
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 # =========================
 # EMAIL CONFIG
 # =========================
-
 EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
 EMAIL_HOST = "smtp.gmail.com"
 EMAIL_PORT = 587
