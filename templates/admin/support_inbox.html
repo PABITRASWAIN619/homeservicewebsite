@@ -1,59 +1,29 @@
-{% extends "admin/base.html" %} {% block content %}
-<style>
-  .inbox-header {
-    margin-bottom: 25px;
-    border-bottom: 2px solid #e9ecef;
-    padding-bottom: 10px;
-  }
-  .chat-card {
-    transition: all 0.2s ease-in-out;
-    border-left: 5px solid #0d6efd; /* Adds a color accent */
-  }
-  .chat-card:hover {
-    transform: translateY(-3px);
-    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
-  }
-  .badge-type {
-    font-size: 0.8rem;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-  }
-</style>
+{% extends "admin/base.html" %}
+{% block content %}
 
-<div class="container mt-4">
-  <div class="inbox-header">
-    <h3>Support Inbox</h3>
-  </div>
+<h4>Support Inbox</h4>
 
-  <div class="row">
+<div class="row">
+
     {% for chat in chats %}
-    <div class="col-md-6 col-lg-4">
-      <div class="card p-3 mb-3 chat-card shadow-sm">
-        <div class="d-flex justify-content-between align-items-center mb-2">
-          <h5 class="mb-0">{{ chat.user.username }}</h5>
-          <span class="badge bg-secondary badge-type"
-            >{{ chat.chat_type }}</span
-          >
+
+    <div class="col-md-4">
+        <div class="card p-3 mb-3">
+
+            <h6>{{ chat.user.username }}</h6>
+            <p class="text-muted small">{{ chat.chat_type }}</p>
+
+            <a href="{% url 'admin_chat' chat.id %}" class="btn btn-primary btn-sm w-100">
+                Open Chat
+            </a>
+
         </div>
-
-        <p class="text-muted small">ID: #{{ chat.id }}</p>
-
-        <a
-          href="{% url 'admin_chat' chat.id %}"
-          class="btn btn-outline-primary btn-sm w-100"
-        >
-          View Conversation
-        </a>
-        <a href="{% url 'admin_chat' chat.id %}" class="btn btn-primary">
-          Open Chat
-        </a>
-      </div>
     </div>
+
     {% empty %}
-    <div class="col-12 text-center mt-5">
-      <p class="text-muted">No active support chats found.</p>
-    </div>
+        <p class="text-muted">No active chats</p>
     {% endfor %}
-  </div>
+
 </div>
+
 {% endblock %}

@@ -15,12 +15,13 @@ SECRET_KEY = os.environ.get(
     "django-insecure-change-this-key-in-production"
 )
 
-DEBUG = os.environ.get("DEBUG", "False").lower() == "true"
+DEBUG = True
 
 ALLOWED_HOSTS = [
     "localhost",
     "127.0.0.1",
-    ".onrender.com"
+    ".onrender.com",
+    "pabitraswainpythonanywhere.com",
 ]
 
 # =========================

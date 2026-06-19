@@ -357,6 +357,30 @@ from django.db import models
 from django.contrib.auth.models import User
 
 
+# =========================
+# SUPPORT CHAT
+# =========================
+class SupportChat(models.Model):
+    CHAT_TYPES = (
+        ("customer", "Customer"),
+        ("worker", "Worker"),
+    )
+
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    chat_type = models.CharField(max_length=20, choices=CHAT_TYPES)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"{self.user.username} - {self.chat_type}"
+
+
+# =========================
+# SUPPORT MESSAGE
+# =========================
+from django.db import models
+from django.contrib.auth.models import User
+
+
 class SupportChat(models.Model):
     CHAT_TYPES = (
         ("customer", "Customer"),
@@ -378,17 +402,31 @@ class SupportMessage(models.Model):
         related_name="messages"
     )
 
-    sender = models.ForeignKey(User, on_delete=models.CASCADE)
+    # ✅ allows bot/system messages safely
+    sender = models.ForeignKey(
+        User,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True
+    )
 
     message = models.TextField(blank=True, null=True)
 
-    image = models.ImageField(upload_to="support/images/", blank=True, null=True)
-    file = models.FileField(upload_to="support/files/", blank=True, null=True)
+    image = models.ImageField(
+        upload_to="support/images/",
+        blank=True,
+        null=True
+    )
+
+    file = models.FileField(
+        upload_to="support/files/",
+        blank=True,
+        null=True
+    )
 
     is_seen = models.BooleanField(default=False)
 
     created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
-        return f"{self.sender.username}"
-    
+        return self.message[:30] if self.message else "Empty Message"

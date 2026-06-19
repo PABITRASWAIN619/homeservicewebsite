@@ -130,6 +130,11 @@ path(
     views.verify_otp,
     name="verify_otp"
 ),
+path(
+    "worker/<int:worker_id>/",
+    views.worker_details,
+    name="worker_details"
+),
     
 
     

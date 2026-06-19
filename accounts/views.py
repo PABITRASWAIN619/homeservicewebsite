@@ -749,6 +749,23 @@ def role_based_redirect(request):
         return redirect("worker_dashboard")
 
     return redirect("login")
+from django.shortcuts import render, get_object_or_404
+
+@login_required
+def worker_details(request, worker_id):
+
+    worker = get_object_or_404(
+        WorkerProfile,
+        id=worker_id
+    )
+
+    return render(
+        request,
+        "customer/worker_details.html",
+        {
+            "worker": worker
+        }
+    )
 # ==========================================
 # BOOK SERVICE
 # ==========================================
@@ -1250,6 +1267,28 @@ from .models import SupportChat, SupportMessage
 
 
 # CUSTOMER CHAT
+from django.shortcuts import render, redirect, get_object_or_404
+from django.http import JsonResponse
+from django.contrib.auth.decorators import login_required
+
+from .models import SupportChat, SupportMessage
+
+
+# ---------------- CUSTOMER ----------------
+from django.shortcuts import render, redirect, get_object_or_404
+from django.http import JsonResponse
+from django.contrib.auth.decorators import login_required
+
+from .models import SupportChat, SupportMessage
+
+
+# ---------------- CUSTOMER SUPPORT ----------------
+from django.contrib.auth.decorators import login_required
+from django.shortcuts import render, redirect, get_object_or_404
+from .models import SupportChat, SupportMessage
+from .utils import get_bot_reply
+
+
 @login_required
 def customer_support(request):
 
@@ -1258,45 +1297,50 @@ def customer_support(request):
         chat_type="customer"
     )
 
-    # 🔵 AUTO WELCOME MESSAGE
+    # ✅ Auto welcome message (only first time)
     if created:
         SupportMessage.objects.create(
             chat=chat,
             sender=None,
-            message="👋 Hi! Welcome to Home Service Support.\nPlease tell us your issue — we are here to help you 24/7.",
-            is_bot=True
+            message="👋 Hi! Welcome to Support. How can I help you today?"
         )
 
-    # ⚡ USER MESSAGE
+    # =========================
+    # SEND MESSAGE
+    # =========================
     if request.method == "POST":
-        user_msg = request.POST.get("message")
+        user_msg = request.POST.get("message", "").strip()
 
-        SupportMessage.objects.create(
-            chat=chat,
-            sender=request.user,
-            message=user_msg
-        )
+        if user_msg:
+            # user message
+            SupportMessage.objects.create(
+                chat=chat,
+                sender=request.user,
+                message=user_msg,
+                image=request.FILES.get("image"),
+                file=request.FILES.get("file")
+            )
 
-        # 🔵 SIMPLE AUTO BOT REPLY
-        bot_reply = get_bot_reply(user_msg)
+            # bot reply
+            bot_reply = get_bot_reply(user_msg)
 
-        SupportMessage.objects.create(
-            chat=chat,
-            sender=None,
-            message=bot_reply,
-            is_bot=True
-        )
+            SupportMessage.objects.create(
+                chat=chat,
+                sender=None,
+                message=bot_reply
+            )
 
         return redirect("customer_support")
 
     messages = chat.messages.all().order_by("created_at")
 
-    return render(request, "customer/support_chat.html", {
+    return render(request, "customer/support.html", {
         "chat": chat,
         "messages": messages
     })
 
-# WORKER CHAT
+
+# ---------------- WORKER SUPPORT ----------------
 @login_required
 def worker_support(request):
 
@@ -1305,59 +1349,50 @@ def worker_support(request):
         chat_type="worker"
     )
 
+    # ✅ Auto welcome message
     if created:
         SupportMessage.objects.create(
             chat=chat,
             sender=None,
-            message="👷 Welcome Worker Support!\nYou can ask about jobs, payments, or app issues here.",
-            is_bot=True
+            message="👷 Welcome to Worker Support. How can I help you today?"
         )
 
+    # =========================
+    # SEND MESSAGE
+    # =========================
     if request.method == "POST":
-        user_msg = request.POST.get("message")
+        user_msg = request.POST.get("message", "").strip()
 
-        SupportMessage.objects.create(
-            chat=chat,
-            sender=request.user,
-            message=user_msg
-        )
+        if user_msg:
+            # user message
+            SupportMessage.objects.create(
+                chat=chat,
+                sender=request.user,
+                message=user_msg,
+                image=request.FILES.get("image"),
+                file=request.FILES.get("file")
+            )
 
-        bot_reply = get_bot_reply(user_msg)
+            # bot reply
+            bot_reply = get_bot_reply(user_msg)
 
-        SupportMessage.objects.create(
-            chat=chat,
-            sender=None,
-            message=bot_reply,
-            is_bot=True
-        )
+            SupportMessage.objects.create(
+                chat=chat,
+                sender=None,
+                message=bot_reply
+            )
 
         return redirect("worker_support")
 
     messages = chat.messages.all().order_by("created_at")
 
-    return render(request, "worker/support_chat.html", {
+    return render(request, "worker/support.html", {
         "chat": chat,
         "messages": messages
     })
-def get_bot_reply(message):
-    
-    msg = message.lower()
 
-    if "booking" in msg:
-        return "📅 You can check your bookings in 'My Bookings' section."
 
-    elif "payment" in msg:
-        return "💰 Payments are processed after job completion."
-
-    elif "worker" in msg:
-        return "👷 Workers are assigned based on nearest location."
-
-    elif "cancel" in msg:
-        return "❌ You can cancel booking before work starts."
-
-    else:
-        return "🤖 We received your message. Our team will respond soon."
-# ADMIN INBOX
+# ---------------- ADMIN INBOX ----------------
 @login_required
 def admin_support(request):
 
@@ -1369,10 +1404,9 @@ def admin_support(request):
     return render(request, "admin/support_inbox.html", {
         "chats": chats
     })
-    
 
 
-# ADMIN CHAT
+# ---------------- ADMIN CHAT ----------------
 @login_required
 def admin_chat(request, chat_id):
 
@@ -1385,7 +1419,7 @@ def admin_chat(request, chat_id):
         SupportMessage.objects.create(
             chat=chat,
             sender=request.user,
-            message=request.POST.get("message"),
+            message=request.POST.get("message", "").strip(),
             image=request.FILES.get("image"),
             file=request.FILES.get("file")
         )
@@ -1393,15 +1427,13 @@ def admin_chat(request, chat_id):
 
     messages = chat.messages.all().order_by("created_at")
 
-    messages.exclude(sender=request.user).update(is_seen=True)
-
     return render(request, "admin/support_chat.html", {
         "chat": chat,
         "messages": messages
     })
 
 
-# UNREAD API
+# ---------------- UNREAD COUNT API ----------------
 @login_required
 def unread_messages_count(request):
 
@@ -1410,13 +1442,29 @@ def unread_messages_count(request):
         is_seen=False
     ).exclude(sender=request.user).count()
 
-    return JsonResponse({
-        "unread_count": count
-    })
-    from django.shortcuts import render, get_object_or_404
-from .models import SupportChat
+    return JsonResponse({"unread_count": count})
 
+
+# ---------------- BOT REPLY ----------------
+def get_bot_reply(message):
+
+    msg = message.lower()
+
+    if "booking" in msg:
+        return "📅 Check My Bookings section."
+    elif "payment" in msg:
+        return "💰 Payment after job completion."
+    elif "worker" in msg:
+        return "👷 Worker assigned based on location."
+    elif "cancel" in msg:
+        return "❌ Cancel before work starts."
+    else:
+        return "🤖 We received your message. Team will reply soon."
+
+
+# ---------------- SUPPORT DETAIL ----------------
 def support_detail(request, id):
+
     chat = get_object_or_404(SupportChat, id=id)
     messages = chat.messages.all().order_by("created_at")
 
