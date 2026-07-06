@@ -1,6 +1,21 @@
 from pathlib import Path
 import os
 import dj_database_url
+# =========================
+# MEDIA (REMOVE OLD MEDIA ROOT IF USING CLOUDINARY)
+# =========================
+
+import cloudinary
+import cloudinary.uploader
+import cloudinary.api
+
+CLOUDINARY_STORAGE = {
+    "CLOUD_NAME": os.environ.get("CLOUDINARY_CLOUD_NAME"),
+    "API_KEY": os.environ.get("CLOUDINARY_API_KEY"),
+    "API_SECRET": os.environ.get("CLOUDINARY_API_SECRET"),
+}
+
+DEFAULT_FILE_STORAGE = "cloudinary_storage.storage.MediaCloudinaryStorage"
 
 # =========================
 # BASE DIRECTORY
@@ -40,6 +55,9 @@ INSTALLED_APPS = [
 
     "channels",
     "accounts",
+
+    "cloudinary",
+    "cloudinary_storage",
 ]
 
 # =========================
