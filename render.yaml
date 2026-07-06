@@ -1,0 +1,6 @@
+services:
+  - type: web
+    name: home-service
+    env: python
+    buildCommand: "./build.sh"
+    startCommand: "gunicorn home_service.wsgi:application"
