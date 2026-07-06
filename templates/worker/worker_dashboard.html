@@ -135,58 +135,102 @@
     background-color: #edf2f7;
   }
 </style>
+{% if worker.warning_count > 0 %}
+<div class="alert alert-warning border-warning shadow-sm mb-4">
 
+    <h5>⚠ Warning from Admin</h5>
+
+    <p>{{ worker.warning_message }}</p>
+
+    <strong>Total Warnings:</strong>
+    {{ worker.warning_count }}
+
+</div>
+{% endif %}
 <div class="container mt-4 pb-5">
   <div class="row g-4 mb-4">
     <div class="col-md-5">
       <div class="card profile-card h-100">
-        <div class="profile-header-banner">
-          <h4 class="m-0 fw-bold">
-            <i class="bi bi-person-badge-fill me-2"></i>Worker Console
-          </h4>
-        </div>
+        <div class="profile-header-banner text-center py-4">
+
+  {% if worker.profile_image %}
+    <img
+      src="{{ worker.profile_image.url }}"
+      class="rounded-circle shadow mb-3"
+      width="120"
+      height="120"
+      style="object-fit:cover;border:4px solid white;"
+      alt="Worker Profile"
+    >
+  {% else %}
+    <img
+      src="https://cdn-icons-png.flaticon.com/512/3135/3135715.png"
+      class="rounded-circle shadow mb-3"
+      width="120"
+      height="120"
+      style="object-fit:cover;border:4px solid white;"
+      alt="Default Profile"
+    >
+  {% endif %}
+
+  <h4 class="m-0 fw-bold">
+    {{ request.user.username }}
+  </h4>
+
+  <small>{{ worker.get_service_type_display }}</small>
+
+</div>
+
         <div class="card-body p-4">
+
           <p class="mb-2">
-            <strong class="text-secondary">Identity Username:</strong> {{
-            worker.user.username }}
+            <strong class="text-secondary">Identity Username:</strong>
+            {{ request.user.username }}
           </p>
+
           <p class="mb-2">
-            <strong class="text-secondary">Contact Phone:</strong> {{
-            worker.phone }}
+            <strong class="text-secondary">Contact Phone:</strong>
+            {{ worker.phone|default:"Not Available" }}
           </p>
+
           <p class="mb-2">
             <strong class="text-secondary">Assigned Domain Specialty:</strong>
-            <span class="badge bg-dark text-white px-2 py-1"
-              >{{ worker.service_type }}</span
-            >
+            <span class="badge bg-dark text-white px-2 py-1">
+              {{ worker.get_service_type_display }}
+            </span>
           </p>
+
           <p class="mb-2">
             <strong class="text-secondary">Validated Field Experience:</strong>
             {{ worker.experience }}
           </p>
+
           <p class="mb-2">
             <strong class="text-secondary">Approval Status:</strong>
             {% if worker.is_approved %}
-            <span class="badge bg-success">Approved Partner</span>
+              <span class="badge bg-success">Approved Partner</span>
             {% else %}
-            <span class="badge bg-warning text-dark">Verification Pending</span>
+              <span class="badge bg-warning text-dark">Verification Pending</span>
             {% endif %}
           </p>
+
           <p class="mb-2">
             <strong class="text-secondary">Telemetry Last Seen:</strong>
-            <span class="text-primary small fw-medium"
-              >{{ worker.last_seen }}</span
-            >
+            <span class="text-primary small fw-medium">
+              {{ worker.last_seen }}
+            </span>
           </p>
+
           <p class="mb-0">
             <strong class="text-secondary">Telemetry Coordinates:</strong>
-            <span id="lat" class="fw-bold text-dark"
-              >{{ worker.latitude|default:"20.5937" }}</span
-            >,
-            <span id="lng" class="fw-bold text-dark"
-              >{{ worker.longitude|default:"78.9629" }}</span
-            >
+            <span id="lat" class="fw-bold text-dark">
+              {{ worker.latitude|default:"20.5937" }}
+            </span>,
+            <span id="lng" class="fw-bold text-dark">
+              {{ worker.longitude|default:"78.9629" }}
+            </span>
           </p>
+
         </div>
       </div>
     </div>

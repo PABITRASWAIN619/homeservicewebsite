@@ -1,171 +1,511 @@
 {% load static %}
-<!doctype html>
-<html>
-  <head>
-    <title>Login | Secure Access</title>
-    <style>
-      * {
-        margin: 0;
-        padding: 0;
-        box-sizing: border-box;
-        font-family: "Segoe UI", sans-serif;
-      }
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-      body {
-        background: linear-gradient(-45deg, #ee7752, #e73c7e, #23a6d5, #23d5ab);
-        background-size: 400% 400%;
-        animation: gradient 15s ease infinite;
-        height: 100vh;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-      }
+<title>Worker Login</title>
 
-      @keyframes gradient {
-        0% {
-          background-position: 0% 50%;
-        }
-        50% {
-          background-position: 100% 50%;
-        }
-        100% {
-          background-position: 0% 50%;
-        }
-      }
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 
-      .login-box {
-        width: 400px;
-        background: rgba(255, 255, 255, 0.2);
-        backdrop-filter: blur(15px);
-        padding: 40px;
-        border-radius: 20px;
-        box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3);
-        border: 1px solid rgba(255, 255, 255, 0.3);
-        color: white;
-      }
+<style>
 
-      h2 {
-        text-align: center;
-        margin-bottom: 25px;
-        font-weight: 300;
-      }
+*{
+margin:0;
+padding:0;
+box-sizing:border-box;
+font-family:'Poppins',sans-serif;
+}
 
-      .input-box {
-        margin-bottom: 20px;
-      }
-      .input-box input {
-        width: 100%;
-        padding: 15px;
-        background: rgba(255, 255, 255, 0.1);
-        border: 1px solid rgba(255, 255, 255, 0.2);
-        border-radius: 10px;
-        color: white;
-        outline: none;
-      }
+body{
 
-      .btn {
-        width: 100%;
-        padding: 15px;
-        border: none;
-        border-radius: 10px;
-        background: #fff;
-        color: #e73c7e;
-        font-weight: bold;
-        cursor: pointer;
-        transition: 0.3s;
-        margin-bottom: 10px;
-      }
+height:100vh;
+display:flex;
+justify-content:center;
+align-items:center;
+overflow:hidden;
 
-      /* Blinking/Pulsing Effect for Back Button */
-      .back-btn {
-        display: block;
-        width: 100%;
-        text-align: center;
-        padding: 12px;
-        background: rgba(0, 0, 0, 0.2);
-        color: white;
-        text-decoration: none;
-        border-radius: 10px;
-        font-size: 14px;
-        animation: blink 2s infinite;
-      }
+background:linear-gradient(-45deg,#0f2027,#203a43,#2c5364,#6a11cb,#2575fc);
+background-size:500% 500%;
+animation:bgAnimation 15s ease infinite;
 
-      @keyframes blink {
-        0% {
-          opacity: 1;
-        }
-        50% {
-          opacity: 0.5;
-        }
-        100% {
-          opacity: 1;
-        }
-      }
+}
 
-      .toggle-section {
-        text-align: center;
-        margin-top: 20px;
-        font-size: 14px;
-      }
-      .toggle-section a {
-        color: #fff;
-        text-decoration: underline;
-        cursor: pointer;
-      }
-    </style>
-  </head>
-  <body>
-    <div class="login-box">
-      <h2 id="form-title">Login</h2>
-      <form method="POST">
-        {% csrf_token %}
-        <div class="input-box">
-          <input
-            type="email"
-            name="email"
-            placeholder="Email Address"
-            required
-          />
-        </div>
-        <div class="input-box" id="pass-field">
-          <input type="password" name="password" placeholder="Password" />
-        </div>
+@keyframes bgAnimation{
 
-        <button type="submit" class="btn" id="submit-btn">Login</button>
+0%{background-position:0% 50%;}
+50%{background-position:100% 50%;}
+100%{background-position:0% 50%;}
 
-        <a href="{% url 'home' %}" class="back-btn">← Back To Home</a>
-      </form>
+}
 
-      <div class="toggle-section">
-        <p id="mode-text">
-          Don't use password? <a onclick="toggleMode()">Login with OTP</a>
-        </p>
-      </div>
-    </div>
+/* Floating Circles */
 
-    <script>
-      let isOtpMode = false;
-      function toggleMode() {
-        isOtpMode = !isOtpMode;
-        const title = document.getElementById("form-title");
-        const passField = document.getElementById("pass-field");
-        const btn = document.getElementById("submit-btn");
-        const modeText = document.getElementById("mode-text");
+body::before,
+body::after{
 
-        if (isOtpMode) {
-          title.innerText = "Email OTP Login";
-          passField.style.display = "none";
-          btn.innerText = "Send OTP";
-          modeText.innerHTML =
-            'Back to <a onclick="toggleMode()">Password Login</a>';
-        } else {
-          title.innerText = "Login";
-          passField.style.display = "block";
-          btn.innerText = "Login";
-          modeText.innerHTML =
-            'Don\'t use password? <a onclick="toggleMode()">Login with OTP</a>';
-        }
-      }
-    </script>
-  </body>
+content:'';
+position:absolute;
+border-radius:50%;
+filter:blur(40px);
+animation:float 8s infinite ease-in-out;
+
+}
+
+body::before{
+
+width:300px;
+height:300px;
+background:#00d4ff;
+top:-100px;
+left:-80px;
+
+}
+
+body::after{
+
+width:280px;
+height:280px;
+background:#ff0099;
+bottom:-100px;
+right:-80px;
+
+}
+
+@keyframes float{
+
+0%,100%{
+
+transform:translateY(0px);
+
+}
+
+50%{
+
+transform:translateY(40px);
+
+}
+
+}
+
+/* Login Card */
+
+.login-box{
+
+position:relative;
+width:420px;
+
+padding:45px;
+
+background:rgba(255,255,255,.12);
+
+backdrop-filter:blur(18px);
+
+border-radius:25px;
+
+border:1px solid rgba(255,255,255,.25);
+
+box-shadow:
+
+0 8px 32px rgba(0,0,0,.4),
+
+0 0 25px rgba(255,255,255,.1);
+
+animation:card 1s ease;
+
+}
+
+@keyframes card{
+
+from{
+
+opacity:0;
+transform:translateY(50px);
+
+}
+
+to{
+
+opacity:1;
+transform:translateY(0);
+
+}
+
+}
+
+.login-box:hover{
+
+transform:translateY(-5px);
+transition:.4s;
+
+}
+
+.login-box h2{
+
+text-align:center;
+color:white;
+margin-bottom:30px;
+font-weight:600;
+letter-spacing:1px;
+
+}
+
+/* Input */
+
+.input-box{
+
+margin-bottom:20px;
+position:relative;
+
+}
+
+.input-box input{
+
+width:100%;
+padding:15px 45px 15px 15px;
+
+background:rgba(255,255,255,.15);
+
+border:1px solid rgba(255,255,255,.25);
+
+border-radius:12px;
+
+outline:none;
+
+color:white;
+
+font-size:15px;
+
+transition:.4s;
+
+}
+
+.input-box input::placeholder{
+
+color:#ddd;
+
+}
+
+.input-box input:focus{
+
+border-color:#00d4ff;
+
+box-shadow:0 0 15px #00d4ff;
+
+}
+
+/* Eye Button */
+
+.eye{
+
+position:absolute;
+
+right:15px;
+
+top:50%;
+
+transform:translateY(-50%);
+
+cursor:pointer;
+
+font-size:20px;
+
+color:white;
+
+transition:.3s;
+
+}
+
+.eye:hover{
+
+transform:translateY(-50%) scale(1.2);
+
+color:#00d4ff;
+
+}
+
+/* Login Button */
+
+.btn{
+
+width:100%;
+
+padding:15px;
+
+border:none;
+
+border-radius:12px;
+
+background:linear-gradient(45deg,#00d4ff,#6a11cb);
+
+color:white;
+
+font-size:16px;
+
+font-weight:600;
+
+cursor:pointer;
+
+transition:.4s;
+
+margin-top:5px;
+
+}
+
+.btn:hover{
+
+transform:translateY(-3px);
+
+box-shadow:0 10px 25px rgba(0,212,255,.5);
+
+}
+
+/* Back Button */
+
+.back-btn{
+
+display:block;
+
+margin-top:15px;
+
+text-align:center;
+
+padding:14px;
+
+text-decoration:none;
+
+border-radius:12px;
+
+background:rgba(255,255,255,.12);
+
+border:1px solid rgba(255,255,255,.2);
+
+color:white;
+
+transition:.4s;
+
+animation:pulse 2s infinite;
+
+}
+
+.back-btn:hover{
+
+background:white;
+
+color:#6a11cb;
+
+transform:scale(1.03);
+
+}
+
+@keyframes pulse{
+
+0%{transform:scale(1);}
+50%{transform:scale(1.03);}
+100%{transform:scale(1);}
+
+}
+
+/* Toggle */
+
+.toggle-section{
+
+text-align:center;
+margin-top:25px;
+color:white;
+font-size:14px;
+
+}
+
+.toggle-section a{
+
+cursor:pointer;
+font-weight:600;
+text-decoration:none;
+color:#00d4ff;
+
+}
+
+.toggle-section a:hover{
+
+text-decoration:underline;
+
+}
+
+/* Responsive */
+
+@media(max-width:500px){
+
+.login-box{
+
+width:92%;
+padding:30px;
+
+}
+
+}
+.forgot-password{
+    text-align: right;
+    margin-top: 12px;
+    margin-bottom: 18px;
+}
+
+.forgot-password a{
+    color: #00d4ff;
+    text-decoration: none;
+    font-size: 14px;
+    font-weight: 500;
+    transition: all 0.3s ease;
+}
+
+.forgot-password a:hover{
+    color: #ffffff;
+    text-decoration: underline;
+}
+
+</style>
+
+</head>
+
+<body>
+
+<div class="login-box">
+
+<h2 id="form-title">Worker Login</h2>
+
+<form method="POST">
+
+{% csrf_token %}
+
+<div class="input-box">
+
+<input
+type="email"
+name="email"
+placeholder="Enter Email"
+required>
+
+</div>
+
+<div class="input-box" id="pass-field">
+
+<input
+type="password"
+name="password"
+id="password"
+placeholder="Enter Password"
+required>
+
+<span class="eye" onclick="togglePassword()">👁</span>
+
+</div>
+
+<button class="btn" type="submit" id="submit-btn">
+
+Login
+
+</button>
+
+
+<div style="text-align:right;margin-top:10px;">
+    <a href="{% url 'forgot_password' %}"
+       style="color:#00d4ff;text-decoration:none;font-size:14px;">
+        Forgot Password?
+    </a>
+</div>
+
+
+
+<a href="{% url 'home' %}" class="back-btn">
+
+← Back To Home
+
+</a>
+
+</form>
+
+<div class="toggle-section">
+
+<p id="mode-text">
+
+Don't use password?
+
+<a onclick="toggleMode()">
+
+Login with OTP
+
+</a>
+
+</p>
+
+</div>
+
+</div>
+
+<script>
+
+let isOtpMode=false;
+
+function toggleMode(){
+
+isOtpMode=!isOtpMode;
+
+const title=document.getElementById("form-title");
+
+const pass=document.getElementById("pass-field");
+
+const btn=document.getElementById("submit-btn");
+
+const text=document.getElementById("mode-text");
+
+if(isOtpMode){
+
+title.innerHTML="Email OTP Login";
+
+pass.style.display="none";
+
+btn.innerHTML="Send OTP";
+
+text.innerHTML='Back to <a onclick="toggleMode()">Password Login</a>';
+
+}else{
+
+title.innerHTML="Worker Login";
+
+pass.style.display="block";
+
+btn.innerHTML="Login";
+
+text.innerHTML='Don\'t use password? <a onclick="toggleMode()">Login with OTP</a>';
+
+}
+
+}
+
+function togglePassword(){
+
+const pass=document.getElementById("password");
+
+const eye=document.querySelector(".eye");
+
+if(pass.type==="password"){
+
+pass.type="text";
+
+eye.innerHTML="🙈";
+
+}else{
+
+pass.type="password";
+
+eye.innerHTML="👁";
+
+}
+
+}
+
+</script>
+
+</body>
 </html>

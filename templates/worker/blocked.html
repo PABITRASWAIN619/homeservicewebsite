@@ -1,0 +1,101 @@
+{% extends "worker/base.html" %}
+
+{% block content %}
+
+<div class="container mt-5">
+
+    <div class="row justify-content-center">
+
+        <div class="col-md-8">
+
+            <div class="card shadow-lg border-danger">
+
+                <!-- HEADER -->
+                <div class="card-header bg-danger text-white text-center">
+                    <h2>🚫 Account Blocked</h2>
+                </div>
+
+                <!-- BODY -->
+                <div class="card-body text-center">
+
+                    <p class="lead">
+                        Your worker account has been <b>blocked by the administrator</b>.
+                    </p>
+
+                    <hr>
+
+                    <!-- BLOCK DETAILS -->
+                    <div class="text-start">
+
+                        <p>
+                            <b>👤 Worker:</b> {{ worker.user.username }}
+                        </p>
+
+                        {% if worker.service_type %}
+                        <p>
+                            <b>🔧 Service:</b> {{ worker.service_type }}
+                        </p>
+                        {% endif %}
+
+                        {% if worker.blocked_reason %}
+                        <p>
+                            <b>📌 Reason:</b> {{ worker.blocked_reason }}
+                        </p>
+                        {% endif %}
+
+                        {% if worker.warning_message %}
+                        <p>
+                            <b>⚠️ Message:</b> {{ worker.warning_message }}
+                        </p>
+                        {% endif %}
+
+                        {% if worker.blocked_at %}
+                        <p>
+                            <b>⏰ Blocked On:</b> {{ worker.blocked_at }}
+                        </p>
+                        {% endif %}
+
+                    </div>
+
+                    <hr>
+
+                    <!-- SUPPORT INFO -->
+                    <div class="alert alert-warning mt-3">
+
+                        <h5>📞 Need Help?</h5>
+
+                        <p>
+                            Contact our admin for support or clarification.
+                        </p>
+
+                        <h4 class="text-danger">
+                            8658302086
+                        </h4>
+
+                        <small class="text-muted">
+                            Available during working hours
+                        </small>
+
+                    </div>
+
+                    <!-- ACTION BUTTON -->
+                    <a href="{% url 'logout' %}" class="btn btn-danger mt-3">
+                        🔒 Logout
+                    </a>
+
+                </div>
+
+                <!-- FOOTER -->
+                <div class="card-footer text-muted text-center">
+                    Home Service Partner Panel
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+{% endblock %}

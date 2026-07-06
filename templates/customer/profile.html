@@ -1,112 +1,161 @@
-{% extends 'customer/base.html' %} {% block content %}
+{% extends 'customer/base.html' %}
+{% block content %}
 
 <div class="container mt-4">
-  <div class="card p-3 shadow-sm">
-    <div class="row">
-      <div class="col-md-8">
-        <h4>Home Service Customer</h4>
 
-        <p>📧 {{ request.user.email }}</p>
-        <p>📍 India</p>
-      </div>
+    <!-- PROFILE CARD -->
+    <div class="card shadow-sm p-4">
 
-      <div class="col-md-4 text-end">
-        <a href="{% url 'edit_profile' %}" class="btn btn-primary">
-          ✏ Edit Profile
+        <div class="row align-items-center">
+
+            <div class="col-md-3 text-center">
+
+                {% if profile.image %}
+                    <img src="{{ profile.image.url }}"
+                         class="rounded-circle shadow"
+                         width="170"
+                         height="170"
+                         style="object-fit:cover;border:5px solid #0d6efd;">
+                {% else %}
+                    <img src="https://via.placeholder.com/170"
+                         class="rounded-circle shadow"
+                         width="170"
+                         height="170"
+                         style="border:5px solid #0d6efd;">
+                {% endif %}
+
+            </div>
+
+            <div class="col-md-6">
+
+                <h3>{{ request.user.first_name }} {{ request.user.last_name }}</h3>
+
+                <p><strong>Username:</strong> {{ request.user.username }}</p>
+
+                <p><strong>Email:</strong> {{ request.user.email }}</p>
+
+                <p><strong>Phone:</strong> {{ profile.phone }}</p>
+
+                <p><strong>City:</strong> {{ profile.city }}</p>
+
+                <p><strong>Address:</strong> {{ profile.address }}</p>
+
+            </div>
+
+            <div class="col-md-3 text-end">
+
+                <a href="{% url 'edit_profile' %}" class="btn btn-primary">
+                    ✏ Edit Profile
+                </a>
+
+            </div>
+
+        </div>
+
+    </div>
+
+    <br>
+
+    <!-- STATS -->
+    <div class="row text-center">
+
+        <div class="col-md-4">
+            <div class="card p-3 shadow-sm">
+                <h6>Total Bookings</h6>
+                <h3>{{ bookings|length }}</h3>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="card p-3 shadow-sm">
+                <h6>Completed Jobs</h6>
+                <h3>{{ completed_jobs }}</h3>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="card p-3 shadow-sm">
+                <h6>Pending Jobs</h6>
+                <h3>{{ pending_jobs }}</h3>
+            </div>
+        </div>
+
+    </div>
+
+    <br>
+
+    <!-- RECENT BOOKINGS -->
+
+    <div class="card shadow-sm p-3">
+
+        <h4 class="mb-3">Recent Bookings</h4>
+
+        <table class="table table-bordered table-hover">
+
+            <thead class="table-primary">
+
+                <tr>
+                    <th>ID</th>
+                    <th>Service</th>
+                    <th>Status</th>
+                    <th>Date</th>
+                </tr>
+
+            </thead>
+
+            <tbody>
+
+                {% for booking in bookings|slice:":5" %}
+
+                <tr>
+
+                    <td>#{{ booking.id }}</td>
+
+                    <td>{{ booking.service.name }}</td>
+
+                    <td>
+
+                        {% if booking.status == "Completed" %}
+                            <span class="badge bg-success">Completed</span>
+
+                        {% elif booking.status == "Pending" %}
+                            <span class="badge bg-warning text-dark">Pending</span>
+
+                        {% else %}
+                            <span class="badge bg-primary">
+                                {{ booking.status }}
+                            </span>
+
+                        {% endif %}
+
+                    </td>
+
+                    <td>{{ booking.booking_date }}</td>
+
+                </tr>
+
+                {% empty %}
+
+                <tr>
+
+                    <td colspan="4" class="text-center">
+                        No bookings available
+                    </td>
+
+                </tr>
+
+                {% endfor %}
+
+            </tbody>
+
+        </table>
+
+        <a href="{% url 'my_bookings' %}" class="btn btn-outline-primary">
+            View All Bookings
         </a>
-      </div>
-    </div>
-  </div>
 
-  <br />
-
-  <!-- STATS -->
-  <div class="row text-center">
-    <div class="col-md-4">
-      <div class="card p-3">
-        <h6>Total Bookings</h6>
-        <h3>{{ bookings|length }}</h3>
-      </div>
     </div>
 
-    <div class="col-md-4">
-      <div class="card p-3">
-        <h6>Completed Jobs</h6>
-        <h3>{{ completed_jobs }}</h3>
-      </div>
-    </div>
-
-    <div class="col-md-4">
-      <div class="card p-3">
-        <h6>Pending Jobs</h6>
-        <h3>{{ pending_jobs }}</h3>
-      </div>
-    </div>
-  </div>
-
-  <br />
-
-  <!-- DETAILS -->
-  <div class="card p-3">
-    <p><strong>Username:</strong> {{ request.user.username }}</p>
-    <p>
-      <strong>Full Name:</strong> {{ request.user.first_name }} {{
-      request.user.last_name }}
-    </p>
-    <p><strong>Email:</strong> {{ request.user.email }}</p>
-    <p><strong>Account Type:</strong> Customer</p>
-    <p><strong>Country:</strong> India</p>
-  </div>
-
-  <br />
-
-  <!-- BOOKINGS -->
-  <div class="card p-3">
-    <h5>Recent Bookings</h5>
-
-    <table class="table">
-      <thead>
-        <tr>
-          <th>ID</th>
-          <th>Service</th>
-          <th>Status</th>
-          <th>Date</th>
-        </tr>
-      </thead>
-
-      <tbody>
-        {% for booking in bookings|slice:":5" %}
-
-        <tr>
-          <td>#{{ booking.id }}</td>
-          <td>{{ booking.service.name }}</td>
-
-          <td>
-            {% if booking.status == "Completed" %}
-            <span class="badge bg-success">Completed</span>
-            {% elif booking.status == "Pending" %}
-            <span class="badge bg-warning text-dark">Pending</span>
-            {% else %}
-            <span class="badge bg-primary">{{ booking.status }}</span>
-            {% endif %}
-          </td>
-
-          <td>{{ booking.booking_date }}</td>
-        </tr>
-
-        {% empty %}
-        <tr>
-          <td colspan="4" class="text-center">No bookings available</td>
-        </tr>
-
-        {% endfor %}
-      </tbody>
-    </table>
-
-    <a href="{% url 'my_bookings' %}" class="btn btn-outline-primary">
-      View All
-    </a>
-  </div>
 </div>
 
 {% endblock %}

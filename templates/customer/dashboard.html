@@ -100,37 +100,77 @@
     color: var(--primary-blue);
     margin: 0;
   }
+/* ==============================
+   POPULAR SERVICE CARDS
+============================== */
 
-  /* POPULAR UTILITY SERVICE TILES */
-  .service-card {
-    background: white;
-    border: none;
-    border-radius: 18px;
-    overflow: hidden;
-    box-shadow: var(--card-shadow);
-    transition: all 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
-    cursor: pointer;
-    height: 100%;
-  }
+.service-card{
+    background:#fff;
+    border:none;
+    border-radius:18px;
+    overflow:hidden;
+    height:100%;
+    cursor:pointer;
+    box-shadow:0 6px 18px rgba(0,0,0,.10);
+    transition:all .35s ease;
+}
 
-  .service-card:hover {
-    transform: scale(1.05);
-    box-shadow: 0 12px 25px rgba(30, 98, 236, 0.1);
-  }
+.service-card:hover{
+    transform:translateY(-8px);
+    box-shadow:0 18px 35px rgba(0,0,0,.18);
+}
 
-  .service-img-placeholder {
-    width: 100%;
-    height: 110px;
-    background-size: cover;
-    background-position: center;
-  }
+/* Image */
 
-  .service-card h6 {
-    font-size: 14px;
-    font-weight: 700;
-    color: var(--text-dark);
-    margin: 12px 0 0 0;
-  }
+.service-card img{
+    width:100%;
+    height:170px;
+    display:block;
+    object-fit:cover;
+    transition:transform .4s ease;
+}
+
+.service-card:hover img{
+    transform:scale(1.08);
+}
+
+/* Card Body */
+
+.service-card .card-body,
+.service-card .p-3{
+    padding:15px;
+    text-align:center;
+    background:#fff;
+}
+
+/* Title */
+
+.service-card h6{
+    margin:0;
+    font-size:16px;
+    font-weight:700;
+    color:#222;
+    line-height:1.4;
+}
+
+/* Responsive */
+
+@media (max-width:768px){
+
+    .service-card img{
+        height:130px;
+    }
+
+    .service-card h6{
+        font-size:14px;
+    }
+
+    .service-card .card-body,
+    .service-card .p-3{
+        padding:12px;
+    }
+
+}
 
   /* VERIFIED WORKER COMPONENT BLOCKS */
   .worker-card {
@@ -244,6 +284,28 @@
     color: white;
     cursor: pointer;
   }
+  .stat-card{
+    border-radius:18px;
+    transition:.3s ease;
+    cursor:pointer;
+    min-height:150px;
+    background:#fff;
+}
+
+.stat-card:hover{
+    transform:translateY(-6px);
+    box-shadow:0 12px 25px rgba(0,0,0,.15);
+}
+
+.stat-card h6{
+    font-size:15px;
+    font-weight:600;
+}
+
+.stat-card h2{
+    font-size:34px;
+    font-weight:700;
+}
 </style>
 
 <!-- HERO SECTION -->
@@ -284,12 +346,21 @@
       <hr class="text-muted opacity-25" />
       <div class="mb-4">
         <p class="mb-2">
-          <strong>Account Nickname:</strong> {{ request.user.username }}
-        </p>
-        <p class="mb-0">
-          <strong>Registered Notification Email:</strong> {{ request.user.email
-          }}
-        </p>
+    <p class="mb-2">
+    <strong>Full Name:</strong> {{ request.user.first_name }}
+</p>
+
+<p class="mb-2">
+    <strong>Email:</strong> {{ request.user.email }}
+</p>
+
+<p class="mb-2">
+    <strong>Phone:</strong> {{ customer.phone }}
+</p>
+{% comment %} 
+<p class="mb-2">
+    <strong>Pincode:</strong> {{ customer.pincode }}
+</p> {% endcomment %}
       </div>
       <a
         href="{% url 'edit_profile' %}"
@@ -322,111 +393,140 @@
 </div>
 
 <!-- DATA STATISTICS ROW COUNTER MODULES -->
-<div class="row mb-5 g-4">
-  <div class="col-6 col-md-3">
-    <div class="card stat-card text-center p-4">
-      <h6>Total Bookings Tally</h6>
-      <h2>{{ bookings.count }}</h2>
+<!-- DASHBOARD STATISTICS -->
+<div class="row g-4 align-items-stretch mb-5">
+
+    <!-- Total Bookings -->
+    <div class="col-lg-3 col-md-6 col-12">
+        <a href="{% url 'my_bookings' %}" class="text-decoration-none">
+            <div class="card stat-card h-100 text-center shadow-sm border-0">
+                <div class="card-body d-flex flex-column justify-content-center">
+                    <h6 class="text-muted mb-2">Total Bookings</h6>
+                    <h2 class="fw-bold text-primary mb-0">
+                        {{ bookings.count }}
+                    </h2>
+                </div>
+            </div>
+        </a>
     </div>
-  </div>
-  <div class="col-6 col-md-3">
-    <div
-      class="card stat-card text-center p-4"
-      style="border-left-color: #10b981"
-    >
-      <h6>Completed Jobs</h6>
-      <h2 class="text-success">{{ completed_jobs }}</h2>
+
+    <!-- Completed Jobs -->
+    <div class="col-lg-3 col-md-6 col-12">
+        <a href="{% url 'my_bookings' %}?status=Completed" class="text-decoration-none">
+            <div class="card stat-card h-100 text-center shadow-sm border-0 border-start border-5 border-success">
+                <div class="card-body d-flex flex-column justify-content-center">
+                    <h6 class="text-muted mb-2">Completed Jobs</h6>
+                    <h2 class="fw-bold text-success mb-0">
+                        {{ completed_jobs }}
+                    </h2>
+                </div>
+            </div>
+        </a>
     </div>
-  </div>
-  <div class="col-6 col-md-3">
-    <div
-      class="card stat-card text-center p-4"
-      style="border-left-color: #f59e0b"
-    >
-      <h6>Pending Jobs Queue</h6>
-      <h2 class="text-warning">{{ pending_jobs }}</h2>
+
+    <!-- Pending Jobs -->
+    <div class="col-lg-3 col-md-6 col-12">
+        <a href="{% url 'my_bookings' %}?status=Pending" class="text-decoration-none">
+            <div class="card stat-card h-100 text-center shadow-sm border-0 border-start border-5 border-warning">
+                <div class="card-body d-flex flex-column justify-content-center">
+                    <h6 class="text-muted mb-2">Pending Jobs</h6>
+                    <h2 class="fw-bold text-warning mb-0">
+                        {{ pending_jobs }}
+                    </h2>
+                </div>
+            </div>
+        </a>
     </div>
-  </div>
-  <div class="col-6 col-md-3">
-    <div
-      class="card stat-card text-center p-4"
-      style="border-left-color: #6366f1"
-    >
-      <h6>Saved Local Addresses</h6>
-      <h2 style="color: #6366f1">1</h2>
+
+    <!-- Saved Address -->
+    <div class="col-lg-3 col-md-6 col-12">
+        <a href="{% url 'profile' %}" class="text-decoration-none">
+            <div class="card stat-card h-100 text-center shadow-sm border-0 border-start border-5 border-primary">
+                <div class="card-body d-flex flex-column justify-content-center">
+                    <h6 class="text-muted mb-2">Saved Addresses</h6>
+                    <h2 class="fw-bold text-primary mb-0">1</h2>
+                </div>
+            </div>
+        </a>
     </div>
-  </div>
+
 </div>
 
-<!-- SPECIALTY UTILITY HOVER BLOCKS -->
-<h4 class="fw-bold mb-3 text-dark">Popular Service Categories</h4>
-<div class="row mb-5 g-3">
-  <div class="col-6 col-md-2">
-    <div class="card service-card text-center p-0">
-      <div
-        class="service-img-placeholder"
-        style="
-          background-image: url(&quot;https://images.unsplash.com/photo-1621905251189-08b45d6a269e?auto=format&fit=crop&q=80&w=200&quot;);
-        "
-      ></div>
-      <div class="p-3"><h6>Electrician</h6></div>
-    </div>
-  </div>
-  <div class="col-6 col-md-2">
-    <div class="card service-card text-center p-0">
-      <div
-        class="service-img-placeholder"
-        style="
-          background-image: url(&quot;https://images.unsplash.com/photo-1504328345606-18bbc8c9d7d1?auto=format&fit=crop&q=80&w=200&quot;);
-        "
-      ></div>
-      <div class="p-3"><h6>Plumber</h6></div>
-    </div>
-  </div>
-  <div class="col-6 col-md-2">
-    <div class="card service-card text-center p-0">
-      <div
-        class="service-img-placeholder"
-        style="
-          background-image: url(&quot;https://images.unsplash.com/photo-1621905252507-b354bc25edac?auto=format&fit=crop&q=80&w=200&quot;);
-        "
-      ></div>
-      <div class="p-3"><h6>AC Repair</h6></div>
-    </div>
-  </div>
-  <div class="col-6 col-md-2">
-    <div class="card service-card text-center p-0">
-      <div
-        class="service-img-placeholder"
-        style="
-          background-image: url(&quot;https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?auto=format&fit=crop&q=80&w=200&quot;);
-        "
-      ></div>
-      <div class="p-3"><h6>Mobile Repair</h6></div>
-    </div>
-  </div>
-  <div class="col-6 col-md-2">
-    <div class="card service-card text-center p-0">
-      <div
-        class="service-img-placeholder"
-        style="
-          background-image: url(&quot;https://images.unsplash.com/photo-1533090161767-e6ffed986c88?auto=format&fit=crop&q=80&w=200&quot;);
-        "
-      ></div>
-      <div class="p-3"><h6>Carpenter</h6></div>
-    </div>
-  </div>
-  <div class="col-6 col-md-2">
-    <div class="card service-card text-center p-0">
-      <div
-        class="service-img-placeholder"
-        style="
-          background-image: url(&quot;https://images.unsplash.com/photo-1589939705384-5185137a7f0f?auto=format&fit=crop&q=80&w=200&quot;);
-        "
-      ></div>
-      <div class="p-3"><h6>Painter</h6></div>
-    </div>
-  </div>
+<!-- Electrician -->
+<div class="col-6 col-md-2">
+    <a href="{% url 'book_service' %}?service_id=6" class="text-decoration-none text-dark">
+        <div class="card service-card text-center p-0 h-100">
+            <img src="https://images.unsplash.com/photo-1621905251189-08b45d6a269e?auto=format&fit=crop&w=400&q=80"
+                 class="card-img-top" style="height:150px;object-fit:cover;">
+            <div class="p-3">
+                <h6>Electrician</h6>
+            </div>
+        </div>
+    </a>
+</div>
+
+<!-- Plumber -->
+<div class="col-6 col-md-2">
+    <a href="{% url 'book_service' %}?service_id=7" class="text-decoration-none text-dark">
+        <div class="card service-card text-center p-0 h-100">
+            <img src="https://images.unsplash.com/photo-1504328345606-18bbc8c9d7d1?auto=format&fit=crop&w=400&q=80"
+                 class="card-img-top" style="height:150px;object-fit:cover;">
+            <div class="p-3">
+                <h6>Plumber</h6>
+            </div>
+        </div>
+    </a>
+</div>
+
+<!-- AC Repair -->
+<div class="col-6 col-md-2">
+    <a href="{% url 'book_service' %}?service_id=8" class="text-decoration-none text-dark">
+        <div class="card service-card h-100">
+            <img src="https://images.pexels.com/photos/5691622/pexels-photo-5691622.jpeg?auto=compress&cs=tinysrgb&w=600"
+                 alt="AC Repair">
+            <div class="card-body text-center">
+                <h6>AC Repair</h6>
+            </div>
+        </div>
+    </a>
+</div>
+<!-- Mobile Repair -->
+<div class="col-6 col-md-2">
+    <a href="{% url 'book_service' %}?service_id=9" class="text-decoration-none text-dark">
+        <div class="card service-card text-center p-0 h-100">
+            <img src="https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?auto=format&fit=crop&w=400&q=80"
+                 class="card-img-top" style="height:150px;object-fit:cover;">
+            <div class="p-3">
+                <h6>Mobile Repair</h6>
+            </div>
+        </div>
+    </a>
+</div>
+
+<!-- Carpenter -->
+<div class="col-6 col-md-2">
+    <a href="{% url 'book_service' %}?service_id=10" class="text-decoration-none text-dark">
+        <div class="card service-card text-center p-0 h-100">
+            <img src="https://images.unsplash.com/photo-1533090161767-e6ffed986c88?auto=format&fit=crop&w=400&q=80"
+                 class="card-img-top" style="height:150px;object-fit:cover;">
+            <div class="p-3">
+                <h6>Carpenter</h6>
+            </div>
+        </div>
+    </a>
+</div>
+
+<!-- Cleaning Service -->
+<div class="col-6 col-md-2">
+    <a href="{% url 'book_service' %}?service_id=11" class="text-decoration-none text-dark">
+        <div class="card service-card text-center p-0 h-100">
+            <img src="https://images.unsplash.com/photo-1581578731548-c64695cc6952?auto=format&fit=crop&w=400&q=80"
+                 class="card-img-top" style="height:150px;object-fit:cover;">
+            <div class="p-3">
+                <h6>Cleaning Service</h6>
+            </div>
+        </div>
+    </a>
 </div>
 
 <!-- ORDER HISTORY RECENT RECORD TABLE LEDGER -->
@@ -475,39 +575,93 @@
   </div>
 </div>
 
-<!-- HIGHLY RATED ASSIGNED TRADE PARTNERS -->
-<h4 class="fw-bold mb-3 text-dark">Top Rated Certified Trade Partners</h4>
+<!-- ================= TOP RATED CERTIFIED TRADE PARTNERS ================= -->
+
+<h4 class="fw-bold mb-4 text-dark">
+    <i class="bi bi-stars text-warning"></i>
+    Top Rated Certified Trade Partners
+</h4>
+
 <div class="row mb-5 g-4">
-  {% for worker in top_workers %}
-  <div class="col-md-3 col-sm-6">
-    <div class="card worker-card">
-      <div style="height: 200px; overflow: hidden; background-color: #f1f5f9">
-        <img
-          src="{{ worker.profile_image.url }}"
-          class="w-100 h-100"
-          style="object-fit: cover"
-          alt="Partner Identity Document Photo"
-        />
-      </div>
-      <div class="worker-card-body">
-        <h5>{{ worker.user.username }}</h5>
-        <p class="text-muted small mb-3">
-          <i class="bi bi-patch-check-fill text-primary me-1"></i>Certified {{
-          worker.service_type }}
-        </p>
-        <span class="badge-status badge-completed w-100 text-center d-block"
-          >Active Duty Available</span
-        >
-      </div>
+
+    {% for worker in top_workers %}
+
+    <div class="col-lg-3 col-md-4 col-sm-6">
+
+        <div class="card worker-card shadow-sm border-0 h-100">
+
+            <div style="height:220px; overflow:hidden;">
+
+                {% if worker.profile_image %}
+                    <img
+                        src="{{ worker.profile_image.url }}"
+                        class="w-100 h-100"
+                        style="object-fit:cover;"
+                        alt="{{ worker.user.username }}">
+                {% else %}
+                    <img
+                        src="/media/worker_profiles/default.png"
+                        class="w-100 h-100"
+                        style="object-fit:cover;"
+                        alt="Default Worker">
+                {% endif %}
+
+            </div>
+
+            <div class="card-body text-center">
+
+                <h5 class="fw-bold mb-2">
+                    {{ worker.user.username }}
+                </h5>
+
+                <p class="text-muted mb-2">
+                    <i class="bi bi-tools text-primary"></i>
+                    {{ worker.get_service_type_display }}
+                </p>
+
+                <p class="small text-secondary mb-3">
+                    <i class="bi bi-briefcase-fill"></i>
+                    {{ worker.experience }} Years Experience
+                </p>
+
+                <span class="badge bg-success mb-3">
+                    <i class="bi bi-patch-check-fill"></i>
+                    Verified Worker
+                </span>
+
+                <div class="d-grid gap-2">
+
+                   <a href="{% url 'worker_details' worker.id %}"
+   class="btn btn-outline-primary w-100 mb-2">
+    <i class="bi bi-person"></i>
+    View Profile
+</a>
+
+<a href="{% url 'book_worker' worker.id %}"
+   class="btn btn-success w-100">
+    <i class="bi bi-calendar-check"></i>
+    Book Now
+</a>
+
+                </div>
+
+            </div>
+
+        </div>
+
     </div>
-  </div>
-  {% empty %}
-  <div class="col-12">
-    <p class="text-muted small">
-      No verified worker profiles currently mapped to local zones.
-    </p>
-  </div>
-  {% endfor %}
+
+    {% empty %}
+
+    <div class="col-12">
+        <div class="alert alert-info text-center">
+            <i class="bi bi-info-circle"></i>
+            No verified workers are available at the moment.
+        </div>
+    </div>
+
+    {% endfor %}
+
 </div>
 
 <!-- ENTERPRISE INTEGRATED SYSTEM FOOTER -->

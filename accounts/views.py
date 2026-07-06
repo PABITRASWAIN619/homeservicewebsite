@@ -18,28 +18,24 @@ from django.shortcuts import render, redirect
 from .models import WorkerProfile
 
 
+from django.contrib.auth.decorators import login_required
+from django.shortcuts import render
+from .models import WorkerProfile
+
+
 @login_required
 def worker_profile(request):
+    worker = WorkerProfile.objects.filter(user=request.user).first()
 
-    print("LOGGED USER:", request.user.id)
-    print("LOGGED EMAIL:", request.user.email)
-
-    profile = WorkerProfile.objects.filter(
-        user=request.user
-    ).first()
-
-    print("PROFILE:", profile)
-
-    if not profile:
-        return render(
-            request,
-            "worker/no_profile.html"
-        )
+    if not worker:
+        return render(request, "worker/no_profile.html")
 
     return render(
         request,
         "worker/worker_profile.html",
-        {"profile": profile}
+        {
+            "worker": worker,
+        },
     )
 # ==========================================
 # HOME
@@ -194,6 +190,7 @@ def worker_signup_step4(request):
         return redirect("worker_signup_step1")
 
     if request.method == "POST":
+
         password = request.POST.get("password")
         confirm = request.POST.get("confirm_password")
 
@@ -204,22 +201,22 @@ def worker_signup_step4(request):
         # VALIDATION
         # -------------------------
         if password != confirm:
-            messages.error(request, "Passwords do not match")
+            messages.error(request, "Passwords do not match.")
             return redirect("worker_signup_step4")
 
         if User.objects.filter(username=email).exists():
-            messages.error(request, "User already exists")
+            messages.error(request, "User already exists.")
             return redirect("login")
 
         if not aadhaar or not pan:
-            messages.error(request, "Upload Aadhaar and PAN")
+            messages.error(request, "Please upload Aadhaar and PAN.")
             return redirect("worker_signup_step4")
 
         try:
             # -------------------------
-            # FACE IMAGE PROCESS
+            # FACE IMAGE
             # -------------------------
-            face_file_payload = None
+            face_file = None
 
             if face_image_base64:
                 if ";base64," in face_image_base64:
@@ -227,36 +224,35 @@ def worker_signup_step4(request):
                 else:
                     imgstr = face_image_base64
 
-                decoded = base64.b64decode(imgstr)
-
-                face_file_payload = ContentFile(
-                    decoded,
-                    name=face_image_name or f"worker_{uuid.uuid4().hex}.png"
+                face_file = ContentFile(
+                    base64.b64decode(imgstr),
+                    name=face_image_name or f"{uuid.uuid4().hex}.png"
                 )
 
             # -------------------------
-            # CREATE USER (KEEP ACTIVE = TRUE)
+            # CREATE USER
             # -------------------------
             user = User.objects.create_user(
                 username=email,
                 email=email,
-                password=password
+                password=password,
             )
 
-            # 🔥 IMPORTANT FIX
-            # DO NOT set is_active = False (it breaks login system)
             user.is_active = True
             user.save()
 
             # -------------------------
-            # ROLE CREATE
+            # CREATE ROLE
             # -------------------------
-            UserRole.objects.create(user=user, role="worker")
+            UserRole.objects.create(
+                user=user,
+                role="worker"
+            )
 
             # -------------------------
-            # WORKER PROFILE CREATE
+            # CREATE WORKER PROFILE
             # -------------------------
-            WorkerProfile.objects.create(
+            worker = WorkerProfile.objects.create(
                 user=user,
                 phone=phone,
                 date_of_birth=request.session.get("date_of_birth"),
@@ -265,7 +261,7 @@ def worker_signup_step4(request):
                 pincode=request.session.get("pincode"),
                 experience=request.session.get("experience"),
 
-                face_image=face_file_payload,
+                face_image=face_file,
                 aadhaar_image=aadhaar,
                 pan_image=pan,
 
@@ -273,15 +269,40 @@ def worker_signup_step4(request):
             )
 
             # -------------------------
-            # GO TO PENDING PAGE
+            # SAVE WORKER ID IN SESSION
+            # -------------------------
+            request.session["worker_id"] = worker.id
+
+            # Optional: clear signup data
+            for key in [
+                "email",
+                "phone",
+                "face_image_base64",
+                "face_image_name",
+                "date_of_birth",
+                "service_type",
+                "address",
+                "pincode",
+                "experience",
+            ]:
+                request.session.pop(key, None)
+
+            # -------------------------
+            # REDIRECT TO PENDING PAGE
             # -------------------------
             return redirect("worker_signup_pending")
 
         except Exception as e:
-            messages.error(request, f"Error: {str(e)}")
+            messages.error(request, f"Error: {e}")
             return redirect("worker_signup_step4")
 
-    return render(request, "worker_signup_step4.html", {"email": email})
+    return render(
+        request,
+        "worker_signup_step4.html",
+        {
+            "email": email
+        }
+    )
 # =========================
 # PENDING PAGE
 # =========================
@@ -290,21 +311,32 @@ from .models import WorkerProfile
 
 
 def worker_signup_pending(request):
+    # Get worker id from session
+    worker_id = request.session.get("worker_id")
 
-    # 🔥 Get latest worker (NO SESSION DEPENDENCY)
-    worker = WorkerProfile.objects.order_by("-id").first()
-
-    if not worker:
+    if not worker_id:
         return redirect("worker_signup_step1")
 
-    # If admin approved → send to login
+    try:
+        worker = WorkerProfile.objects.get(id=worker_id)
+    except WorkerProfile.DoesNotExist:
+        return redirect("worker_signup_step1")
+
+    # If admin approved the account
     if worker.is_approved:
+        # Remove session
+        request.session.pop("worker_id", None)
+
+        # Redirect to login
         return redirect("login")
 
+    # Show waiting page
     return render(
         request,
         "worker_signup_pending.html",
-        {"worker": worker}
+        {
+            "worker": worker
+        }
     )
 # ==========================================
 # CUSTOMER SIGNUP
@@ -327,48 +359,68 @@ def customer_signup(request):
         password1 = request.POST.get("password1")
         password2 = request.POST.get("password2")
 
+        # -----------------------------
+        # Validation
+        # -----------------------------
         if password1 != password2:
-            messages.error(request, "Passwords do not match")
+            messages.error(request, "Passwords do not match.")
             return redirect("customer_signup")
 
         if User.objects.filter(username=email).exists():
-            messages.error(request, "Email already exists")
+            messages.error(request, "Email already exists.")
             return redirect("customer_signup")
 
-        user = User.objects.create_user(
-            username=email,
-            email=email,
-            password=password1,
-            first_name=full_name
-        )
+        try:
 
-        CustomerProfile.objects.create(
-            user=user,
-            phone=phone,
-            pincode=pincode
-        )
+            # -----------------------------
+            # Create User
+            # -----------------------------
+            user = User.objects.create_user(
+                username=email,
+                email=email,
+                password=password1,
+                first_name=full_name
+            )
 
-        UserRole.objects.create(
-            user=user,
-            role="customer"
-        )
+            # -----------------------------
+            # Update Existing CustomerProfile
+            # (Created automatically by signals.py)
+            # -----------------------------
+            profile = CustomerProfile.objects.get(user=user)
 
-        messages.success(
-            request,
-            "Customer account created successfully"
-        )
+            profile.phone = phone
+            profile.pincode = pincode
 
-        return render(
-            request,
-            "customer_signup.html",
-            {"redirect_to_login": True}
-        )
+            profile.save()
 
-    return render(
-        request,
-        "customer_signup.html"
-    )
+            # -----------------------------
+            # Create User Role
+            # -----------------------------
+            UserRole.objects.get_or_create(
+                user=user,
+                defaults={
+                    "role": "customer"
+                }
+            )
 
+            messages.success(
+                request,
+                "Customer account created successfully."
+            )
+
+            return render(
+                request,
+                "customer_signup.html",
+                {
+                    "redirect_to_login": True
+                }
+            )
+
+        except Exception as e:
+            messages.error(request, f"Error: {e}")
+            return redirect("customer_signup")
+
+    return render(request, "customer_signup.html")
 # ==========================================
 # LOGIN
 # ==========================================
@@ -497,12 +549,21 @@ from .models import (
 # ==========================================
 # ADMIN DASHBOARD
 # ==========================================
+from django.contrib.auth.decorators import login_required
+from django.shortcuts import render, redirect
+from .models import WorkerProfile, CustomerProfile, Booking, AdminProfile
+
 @login_required
 def admin_dashboard(request):
     if not request.user.is_superuser:
         return redirect("login")
 
+    # Get admin profile
+    profile, created = AdminProfile.objects.get_or_create(user=request.user)
+
     context = {
+        "profile": profile,
+
         "total_workers": WorkerProfile.objects.count(),
         "pending_workers": WorkerProfile.objects.filter(is_approved=False).count(),
 
@@ -519,16 +580,40 @@ def admin_dashboard(request):
 # ==========================================
 # WORKERS PAGE
 # ==========================================
+from django.contrib.auth.decorators import login_required
+from django.shortcuts import render, redirect
+from django.db.models import Q
+from .models import WorkerProfile
+
 @login_required
 def admin_workers(request):
+
+    # Allow only admin
     if not request.user.is_superuser:
         return redirect("login")
 
-    workers = WorkerProfile.objects.all()
+    # Get search text from URL
+    search = request.GET.get("search", "")
 
-    return render(request, "admin/workers.html", {
-        "workers": workers
-    })
+    # Get all workers
+    workers = WorkerProfile.objects.select_related("user").all()
+
+    # Search by username, first name, last name, email, or phone
+    if search:
+        workers = workers.filter(
+            Q(user__username__icontains=search) |
+            Q(user__first_name__icontains=search) |
+            Q(user__last_name__icontains=search) |
+            Q(user__email__icontains=search) |
+            Q(phone__icontains=search)
+        )
+
+    context = {
+        "workers": workers,
+        "search": search,
+    }
+
+    return render(request, "admin/workers.html", context)
 
 
 # ==========================================
@@ -544,11 +629,124 @@ def admin_customers(request):
     return render(request, "admin/customers.html", {
         "customers": customers
     })
+from django.contrib.auth.decorators import login_required
+from django.shortcuts import get_object_or_404, redirect
+from django.contrib import messages
+from .models import WorkerProfile
 
+
+from django.shortcuts import get_object_or_404, redirect
+from django.contrib import messages
+@login_required
+def warn_worker(request, worker_id):
+    # Only admin can warn workers
+    if not request.user.is_superuser:
+        return redirect("login")
+
+    worker = get_object_or_404(WorkerProfile, id=worker_id)
+
+    message = "Please follow the platform rules. This is an official warning from the administrator."
+
+    # Update worker
+    worker.warning_count += 1
+    worker.warning_message = message
+    worker.save()
+
+    # Save warning history
+    WorkerWarning.objects.create(
+        worker=worker,
+        message=message,
+        warned_by=request.user,
+    )
+
+    messages.success(
+        request,
+        f"Warning sent to {worker.user.username}."
+    )
+
+    return redirect("admin_workers")
+@login_required
+def worker_blocked(request):
+
+    worker = WorkerProfile.objects.filter(user=request.user).first()
+
+    if not worker or not worker.is_blocked:
+        return redirect("worker_dashboard")
+
+    return render(request, "worker/blocked.html", {
+        "worker": worker
+    })
+
+
+@login_required
+def block_worker(request, worker_id):
+
+    if not request.user.is_superuser:
+        return redirect("login")
+
+    worker = get_object_or_404(WorkerProfile, id=worker_id)
+
+    # 🔴 BLOCK WORKER
+    worker.is_blocked = True
+    worker.warning_message = "🚫 Your account has been blocked by the administrator."
+    worker.blocked_reason = "Blocked by Administrator"
+    worker.blocked_at = timezone.now()
+    worker.save()
+
+    # 🔥 IMPORTANT: REMOVE ACTIVE JOBS
+    Booking.objects.filter(
+        worker=worker,
+        status__in=["Assigned", "Accepted", "On The Way", "Working"]
+    ).update(worker=None, status="Pending")
+
+    messages.success(
+        request,
+        f"{worker.user.username} has been blocked successfully."
+    )
+
+    return redirect("admin_workers")
+@login_required
+def blocked_page(request):
+    worker = request.user.workerprofile
+
+    if not worker.is_blocked:
+        return redirect("worker_dashboard")
+
+    return render(request, "blocked.html", {
+        "message": worker.warning_message,
+        "reason": worker.blocked_reason,
+    })
+
+
+@login_required
+def unblock_worker(request, worker_id):
+    # Only admin can unblock workers
+    if not request.user.is_superuser:
+        return redirect("login")
+
+    worker = get_object_or_404(WorkerProfile, id=worker_id)
+
+    worker.is_blocked = False
+    worker.warning_count = 0
+    worker.warning_message = ""
+    worker.blocked_reason = ""
+    worker.blocked_at = None
+
+    worker.save()
+
+    messages.success(
+        request,
+        f"{worker.user.username} has been unblocked successfully."
+    )
+
+    return redirect("admin_workers")
 
 # ==========================================
 # BOOKINGS PAGE
 # ==========================================
+from django.contrib.auth.decorators import login_required
+from django.shortcuts import render, redirect
+
 @login_required
 def admin_bookings(request):
 
@@ -559,11 +757,19 @@ def admin_bookings(request):
         "customer",
         "worker",
         "service"
-    ).order_by("-booking_date")   # ✅ FIXED
+    ).order_by("-booking_date")
+
+    # Get status from URL
+    status = request.GET.get("status")
+
+    # Filter pending bookings
+    if status == "pending":
+        bookings = bookings.filter(status="Pending")   # Change "Pending" if your status value is different
 
     workers = WorkerProfile.objects.filter(
-        is_approved=True
-    )
+    is_approved=True,
+    is_blocked=False
+)
 
     return render(
         request,
@@ -595,16 +801,43 @@ def select_payment_method(request, booking_id, method):
 # ==========================================
 # PROFILE PAGE
 # ==========================================
+from django.shortcuts import render, redirect
+from django.contrib import messages
+from .models import AdminProfile, WorkerProfile, CustomerProfile, Booking
+
 def admin_profile(request):
     if not request.user.is_superuser:
         return redirect("login")
 
-    return render(request, "admin/profile.html", {
+    # Get or create admin profile
+    profile, created = AdminProfile.objects.get_or_create(user=request.user)
+
+    if request.method == "POST":
+
+        request.user.username = request.POST.get("username")
+        request.user.email = request.POST.get("email")
+        request.user.first_name = request.POST.get("first_name")
+        request.user.last_name = request.POST.get("last_name")
+
+        if request.FILES.get("profile_image"):
+            profile.image = request.FILES["profile_image"]
+
+        request.user.save()
+        profile.save()
+
+        messages.success(request, "✅ Profile updated successfully!")
+
+        return redirect("admin_profile")
+
+    context = {
+        "profile": profile,
         "total_workers": WorkerProfile.objects.count(),
         "total_customers": CustomerProfile.objects.count(),
         "total_bookings": Booking.objects.count(),
         "pending_bookings": Booking.objects.filter(status="Pending").count(),
-    })
+    }
+
+    return render(request, "admin/profile.html", context)
 
 
 # ==========================================
@@ -877,25 +1110,19 @@ def needs_payment(self):
 # ==========================================
 # CUSTOMER PROFILE
 # ==========================================
-from .models import (
-    CustomerProfile,
-    WorkerProfile,
-    UserRole,
-    Booking
-)
+from django.contrib.auth.decorators import login_required
+from django.shortcuts import render
+from .models import CustomerProfile, WorkerProfile, UserRole, Booking
+
 
 @login_required
 def profile(request):
 
-    role = UserRole.objects.get(
-        user=request.user
-    ).role
+    role = UserRole.objects.get(user=request.user).role
 
     if role == "worker":
 
-        profile = WorkerProfile.objects.get(
-            user=request.user
-        )
+        profile = WorkerProfile.objects.get(user=request.user)
 
         return render(
             request,
@@ -905,23 +1132,27 @@ def profile(request):
             }
         )
 
-    customer = CustomerProfile.objects.get(
-        user=request.user
-    )
+    # Customer Profile
+    profile = CustomerProfile.objects.get(user=request.user)
 
     bookings = Booking.objects.filter(
-        customer=customer
-    ).order_by("-id")[:5]
+        customer=profile
+    ).order_by("-id")
+
+    completed_jobs = bookings.filter(status="Completed").count()
+
+    pending_jobs = bookings.exclude(status="Completed").count()
 
     return render(
         request,
         "customer/profile.html",
         {
-            "customer": customer,
-            "bookings": bookings
+            "profile": profile,
+            "bookings": bookings,
+            "completed_jobs": completed_jobs,
+            "pending_jobs": pending_jobs,
         }
     )
-
 
 # ==========================================
 # EDIT PROFILE
@@ -939,22 +1170,42 @@ def edit_worker_profile(request):
         return redirect("worker_profile")
 
     if request.method == "POST":
-        profile.phone = request.POST.get("phone")
-        # Handle potential empty input
-        profile.location = request.POST.get("location") or ""
-        profile.address = request.POST.get("address")
-        profile.experience = request.POST.get("experience")
-        profile.pincode = request.POST.get("pincode")
+
+        # Update basic information
+        profile.phone = request.POST.get("phone", "").strip()
+        profile.location = request.POST.get("location", "").strip()
+        profile.address = request.POST.get("address", "").strip()
+        profile.experience = request.POST.get("experience", "").strip()
+        profile.pincode = request.POST.get("pincode", "").strip()
+
+        # Update latitude & longitude
+        latitude = request.POST.get("latitude")
+        longitude = request.POST.get("longitude")
+
+        if latitude:
+            profile.latitude = float(latitude)
+
+        if longitude:
+            profile.longitude = float(longitude)
+
+        # Update profile picture
+        if request.FILES.get("profile_image"):
+            profile.profile_image = request.FILES["profile_image"]
 
         profile.save()
+
         return redirect("worker_profile")
 
-    # FIX: Ensure 'None' is converted to an empty string for the template
     context = {
         "profile": profile,
-        "location_value": profile.location if profile.location else ""
+        "location_value": profile.location or "",
     }
-    return render(request, "worker/edit_worker_profile.html", context)
+
+    return render(
+        request,
+        "worker/edit_worker_profile.html",
+        context,
+    )
 # ==========================================
 # SERVICES
 # ==========================================
@@ -1004,18 +1255,13 @@ from .models import WorkerProfile, Booking
 # ==========================================
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import render, redirect
-from .models import WorkerProfile, Booking, UserRole
+from .models import WorkerProfile, Booking, UserRole, WorkerWarning
+
 
 @login_required
 def worker_dashboard(request):
 
-    print("========== WORKER DASHBOARD ==========")
-    print("USER:", request.user)
-    print("EMAIL:", request.user.email)
-
     role = UserRole.objects.filter(user=request.user).first()
-
-    print("ROLE:", role.role if role else "NO ROLE")
 
     if not role:
         return redirect("login")
@@ -1025,22 +1271,31 @@ def worker_dashboard(request):
 
     worker = WorkerProfile.objects.filter(user=request.user).first()
 
-    print("WORKER:", worker)
-
     if not worker:
-        print("NO WORKER PROFILE FOUND")
         return redirect("worker_profile")
 
-    print("APPROVED:", worker.is_approved)
+    # Worker is blocked
+    if worker.is_blocked:
+        return render(
+            request,
+            "worker/blocked.html",
+            {
+                "worker": worker,
+            },
+        )
 
+    # Worker not approved
     if not worker.is_approved:
-        print("REDIRECTING TO PENDING PAGE")
         return redirect("worker_signup_pending")
 
     bookings = Booking.objects.filter(worker=worker).order_by("-id")
 
+    warnings = WorkerWarning.objects.filter(worker=worker).order_by("-created_at")
+
     total_jobs = bookings.count()
+
     assigned_jobs = bookings.filter(status="Assigned").count()
+
     completed_jobs = bookings.filter(status="Completed").count()
 
     total_earnings = sum(
@@ -1048,16 +1303,19 @@ def worker_dashboard(request):
         for booking in bookings.filter(status="Completed")
     )
 
-    print("LOADING DASHBOARD")
-
-    return render(request, "worker/worker_dashboard.html", {
-        "worker": worker,
-        "bookings": bookings,
-        "total_jobs": total_jobs,
-        "assigned_jobs": assigned_jobs,
-        "completed_jobs": completed_jobs,
-        "total_earnings": total_earnings,
-    })
+    return render(
+        request,
+        "worker/worker_dashboard.html",
+        {
+            "worker": worker,
+            "bookings": bookings,
+            "warnings": warnings,
+            "total_jobs": total_jobs,
+            "assigned_jobs": assigned_jobs,
+            "completed_jobs": completed_jobs,
+            "total_earnings": total_earnings,
+        },
+    )
 @login_required
 def on_the_way(request, booking_id):
 
@@ -1483,6 +1741,10 @@ from django.contrib import messages
 from .models import Booking, WorkerProfile
 
 
+from django.contrib.auth.decorators import login_required
+from django.shortcuts import get_object_or_404, redirect
+from django.contrib import messages
+
 @login_required
 def assign_worker(request, booking_id):
 
@@ -1504,10 +1766,12 @@ def assign_worker(request, booking_id):
             messages.error(request, "Please select a worker.")
             return redirect("assign_worker", booking_id=booking.id)
 
+        # ✅ SAFE: block blocked + unapproved workers
         worker = get_object_or_404(
             WorkerProfile,
             id=worker_id,
-            is_approved=True
+            is_approved=True,
+            is_blocked=False
         )
 
         booking.worker = worker
@@ -1520,7 +1784,6 @@ def assign_worker(request, booking_id):
         )
 
         return redirect("all_bookings")
-
     # =========================
     # GET → SHOW PAGE
     # =========================
@@ -1638,37 +1901,50 @@ def auto_assign_worker(request, booking_id):
 
 
 from django.contrib.auth.decorators import login_required
-from django.shortcuts import render, redirect, get_object_or_404
-from .models import WorkerProfile
+from django.shortcuts import render, redirect
+from django.contrib import messages
+from .models import CustomerProfile
 
 
 @login_required
 def edit_profile(request):
-    try:
-        profile = WorkerProfile.objects.get(user=request.user)
-    except WorkerProfile.DoesNotExist:
-        profile = None
+
+    profile, created = CustomerProfile.objects.get_or_create(
+        user=request.user
+    )
 
     if request.method == "POST":
-        if profile is None:
-            profile = WorkerProfile(user=request.user)
 
-        profile.name = request.POST.get("name")
+        # Update Django User
+        request.user.first_name = request.POST.get("first_name")
+        request.user.last_name = request.POST.get("last_name")
+        request.user.username = request.POST.get("username")
+        request.user.email = request.POST.get("email")
+        request.user.save()
+
+        # Update Customer Profile
         profile.phone = request.POST.get("phone")
-        profile.date_of_birth = request.POST.get("date_of_birth")
-        profile.service_type = request.POST.get("service_type")
-        profile.address = request.POST.get("address")
         profile.city = request.POST.get("city")
-        profile.state = request.POST.get("state")
-        profile.experience = request.POST.get("experience")
+        profile.address = request.POST.get("address")
         profile.pincode = request.POST.get("pincode")
 
-        profile.save()
-        return redirect("worker_profile")
+        # Upload Profile Image
+        if request.FILES.get("profile_image"):
+            profile.image = request.FILES["profile_image"]
 
-    return render(request, "accounts/edit___profile.html", {
-        "profile": profile
-    })
+        profile.save()
+
+        messages.success(request, "Profile updated successfully.")
+
+        return redirect("profile")
+
+    return render(
+        request,
+        "customer/edit_profile.html",
+        {
+            "profile": profile
+        }
+    )
 @login_required
 def accept_job(request, booking_id):
     worker = WorkerProfile.objects.get(user=request.user)
@@ -1697,14 +1973,32 @@ def reject_job(request, booking_id):
 
     return redirect("worker_dashboard")
 from django.shortcuts import render, get_object_or_404
+from django.http import JsonResponse
 from .models import Booking
+from django.contrib.auth.decorators import login_required
 
+
+@login_required
 def track_worker(request, booking_id):
     booking = get_object_or_404(Booking, id=booking_id)
 
-    return render(request, "customer/track_worker.html", {
-        "booking": booking
-    })
+    return render(
+        request,
+        "worker/track_worker.html",
+        {
+            "booking": booking
+        }
+    )
+
+
+# @login_required
+# def get_worker_location(request, booking_id):
+#     booking = get_object_or_404(Booking, id=booking_id)
+
+#     return JsonResponse({
+#         "latitude": booking.latitude,
+#         "longitude": booking.longitude,
+#     })
 from django.http import JsonResponse
 from .models import WorkerLocation
 from django.contrib.auth.decorators import login_required
@@ -1757,6 +2051,17 @@ def get_worker_location(request, booking_id):
         "lat": loc.lat,
         "lng": loc.lng,
         "distance": distance
+    })
+    from django.http import JsonResponse
+from django.shortcuts import get_object_or_404
+
+@login_required
+def get_customer_location(request, booking_id):
+    booking = get_object_or_404(Booking, id=booking_id)
+
+    return JsonResponse({
+        "latitude": booking.latitude,
+        "longitude": booking.longitude,
     })
 # views.py
 
@@ -1875,43 +2180,77 @@ def resend_otp(request, booking_id):
         messages.error(request, "Wait 5 minutes")
 
     return redirect("assign_jobs")
+from django.contrib.auth.decorators import login_required
 from django.shortcuts import render, redirect
 from django.contrib import messages
 from .models import CustomerProfile
 
 
+@login_required
 def edit_profile(request):
-    user = request.user
 
-    # get or create customer profile
-    profile, created = CustomerProfile.objects.get_or_create(user=user)
+    profile, created = CustomerProfile.objects.get_or_create(
+        user=request.user
+    )
 
     if request.method == "POST":
 
-        # ======================
-        # USER MODEL UPDATE
-        # ======================
-        user.first_name = request.POST.get("first_name")
-        user.last_name = request.POST.get("last_name")
-        user.username = request.POST.get("username")
-        user.email = request.POST.get("email")
-        user.save()
+        # ==========================
+        # Update Django User
+        # ==========================
+        request.user.first_name = request.POST.get("first_name", "")
+        request.user.last_name = request.POST.get("last_name", "")
+        request.user.username = request.POST.get("username", "")
+        request.user.email = request.POST.get("email", "")
+        request.user.save()
 
-        # ======================
-        # CUSTOMER PROFILE UPDATE
-        # ======================
-        profile.phone = request.POST.get("phone")
-        profile.pincode = request.POST.get("pincode")
+        # ==========================
+        # Update Customer Profile
+        # ==========================
+        profile.phone = request.POST.get("phone", "")
+        profile.city = request.POST.get("city", "")
+        profile.address = request.POST.get("address", "")
+        profile.pincode = request.POST.get("pincode", "")
 
-        profile.latitude = request.POST.get("latitude") or None
-        profile.longitude = request.POST.get("longitude") or None
+        # ==========================
+        # DEBUG
+        # ==========================
+        print("POST DATA:", request.POST)
+        print("FILES:", request.FILES)
+
+        # ==========================
+        # Upload Image
+        # ==========================
+        if "profile_image" in request.FILES:
+
+            image = request.FILES["profile_image"]
+
+            print("Image Received:", image)
+
+            profile.image = image
+
+        else:
+
+            print("No image uploaded.")
 
         profile.save()
 
-        messages.success(request, "Profile updated successfully!")
+        print("Saved Image:", profile.image)
+
+        messages.success(
+            request,
+            "Profile updated successfully."
+        )
+
         return redirect("profile")
 
-    return render(request, "customer/edit_profile.html", {"profile": profile})
+    return render(
+        request,
+        "customer/edit_profile.html",
+        {
+            "profile": profile
+        }
+    )
 from django.http import JsonResponse
 from .models import Booking
 
@@ -2166,3 +2505,156 @@ def admin_reviews(request):
             "reviews": reviews
         }
     )
+from django.shortcuts import get_object_or_404, redirect
+
+@login_required
+def book_worker(request, worker_id):
+    worker = get_object_or_404(
+        WorkerProfile,
+        id=worker_id,
+        is_approved=True
+    )
+
+    request.session["selected_worker"] = worker.id
+
+    service = Service.objects.get(name=worker.service_type)
+
+    return redirect(f"/book-service/?service_id={service.id}")
+
+
+@login_required
+def my_worker_profile(request):
+
+    worker = WorkerProfile.objects.filter(
+        user=request.user
+    ).first()
+
+    if not worker:
+        return render(
+            request,
+            "worker/no_profile.html"
+        )
+
+    return render(
+        request,
+        "worker/profile.html",
+        {
+            "worker": worker
+        }
+    )
+# from django.contrib import messages
+
+# def admin_profile(request):
+
+#     profile = request.user.adminprofile
+
+#     if request.method == "POST":
+
+#         request.user.username = request.POST.get("username")
+#         request.user.email = request.POST.get("email")
+#         request.user.first_name = request.POST.get("first_name")
+#         request.user.last_name = request.POST.get("last_name")
+
+#         if request.FILES.get("profile_image"):
+#             profile.image = request.FILES["profile_image"]
+
+#         request.user.save()
+#         profile.save()
+
+#         messages.success(request, "✅ Profile updated successfully!")
+
+#         return redirect("admin_profile")
+
+#     context = {
+#         "profile": profile,
+#     }
+
+#     return render(request, "admin/profile.html", context)
+@login_required
+def my_worker_profile(request):
+
+    worker = WorkerProfile.objects.filter(
+        user=request.user
+    ).first()
+
+    if not worker:
+        return render(
+            request,
+            "worker/no_profile.html"
+        )
+
+    return render(
+        request,
+        "worker/profile.html",
+        {
+            "worker": worker
+        }
+    )
+from django.contrib.auth.decorators import login_required
+from django.shortcuts import get_object_or_404, render
+from django.db.models import Avg
+
+from .models import WorkerProfile, Booking, Review
+
+
+@login_required
+def worker_details(request, worker_id):
+
+    worker = get_object_or_404(
+        WorkerProfile,
+        id=worker_id,
+        is_approved=True
+    )
+
+    completed_jobs = Booking.objects.filter(
+        worker=worker,
+        status="Completed"
+    ).count()
+
+    reviews = Review.objects.filter(
+        booking__worker=worker
+    ).order_by("-created_at")
+
+    average_rating = reviews.aggregate(
+        Avg("rating")
+    )["rating__avg"] or 0
+
+    return render(
+        request,
+        "customer/worker_details.html",
+        {
+            "worker": worker,
+            "completed_jobs": completed_jobs,
+            "reviews": reviews,
+            "reviews_count": reviews.count(),
+            "average_rating": round(average_rating, 1),
+        },
+    )
+from django.contrib.auth.models import User
+from django.contrib import messages
+from django.shortcuts import render, redirect
+
+def forgot_password(request):
+
+    if request.method == "POST":
+
+        email = request.POST.get("email")
+        new_password = request.POST.get("new_password")
+        confirm_password = request.POST.get("confirm_password")
+
+        if new_password != confirm_password:
+            messages.error(request, "Passwords do not match.")
+            return redirect("forgot_password")
+
+        try:
+            user = User.objects.get(email=email)
+            user.set_password(new_password)
+            user.save()
+
+            messages.success(request, "Password changed successfully. Please login.")
+            return redirect("login")
+
+        except User.DoesNotExist:
+            messages.error(request, "Email not found.")
+
+    return render(request, "forgot_password.html")

@@ -1,78 +1,427 @@
-{% extends "admin/base.html" %} {% load static %} {% block content %}
+{% extends "admin/base.html" %}
+{% load static %}
 
-<div class="main">
-  <h3 class="mb-3">👤 Admin Profile</h3>
+{% block content %}
 
-  <div class="table-box">
-    <div class="row">
-      <!-- ================= LEFT SIDE ================= -->
-      <div class="col-md-6">
-        <h5>Account Info</h5>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 
-        <p><b>Username:</b> {{ request.user.username }}</p>
-        <p><b>Email:</b> {{ request.user.email }}</p>
-        <p><b>Joined:</b> {{ request.user.date_joined|date:"d M Y" }}</p>
-        <p><b>Last Login:</b> {{ request.user.last_login|date:"d M Y H:i" }}</p>
-      </div>
+<style>
 
-      <!-- ================= RIGHT SIDE ================= -->
-      <div class="col-md-6">
-        <h5>System Overview</h5>
+*{
+    font-family:'Poppins',sans-serif;
+}
 
-        <p><b>Total Workers:</b> {{ total_workers }}</p>
-        <p><b>Total Customers:</b> {{ total_customers }}</p>
-        <p><b>Total Bookings:</b> {{ total_bookings }}</p>
-        <p><b>Pending Bookings:</b> {{ pending_bookings }}</p>
-      </div>
-    </div>
-  </div>
+body{
+    background:#fafafa;
+}
+
+.profile-container{
+    max-width:1000px;
+    margin:30px auto;
+    background:#fff;
+    border:1px solid #dbdbdb;
+    border-radius:12px;
+    overflow:hidden;
+    box-shadow:0 10px 30px rgba(0,0,0,.08);
+}
+
+.profile-top{
+    display:flex;
+    flex-wrap:wrap;
+    align-items:center;
+    padding:40px;
+    gap:50px;
+}
+
+.profile-image{
+
+    width:180px;
+    height:180px;
+    border-radius:50%;
+    overflow:hidden;
+    border:5px solid #e1306c;
+    box-shadow:0 5px 20px rgba(225,48,108,.3);
+
+}
+
+.profile-image img{
+
+    width:100%;
+    height:100%;
+    object-fit:cover;
+
+}
+
+.profile-info{
+
+    flex:1;
+
+}
+
+.profile-info h2{
+
+    font-size:32px;
+    font-weight:600;
+    margin-bottom:15px;
+
+}
+
+.badge-admin{
+
+    background:#4e73df;
+    color:white;
+    padding:5px 15px;
+    border-radius:20px;
+    font-size:13px;
+    margin-left:10px;
+
+}
+
+.stats{
+
+    display:flex;
+    gap:35px;
+    margin:25px 0;
+
+}
+
+.stats div{
+
+    text-align:center;
+
+}
+
+.stats h3{
+
+    margin:0;
+    color:#222;
+
+}
+
+.stats span{
+
+    color:#777;
+    font-size:14px;
+
+}
+
+.bio{
+
+    color:#555;
+    line-height:28px;
+
+}
+
+.edit-section{
+
+    border-top:1px solid #eee;
+    padding:40px;
+
+}
+
+.edit-section h3{
+
+    margin-bottom:30px;
+    color:#444;
+
+}
+
+.form-group{
+
+    margin-bottom:20px;
+
+}
+
+.form-group label{
+
+    display:block;
+    font-weight:600;
+    margin-bottom:8px;
+
+}
+
+.form-control{
+
+    width:100%;
+    padding:13px 15px;
+    border:1px solid #ddd;
+    border-radius:10px;
+    transition:.3s;
+
+}
+
+.form-control:focus{
+
+    border-color:#e1306c;
+    outline:none;
+    box-shadow:0 0 10px rgba(225,48,108,.2);
+
+}
+
+.profile-upload{
+
+    margin-top:15px;
+
+}
+
+.profile-upload input{
+
+    margin-top:10px;
+
+}
+
+.btn-save{
+
+    background:linear-gradient(45deg,#833ab4,#fd1d1d,#fcb045);
+    color:white;
+    border:none;
+    padding:14px 35px;
+    border-radius:10px;
+    font-weight:bold;
+    transition:.3s;
+    cursor:pointer;
+
+}
+
+.btn-save:hover{
+
+    transform:translateY(-3px);
+    box-shadow:0 10px 20px rgba(0,0,0,.2);
+
+}
+
+.alert{
+
+    margin:20px;
+}
+
+</style>
+
+<div class="profile-container">
+
+{% if messages %}
+    {% for message in messages %}
+        <div class="alert alert-success">
+            {{ message }}
+        </div>
+    {% endfor %}
+{% endif %}
+
+<div class="profile-top">
+
+<div class="profile-image">
+
+{% if profile.image %}
+<img src="{{ profile.image.url }}">
+{% else %}
+<img src="{% static 'images/admin.png' %}">
+{% endif %}
+
 </div>
 
-<!-- ================= STYLES ================= -->
-<style>
-  body {
-    margin: 0;
-    font-family: "Segoe UI", Arial;
-    background: #f4f6f9;
-  }
+<div class="profile-info">
 
-  .main {
-    padding: 20px;
-  }
+<h2>
 
-  .table-box {
-    background: white;
-    padding: 20px;
-    border-radius: 14px;
-    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.08);
-  }
+{{ request.user.username }}
 
-  h3,
-  h5 {
-    color: #1f2937;
-  }
+<span class="badge-admin">
 
-  p {
-    font-size: 14px;
-    margin-bottom: 10px;
-  }
+Administrator
 
-  .row {
-    display: flex;
-    flex-wrap: wrap;
-  }
+</span>
 
-  .col-md-6 {
-    flex: 1;
-    min-width: 250px;
-    padding: 10px;
-  }
+</h2>
 
-  @media (max-width: 768px) {
-    .table-box {
-      padding: 15px;
+<div class="stats">
+
+<div>
+
+<h3>{{ total_workers }}</h3>
+
+<span>Workers</span>
+
+</div>
+
+<div>
+
+<h3>{{ total_customers }}</h3>
+
+<span>Customers</span>
+
+</div>
+
+<div>
+
+<h3>{{ total_bookings }}</h3>
+
+<span>Bookings</span>
+
+</div>
+
+<div>
+
+<h3>{{ pending_bookings }}</h3>
+
+<span>Pending</span>
+
+</div>
+
+</div>
+
+<div class="bio">
+
+<b>Name :</b>
+
+{{ request.user.first_name }} {{ request.user.last_name }}
+
+<br>
+
+<b>Email :</b>
+
+{{ request.user.email }}
+
+<br>
+
+<b>Joined :</b>
+
+{{ request.user.date_joined|date:"d M Y" }}
+
+<br>
+
+<b>Last Login :</b>
+
+{{ request.user.last_login|date:"d M Y H:i" }}
+
+</div>
+
+</div>
+
+</div>
+
+<div class="edit-section">
+
+<h3>Edit Profile</h3>
+
+<form method="POST" enctype="multipart/form-data">
+
+{% csrf_token %}
+<div class="row">
+
+    <div class="col-md-6">
+
+        <div class="form-group">
+            <label>Username</label>
+            <input type="text"
+                   name="username"
+                   class="form-control"
+                   value="{{ request.user.username }}"
+                   required>
+        </div>
+
+    </div>
+
+    <div class="col-md-6">
+
+        <div class="form-group">
+            <label>Email Address</label>
+            <input type="email"
+                   name="email"
+                   class="form-control"
+                   value="{{ request.user.email }}"
+                   required>
+        </div>
+
+    </div>
+
+    <div class="col-md-6">
+
+        <div class="form-group">
+            <label>First Name</label>
+            <input type="text"
+                   name="first_name"
+                   class="form-control"
+                   value="{{ request.user.first_name }}">
+        </div>
+
+    </div>
+
+    <div class="col-md-6">
+
+        <div class="form-group">
+            <label>Last Name</label>
+            <input type="text"
+                   name="last_name"
+                   class="form-control"
+                   value="{{ request.user.last_name }}">
+        </div>
+
+    </div>
+
+    <div class="col-md-12">
+
+        <div class="form-group profile-upload">
+
+            <label>Profile Picture</label>
+
+            {% if profile.image %}
+                <img src="{{ profile.image.url }}"
+                     id="preview"
+                     style="width:120px;height:120px;border-radius:50%;object-fit:cover;border:3px solid #E1306C;margin-bottom:15px;">
+            {% else %}
+                <img src="{% static 'images/admin.png' %}"
+                     id="preview"
+                     style="width:120px;height:120px;border-radius:50%;object-fit:cover;border:3px solid #E1306C;margin-bottom:15px;">
+            {% endif %}
+
+            <input type="file"
+                   name="profile_image"
+                   class="form-control"
+                   accept="image/*"
+                   onchange="previewImage(event)">
+
+        </div>
+
+    </div>
+
+    <div class="col-md-12 mt-4">
+
+        <button type="submit" class="btn-save">
+            💾 Save Changes
+        </button>
+
+        <a href="{% url 'admin_dashboard' %}"
+           class="btn btn-secondary"
+           style="margin-left:15px;padding:14px 30px;border-radius:10px;">
+            ← Back Dashboard
+        </a>
+
+    </div>
+
+</div>
+
+</form>
+
+</div>
+
+</div>
+
+<script>
+
+function previewImage(event){
+
+    const reader = new FileReader();
+
+    reader.onload = function(){
+
+        document.getElementById("preview").src = reader.result;
+
     }
-  }
-</style>
+
+    reader.readAsDataURL(event.target.files[0]);
+
+}
+
+</script>
 
 {% endblock %}

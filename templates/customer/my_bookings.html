@@ -34,17 +34,36 @@
       {% for booking in bookings %}
       <tr>
         <!-- 👤 CUSTOMER -->
-        <td>
-          <strong>{{ booking.customer.user.username }}</strong>
-        </td>
+       <td>
+    {% if booking.worker %}
+        <strong>{{ booking.worker.user.username }}</strong><br>
+        <small class="text-muted">{{ booking.worker.user.email }}</small>
+    {% else %}
+        <span class="text-muted">Not Assigned</span>
+    {% endif %}
+</td>
 
-        <!-- 📞 PHONE -->
-        <td>{{ booking.customer.phone }}</td>
+       <!-- 📞 WORKER PHONE -->
+<td>
+    {% if booking.worker %}
+        {{ booking.worker.phone }}
+    {% else %}
+        <span class="text-muted">Not Assigned</span>
+    {% endif %}
+</td>
 
         <!-- 🔧 SERVICE -->
         <td>
-          <span class="badge bg-primary"> {{ booking.service.name }} </span>
-        </td>
+    {% if booking.worker %}
+        <span class="badge bg-primary">
+            {{ booking.worker.service_type }}
+        </span>
+    {% else %}
+        <span class="badge bg-secondary">
+            {{ booking.service.name }}
+        </span>
+    {% endif %}
+</td>
 
         <!-- 📍 ADDRESS -->
         <td>{{ booking.address }}</td>

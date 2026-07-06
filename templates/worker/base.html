@@ -340,9 +340,19 @@
         </button>
 
         <div class="worker-profile-badge shadow-sm">
-          <div class="avatar-circle">
-            {{ request.user.username|slice:":1"|upper }}
-          </div>
+          {% if request.user.workerprofile.profile_image %}
+<div class="avatar-circle p-0 overflow-hidden">
+    <img
+        src="{{ request.user.workerprofile.profile_image.url }}"
+        alt="Profile"
+        style="width:100%;height:100%;object-fit:cover;border-radius:50%;"
+    >
+</div>
+{% else %}
+<div class="avatar-circle">
+    {{ request.user.username|slice:":1"|upper }}
+</div>
+{% endif %}
 
           <div>
             <div class="fw-bold">{{ request.user.username }}</div>

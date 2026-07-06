@@ -6,7 +6,7 @@
 <div class="table-responsive">
 <table class="table table-bordered table-hover align-middle">
 
-```
+
 <thead class="table-dark">
     <tr>
         <th>Customer</th>
@@ -39,29 +39,38 @@
     <td>{{ booking.address }}</td>
 
     <td>
-        {% if booking.latitude and booking.longitude %}
 
-            <a href="https://www.google.com/maps?q={{ booking.latitude }},{{ booking.longitude }}"
-               target="_blank"
-               class="btn btn-primary btn-sm">
-                View Map
-            </a>
+{% if booking.latitude and booking.longitude %}
 
-            <br>
+    <a href="https://www.google.com/maps?q={{ booking.latitude }},{{ booking.longitude }}"
+       target="_blank"
+       class="btn btn-primary btn-sm mb-2">
+        View Map
+    </a>
 
-            <small class="text-muted">
-                {{ booking.latitude }},
-                {{ booking.longitude }}
-            </small>
+    <br>
 
-        {% else %}
+    <a href="{% url 'track_worker' booking.id %}"
+       class="btn btn-success btn-sm">
+        📍 Live Location
+    </a>
 
-            <span class="text-danger">
-                No Location
-            </span>
+    <br>
 
-        {% endif %}
-    </td>
+    <small class="text-muted">
+        {{ booking.latitude }},
+        {{ booking.longitude }}
+    </small>
+
+{% else %}
+
+    <span class="text-danger">
+        No Location
+    </span>
+
+{% endif %}
+
+</td>
 
     <td>
 
@@ -223,8 +232,6 @@
 {% endfor %}
 
 </tbody>
-```
-
 </table>
 </div>
 

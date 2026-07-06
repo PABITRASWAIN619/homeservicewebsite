@@ -1,0 +1,69 @@
+{% extends 'worker/base.html' %}
+{% block content %}
+
+<link rel="stylesheet"
+href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+
+<div class="container mt-4">
+
+    <div class="card shadow">
+
+        <div class="card-header bg-success text-white">
+            <h4>Customer Live Location</h4>
+        </div>
+
+        <div class="card-body">
+
+            <div id="map" style="height:550px;"></div>
+
+        </div>
+
+    </div>
+
+</div>
+
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+<script>
+
+let map = L.map('map').setView(
+[
+{{ booking.latitude }},
+{{ booking.longitude }}
+],16);
+
+L.tileLayer(
+'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
+{
+maxZoom:19
+}
+).addTo(map);
+
+let marker = L.marker([
+{{ booking.latitude }},
+{{ booking.longitude }}
+]).addTo(map);
+
+marker.bindPopup("Customer Location").openPopup();
+
+function refreshLocation(){
+
+fetch("{% url 'get_worker_location' booking.id %}")
+
+.then(response=>response.json())
+
+.then(data=>{
+
+marker.setLatLng([data.latitude,data.longitude]);
+
+map.panTo([data.latitude,data.longitude]);
+
+});
+
+}
+
+setInterval(refreshLocation,5000);
+
+</script>
+
+{% endblock %}

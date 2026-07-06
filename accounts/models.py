@@ -13,14 +13,35 @@ from django.contrib.auth.models import User
 
 
 class CustomerProfile(models.Model):
-    
+
     user = models.OneToOneField(
         User,
         on_delete=models.CASCADE
     )
 
-    phone = models.CharField(max_length=15)
+    # Contact
+    phone = models.CharField(
+        max_length=15,
+        blank=True
+    )
 
+    city = models.CharField(
+        max_length=100,
+        blank=True
+    )
+
+    address = models.TextField(
+        blank=True
+    )
+
+    # Profile Picture
+    image = models.ImageField(
+        upload_to='profile_images/',
+        blank=True,
+        null=True
+    )
+
+    # Existing Fields
     pincode = models.CharField(
         max_length=10,
         blank=True,
@@ -45,9 +66,8 @@ class CustomerProfile(models.Model):
         return self.user.username
 # ==========================================
 # WORKER PROFILE
-# ==========================================
 class WorkerProfile(models.Model):
-    
+
     SERVICE_CHOICES = [
         ('electrician', 'Electrician'),
         ('plumber', 'Plumber'),
@@ -75,7 +95,6 @@ class WorkerProfile(models.Model):
     address = models.TextField()
 
     location = models.CharField(max_length=255, blank=True, null=True)
-
     pincode = models.CharField(max_length=10, blank=True, null=True)
 
     latitude = models.FloatField(null=True, blank=True)
@@ -84,6 +103,13 @@ class WorkerProfile(models.Model):
     experience = models.CharField(max_length=50)
 
     is_approved = models.BooleanField(default=False)
+
+    # New fields
+    is_blocked = models.BooleanField(default=False)
+    warning_count = models.PositiveIntegerField(default=0)
+    warning_message = models.TextField(blank=True, null=True)
+    blocked_reason = models.TextField(blank=True, null=True)
+    blocked_at = models.DateTimeField(null=True, blank=True)
 
     face_image = models.ImageField(upload_to="faces/", null=True, blank=True)
     aadhaar_image = models.ImageField(upload_to="aadhaar/", null=True, blank=True)
@@ -100,6 +126,25 @@ class WorkerProfile(models.Model):
 
     def __str__(self):
         return f"{self.user.username} ({self.service_type})"
+class WorkerWarning(models.Model):
+    worker = models.ForeignKey(
+        WorkerProfile,
+        on_delete=models.CASCADE,
+        related_name="warnings"
+    )
+
+    message = models.TextField()
+
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    warned_by = models.ForeignKey(
+        User,
+        on_delete=models.SET_NULL,
+        null=True
+    )
+
+    def __str__(self):
+        return f"{self.worker.user.username} - Warning"    
 
 # ==========================================
 # USER ROLE
@@ -116,6 +161,15 @@ class UserRole(models.Model):
 
     def __str__(self):
         return f"{self.user.username} - {self.role}"
+    from django.db import models
+from django.contrib.auth.models import User
+
+class AdminProfile(models.Model):
+    user = models.OneToOneField(User, on_delete=models.CASCADE)
+    image = models.ImageField(upload_to="admin_profile/", default="admin_profile/default.png")
+
+    def __str__(self):
+        return self.user.username
 
 
 # ==========================================

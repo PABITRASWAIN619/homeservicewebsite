@@ -26,7 +26,8 @@ path("redirect/", views.role_based_redirect, name="role_redirect"),
     path('worker-dashboard/', views.worker_dashboard, name='worker_dashboard'),
     path('customer-dashboard/', views.customer_dashboard, name='customer_dashboard'),
     
-
+ path('worker-blocked/', views.worker_blocked, name='worker_blocked'),
+ path('worker-blocked/', views.worker_blocked, name='worker_blocked'),
     # =========================
     # WORKERS
     # =========================
@@ -140,16 +141,32 @@ path(
     
 path("dashboard/admin/", views.admin_dashboard, name="admin_dashboard"),
 path("dashboard/admin/workers/", views.admin_workers, name="admin_workers"),
+
+path(
+    "dashboard/admin/workers/warn/<int:worker_id>/",
+    views.warn_worker,
+    name="warn_worker",
+),
+
+path(
+    "dashboard/admin/workers/block/<int:worker_id>/",
+    views.block_worker,
+    name="block_worker",
+),
+
+path(
+    "dashboard/admin/workers/unblock/<int:worker_id>/",
+    views.unblock_worker,
+    name="unblock_worker",
+),
+
 path("dashboard/admin/customers/", views.admin_customers, name="admin_customers"),
 path("dashboard/admin/bookings/", views.admin_bookings, name="admin_bookings"),
+ path("dashboard/admin/profile/", views.admin_profile, name="admin_profile"),
 path("dashboard/admin/profile/", views.admin_profile, name="admin_profile"),
 path("dashboard/admin/support/", views.admin_support, name="admin_support"),
+path("dashboard/admin/reviews/", views.admin_reviews, name="admin_reviews"),
 path("admin-stats/", views.admin_stats, name="admin_stats"),
-path(
-    "dashboard/admin/reviews/",
-    views.admin_reviews,
-    name="admin_reviews"
-),
 # =========================
     # SUPPORT SYSTEM
     # =========================
@@ -185,6 +202,57 @@ path(
     "mark_payment_done/<int:booking_id>/<str:method>/",
     views.mark_payment_done,
     name="mark_payment_done"
+),
+path(
+    "get-customer-location/<int:booking_id>/",
+    views.get_customer_location,
+    name="get_customer_location",
+),
+path(
+    "track-worker/<int:booking_id>/",
+    views.track_worker,
+    name="track_worker",
+),
+path(
+    "book-worker/<int:worker_id>/",
+    views.book_worker,
+    name="book_worker",
+),
+
+# ==========================================
+# WORKER PROFILE
+# ==========================================
+
+# Customer views a worker profile
+path(
+    "worker-profile/<int:worker_id>/",
+    views.worker_details,
+    name="worker_details",
+),
+
+# Worker views his own profile
+path(
+    "my-worker-profile/",
+    views.my_worker_profile,
+    name="my_worker_profile",
+),
+
+# Customer books a worker
+path(
+    "book-worker/<int:worker_id>/",
+    views.book_worker,
+    name="book_worker",
+),
+path(
+    "forgot-password/",
+    views.forgot_password,
+    name="forgot_password"
+),
+path('login/', views.user_login, name='login'),
+path(
+    "worker-login/",
+    views.user_login,
+    name="worker_login"
 ),
 
 
