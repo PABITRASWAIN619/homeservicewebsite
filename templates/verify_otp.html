@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+
+<title>Verify OTP</title>
+
+<style>
+
+body{
+
+background:#111;
+
+display:flex;
+
+justify-content:center;
+
+align-items:center;
+
+height:100vh;
+
+font-family:Arial;
+
+}
+
+.box{
+
+background:white;
+
+padding:30px;
+
+width:350px;
+
+border-radius:10px;
+
+text-align:center;
+
+}
+
+input{
+
+width:100%;
+
+padding:12px;
+
+margin:15px 0;
+
+font-size:18px;
+
+}
+
+button{
+
+width:100%;
+
+padding:12px;
+
+background:#007bff;
+
+color:white;
+
+border:none;
+
+cursor:pointer;
+
+font-size:18px;
+
+}
+
+</style>
+
+</head>
+
+<body>
+
+<div class="box">
+
+<h2>Email OTP Verification</h2>
+
+<form method="POST">
+
+{% csrf_token %}
+
+<input
+type="text"
+name="otp"
+placeholder="Enter OTP"
+maxlength="6"
+required>
+
+<button type="submit">
+
+Verify OTP
+
+</button>
+
+</form>
+
+</div>
+
+</body>
+
+</html>
