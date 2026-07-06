@@ -1212,10 +1212,7 @@ def edit_worker_profile(request):
 
 @login_required
 def services(request):
-
-    services = Service.objects.filter(
-        is_active=True
-    )
+    services = Service.objects.all()
 
     return render(
         request,
