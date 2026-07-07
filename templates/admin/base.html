@@ -189,35 +189,57 @@
 
       <ul>
         <li>
-          <a href="{% url 'admin_dashboard' %}" class="active">
-            📊 Dashboard
-          </a>
-        </li>
+    <a href="{% url 'admin_dashboard' %}"
+       class="{% if request.resolver_match.url_name == 'admin_dashboard' %}active{% endif %}">
+        📊 Dashboard
+    </a>
+</li>
 
-        <li>
-          <a href="{% url 'admin_workers' %}"> 👷 Workers </a>
-        </li>
+<li>
+    <a href="{% url 'admin_workers' %}"
+       class="{% if request.resolver_match.url_name == 'admin_workers' %}active{% endif %}">
+        👷 Workers
+    </a>
+</li>
 
-        <li>
-          <a href="{% url 'admin_customers' %}"> 👥 Customers </a>
-        </li>
+<li>
+    <a href="{% url 'admin_customers' %}"
+       class="{% if request.resolver_match.url_name == 'admin_customers' %}active{% endif %}">
+        👥 Customers
+    </a>
+</li>
 
-        <li>
-          <a href="{% url 'admin_bookings' %}"> 📅 Bookings </a>
-        </li>
+<li>
+    <a href="{% url 'admin_bookings' %}"
+       class="{% if request.resolver_match.url_name == 'admin_bookings' %}active{% endif %}">
+        📅 Bookings
+    </a>
+</li>
 
-        <li>
-          <a href="{% url 'admin_profile' %}"> 👤 Profile </a>
-        </li>
-        <li><a href="{% url 'admin_reviews' %}"> ⭐ Reviews </a></li>
+<li>
+    <a href="{% url 'admin_profile' %}"
+       class="{% if request.resolver_match.url_name == 'admin_profile' %}active{% endif %}">
+        👤 Profile
+    </a>
+</li>
 
-        <li>
-          <a href="{% url 'admin_support' %}">Support</a>
-        </li>
+<li>
+    <a href="{% url 'admin_reviews' %}"
+       class="{% if request.resolver_match.url_name == 'admin_reviews' %}active{% endif %}">
+        ⭐ Reviews
+    </a>
+</li>
 
-        <li class="logout">
-          <a href="{% url 'logout' %}"> 🚪 Logout </a>
-        </li>
+<li>
+    <a href="{% url 'admin_support' %}"
+       class="{% if request.resolver_match.url_name == 'admin_support' %}active{% endif %}">
+        💬 Support
+    </a>
+</li>
+
+<li class="logout">
+    <a href="{% url 'logout' %}">🚪 Logout</a>
+</li>
       </ul>
     </div>
 

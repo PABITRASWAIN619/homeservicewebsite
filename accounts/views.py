@@ -2,6 +2,7 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.models import User
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
+from django.views.decorators.cache import never_cache
 from django.contrib import messages
 
 from .forms import WorkerSignupForm, CustomerSignupForm
@@ -532,7 +533,12 @@ from django.shortcuts import redirect
 
 def user_logout(request):
     logout(request)
-    return redirect("login")
+    request.session.flush()
+    response = redirect("login")
+    response["Cache-Control"] = "no-cache, no-store, must-revalidate"
+    response["Pragma"] = "no-cache"
+    response["Expires"] = "0"
+    return response
 # ==========================================
 # ADMIN DASHBOARD
 # ==========================================
@@ -553,7 +559,9 @@ from django.contrib.auth.decorators import login_required
 from django.shortcuts import render, redirect
 from .models import WorkerProfile, CustomerProfile, Booking, AdminProfile
 
+
 @login_required
+@never_cache
 def admin_dashboard(request):
     if not request.user.is_superuser:
         return redirect("login")
@@ -624,7 +632,9 @@ def admin_customers(request):
     if not request.user.is_superuser:
         return redirect("login")
 
-    customers = CustomerProfile.objects.all()
+    customers = CustomerProfile.objects.filter(
+        user__userrole__role="customer"
+    ).select_related("user")
 
     return render(request, "admin/customers.html", {
         "customers": customers
@@ -937,6 +947,7 @@ from django.shortcuts import render, redirect
 from .models import UserRole, CustomerProfile, Booking, WorkerProfile
 
 @login_required
+@never_cache
 def customer_dashboard(request):
 
     role = UserRole.objects.filter(user=request.user).first()
@@ -1256,6 +1267,7 @@ from .models import WorkerProfile, Booking, UserRole, WorkerWarning
 
 
 @login_required
+@never_cache
 def worker_dashboard(request):
 
     role = UserRole.objects.filter(user=request.user).first()
