@@ -176,26 +176,31 @@
 
         {% elif booking.status == "Working" %}
 
-            {% if booking.payment_status == "Pending" %}
+    {% if booking.payment_status == "Pending" %}
 
-                <a href="{% url 'mark_payment_done' booking.id 'cash' %}"
-                   class="btn btn-warning btn-sm">
-                    Cash Paid
-                </a>
+        <a href="{% url 'mark_payment_done' booking.id 'cash' %}"
+           class="btn btn-warning btn-sm">
+            Cash Paid
+        </a>
 
-                <a href="{% url 'mark_payment_done' booking.id 'online' %}"
-                   class="btn btn-success btn-sm">
-                    Online Paid
-                </a>
+        <a href="{% url 'mark_payment_done' booking.id 'online' %}"
+           class="btn btn-success btn-sm">
+            Online Paid
+        </a>
 
-            {% else %}
+    {% else %}
 
-                <a href="{% url 'verify_otp' booking.id %}"
-                   class="btn btn-primary btn-sm">
-                    Verify OTP
-                </a>
+        <a href="{% url 'verify_otp' booking.id %}"
+           class="btn btn-primary btn-sm mb-1">
+            Verify OTP
+        </a>
 
-            {% endif %}
+        <a href="{% url 'resend_otp' booking.id %}"
+           class="btn btn-warning btn-sm">
+            🔄 Resend OTP
+        </a>
+
+    {% endif %}
 
         {% elif booking.status == "Completed" %}
 

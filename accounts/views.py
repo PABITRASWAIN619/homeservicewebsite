@@ -1478,31 +1478,97 @@ def completed_jobs(request):
 # ==========================================
 # EARNINGS
 # ==========================================
+from django.contrib.auth.decorators import login_required
+from django.shortcuts import render, get_object_or_404
+from django.db.models import Sum
+from django.utils import timezone
+
+from .models import WorkerProfile, Booking
+
 
 @login_required
 def earnings(request):
 
-    worker = WorkerProfile.objects.get(
+    worker = get_object_or_404(
+        WorkerProfile,
         user=request.user
     )
 
+
+    # Completed jobs only
     jobs = Booking.objects.filter(
         worker=worker,
         status="Completed"
-    )
+    ).order_by("-booking_date")
 
-    total = sum(
-        booking.amount
-        for booking in jobs
-    )
+
+
+    # Lifetime earnings
+    total_earnings = jobs.aggregate(
+        total=Sum("amount")
+    )["total"] or 0
+
+
+
+
+    # Current month earnings
+    today = timezone.now()
+
+
+    monthly_earnings = jobs.filter(
+        booking_date__year=today.year,
+        booking_date__month=today.month
+    ).aggregate(
+        total=Sum("amount")
+    )["total"] or 0
+
+
+
+
+    # Chart data (Jan-Dec)
+
+    monthly_data = []
+
+
+    for month in range(1, 13):
+
+        amount = jobs.filter(
+            booking_date__month=month
+        ).aggregate(
+            total=Sum("amount")
+        )["total"] or 0
+
+
+        monthly_data.append(float(amount))
+
+
+
+    context = {
+
+
+        "jobs": jobs,
+
+
+        "total": total_earnings,
+
+
+        "total_earnings": total_earnings,
+
+
+        "monthly_earnings": monthly_earnings,
+
+
+        "monthly_data": monthly_data,
+
+
+    }
+
+
 
     return render(
         request,
         "worker/earnings.html",
-        {
-            "jobs": jobs,
-            "total": total
-        }
+        context
     )
 
 
@@ -2160,9 +2226,8 @@ def cancel_booking(request, id):
 def payment_page(request, id):
     booking = Booking.objects.get(id=id)
     return render(request, "customer/payment.html", {"booking": booking})
-from django.shortcuts import get_object_or_404, redirect
-from django.contrib.auth.decorators import login_required
-from django.contrib import messages
+from django.utils import timezone
+import random
 
 @login_required
 def update_status(request, booking_id, status):
@@ -2170,25 +2235,67 @@ def update_status(request, booking_id, status):
     booking = get_object_or_404(Booking, id=booking_id)
 
     booking.status = status
+
+    # Generate OTP when work starts
+    if status == "Working":
+        booking.otp = str(random.randint(100000, 999999))
+        booking.otp_created_time = timezone.now()
+        booking.otp_verified = False
+
     booking.save()
 
     messages.success(request, f"Status updated to {status}")
+
     return redirect("assign_jobs")
+from django.contrib import messages
+from django.shortcuts import get_object_or_404, redirect
+from django.contrib.auth.decorators import login_required
+
 @login_required
 def resend_otp(request, booking_id):
+
+    booking = get_object_or_404(
+        Booking,
+        id=booking_id
+    )
+
+    if booking.can_resend_otp:
+        booking.generate_otp()
+
+        messages.success(
+            request,
+            "OTP Resent Successfully."
+        )
+    else:
+        messages.error(
+            request,
+            "Please wait 5 minutes before requesting another OTP."
+        )
+
+    return redirect("assign_jobs")
+    
+from django.contrib.auth.decorators import login_required
+from django.shortcuts import get_object_or_404, redirect
+from django.contrib import messages
+@login_required
+def admin_resend_otp(request, booking_id):
+
+    if not request.user.is_superuser:
+        return redirect("login")
 
     booking = get_object_or_404(Booking, id=booking_id)
 
     if booking.can_resend_otp:
         booking.generate_otp()
-        booking.otp_created_time = timezone.now()
+        booking.otp_verified = False
         booking.save()
-
-        messages.success(request, "OTP resent")
+        messages.success(request, "OTP resent successfully.")
     else:
-        messages.error(request, "Wait 5 minutes")
+        messages.error(request, "Please wait 5 minutes before resending OTP.")
 
-    return redirect("assign_jobs")
+    return redirect("admin_bookings")
+
+    
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import render, redirect
 from django.contrib import messages

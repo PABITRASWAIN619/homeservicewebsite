@@ -1,484 +1,1086 @@
 {% load static %}
-<!doctype html>
-<html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Worker Signup - Step 2</title>
 
-    <link
-      href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght=400;500;600;700&display=swap"
-      rel="stylesheet"
-    />
-    <link
-      rel="stylesheet"
-      href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css"
-    />
+<link
+href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap"
+rel="stylesheet"
+/>
 
-    <style>
-      :root {
-        --primary-sky: #38bdf8;
-        --royal-purple: #6366f1;
-        --error-rose: #f43f5e;
-        --success-emerald: #10b981;
-        --gradient-premium: linear-gradient(
-          135deg,
-          #0f172a 0%,
-          #1e1b4b 50%,
-          #311042 100%
-        );
-        --card-bg: rgba(17, 24, 39, 0.75);
-        --input-bg: #0b1220;
-        --border-color: #334155;
-        --text-muted: #94a3b8;
-      }
+<link
+rel="stylesheet"
+href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css"
+/>
 
-      * {
-        box-sizing: border-box;
-        margin: 0;
-        padding: 0;
-      }
 
-      body {
-        font-family: "Plus Jakarta Sans", sans-serif;
-        background: var(--gradient-premium) !important;
-        background-attachment: fixed !important;
-        min-height: 100vh;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        padding: 20px;
-      }
+<style>
 
-      /* PREMIUM DARK CYBER GLASS CONTAINER */
-      .card {
-        width: 100%;
-        max-width: 450px;
-        background: var(--card-bg);
-        backdrop-filter: blur(16px);
-        -webkit-backdrop-filter: blur(16px);
-        padding: 40px 30px;
-        border-radius: 24px;
-        border: 1px solid rgba(255, 255, 255, 0.08);
-        box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
-      }
+:root{
+    --primary:#38bdf8;
+    --purple:#6366f1;
+    --success:#10b981;
+    --danger:#f43f5e;
 
-      /* Stepper Tracker Row */
-      .step-progress-tracker {
-        display: flex;
-        justify-content: center;
-        gap: 6px;
-        margin-bottom: 25px;
-      }
+    --bg:
+    linear-gradient(
+        135deg,
+        #020617,
+        #1e1b4b,
+        #312e81
+    );
 
-      .progress-bar-segment {
-        height: 4px;
-        width: 40px;
-        border-radius: 2px;
-        background: rgba(255, 255, 255, 0.1);
-      }
+    --card:rgba(15,23,42,.85);
+    --input:#020617;
+    --border:#334155;
+}
 
-      .progress-bar-segment.completed {
-        background: var(--success-emerald);
-      }
 
-      .progress-bar-segment.active {
-        background: linear-gradient(
-          90deg,
-          var(--primary-sky),
-          var(--royal-purple)
-        );
-        box-shadow: 0 0 10px rgba(56, 189, 248, 0.4);
-      }
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+}
 
-      h2 {
-        text-align: center;
-        color: #ffffff;
-        font-size: 26px;
-        font-weight: 700;
-        letter-spacing: -0.5px;
-        margin-bottom: 8px;
-      }
 
-      .subtitle-desc {
-        text-align: center;
-        color: var(--text-muted);
-        font-size: 14px;
-        margin-bottom: 30px;
-      }
+body{
 
-      .input-box {
-        margin-bottom: 20px;
-        position: relative;
-      }
+    min-height:100vh;
 
-      .input-box label {
-        display: block;
-        color: #f1f5f9;
-        font-size: 12px;
-        font-weight: 600;
-        text-transform: uppercase;
-        letter-spacing: 0.75px;
-        margin-bottom: 8px;
-        padding-left: 4px;
-      }
+    display:flex;
+    justify-content:center;
+    align-items:center;
 
-      .input-wrapper {
-        position: relative;
-        display: flex;
-        align-items: center;
-      }
+    padding:20px;
 
-      .input-wrapper i.input-icon {
-        position: absolute;
-        left: 14px;
-        color: var(--text-muted);
-        font-size: 18px;
-        pointer-events: none;
-        transition: color 0.3s ease;
-        z-index: 5;
-      }
+    font-family:
+    "Plus Jakarta Sans",
+    sans-serif;
 
-      .input-box input,
-      .input-box select {
-        width: 100%;
-        padding: 14px 16px 14px 44px;
-        border-radius: 12px;
-        border: 1px solid var(--border-color);
-        background: var(--input-bg);
-        color: white;
-        font-size: 15px;
-        font-family: inherit;
-        outline: none;
-        transition: all 0.25s ease;
-        appearance: none; /* Clear native dropdown arrow tracking elements */
-        -webkit-appearance: none;
-      }
+    background:var(--bg);
+    background-attachment:fixed;
 
-      /* Native dropdown custom arrow integration hook */
-      .input-box select {
-        background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='%2394a3b8'%3e%3cpath fill-rule='evenodd' d='M1.646 4.646a.5.708 0 0 1 .708 0L8 10.293l5.646-5.647a.5.708 0 0 1 .708.708l-6 6a.5.708 0 0 1-.708 0l-6-6a.5.708 0 0 1 0-.708z'/%3e%3c/svg%3e");
-        background-repeat: no-repeat;
-        background-position: right 14px center;
-        background-size: 12px;
-        padding-right: 40px;
-      }
+    overflow-x:hidden;
+}
 
-      .input-box select option {
-        background-color: #111827;
-        color: white;
-      }
 
-      .input-box input:focus,
-      .input-box select:focus {
-        border-color: var(--primary-sky);
-        box-shadow: 0 0 0 4px rgba(56, 189, 248, 0.15);
-        background: #0f172a;
-      }
+/* Background Animation */
 
-      .input-box input:focus ~ i.input-icon,
-      .input-box select:focus ~ i.input-icon {
-        color: var(--primary-sky);
-      }
+body::before{
 
-      /* LIVE VALIDATION GLOWS */
-      .input-box.is-invalid-field input,
-      .input-box.is-invalid-field select {
-        border-color: var(--error-rose) !important;
-        box-shadow: 0 0 0 4px rgba(244, 63, 94, 0.15) !important;
-      }
+    content:"";
 
-      .input-box.is-invalid-field i.input-icon {
-        color: var(--error-rose) !important;
-      }
+    position:fixed;
 
-      .input-box.is-valid-field input,
-      .input-box.is-valid-field select {
-        border-color: var(--success-emerald) !important;
-      }
+    width:400px;
+    height:400px;
 
-      .input-box.is-valid-field i.input-icon {
-        color: var(--success-emerald) !important;
-      }
+    background:#38bdf8;
 
-      .field-error-feedback {
-        color: var(--error-rose);
-        font-size: 12px;
-        font-weight: 500;
-        margin-top: 6px;
-        padding-left: 4px;
-        display: none;
-        align-items: center;
-        gap: 6px;
-      }
+    filter:blur(150px);
 
-      button[type="submit"] {
-        width: 100%;
-        padding: 14px;
-        background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
-        border: none;
-        color: white;
-        border-radius: 12px;
-        font-size: 16px;
-        font-weight: 600;
-        letter-spacing: 0.5px;
-        cursor: pointer;
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-        gap: 8px;
-        box-shadow: 0 4px 15px rgba(37, 99, 235, 0.3);
-        transition: all 0.3s ease;
-        margin-top: 10px;
-      }
+    opacity:.25;
 
-      button[type="submit"]:hover {
-        background: linear-gradient(135deg, #1d4ed8 0%, #1e40af 100%);
-        transform: translateY(-2px);
-        box-shadow: 0 8px 25px rgba(37, 99, 235, 0.45);
-      }
+    top:-100px;
+    left:-100px;
 
-      @media (max-width: 480px) {
-        body {
-          padding: 15px;
-        }
-        .card {
-          padding: 30px 20px;
-          border-radius: 20px;
-        }
-        h2 {
-          font-size: 22px;
-        }
-        .input-box input,
-        .input-box select {
-          padding: 12px 14px 12px 40px;
-          font-size: 14px;
-        }
-      }
-    </style>
-  </head>
+    animation:
+    moveGlow 8s infinite alternate;
 
-  <body>
-    <div class="card">
-      <div class="step-progress-tracker">
-        <div class="progress-bar-segment completed"></div>
-        <div class="progress-bar-segment active"></div>
-        <div class="progress-bar-segment"></div>
-        <div class="progress-bar-segment"></div>
-      </div>
+}
 
-      <h2>Worker Signup</h2>
-      <p class="subtitle-desc">
-        Step 2 of 4 – Professional Core Specifications
-      </p>
 
-      <form method="POST" id="serviceDetailsForm" novalidate>
-        {% csrf_token %}
 
-        <div class="input-box" id="serviceBox">
-          <label>Service Allocation Type</label>
+@keyframes moveGlow{
 
-          <div class="input-wrapper">
-            <i class="bi bi-briefcase-fill input-icon"></i>
+from{
+transform:translate(0,0);
+}
 
-            <select name="service_type" id="serviceSelect" required>
-              <option value="">Select Domain Specialization</option>
+to{
+transform:translate(250px,150px);
+}
 
-              <option value="Electrician">Electrician</option>
-              <option value="Plumber">Plumber</option>
-              <option value="AC Repair">AC Repair</option>
-              <option value="Carpenter">Carpenter</option>
-              <option value="Painter">Painter</option>
+}
 
-              <!-- FIXED VALUE -->
-              <option value="Cleaning Service">Cleaning Service</option>
 
-              <option value="Mobile Repair">Mobile Repair</option>
-            </select>
-          </div>
 
-          <div class="field-error-feedback" id="serviceError"></div>
-        </div>
-        <div class="input-box" id="addressBox">
-          <label>Full Operational Address</label>
-          <div class="input-wrapper">
-            <i class="bi bi-house-door-fill input-icon"></i>
-            <input
-              type="text"
-              name="address"
-              id="addressInput"
-              placeholder="Enter Street Name, Locality House Number"
-              required
-            />
-          </div>
-          <div class="field-error-feedback" id="addressError"></div>
-        </div>
 
-        <div class="input-box" id="pincodeBox">
-          <label>Regional Pin Code</label>
-          <div class="input-wrapper">
-            <i class="bi bi-geo-alt-fill input-icon"></i>
-            <input
-              type="text"
-              name="pincode"
-              id="pincodeInput"
-              placeholder="Enter 6-digit code"
-              maxlength="6"
-              required
-            />
-          </div>
-          <div class="field-error-feedback" id="pincodeError"></div>
-        </div>
+.card{
 
-        <div class="input-box" id="experienceBox">
-          <label>Years of Trade Experience</label>
-          <div class="input-wrapper">
-            <i class="bi bi-award-fill input-icon"></i>
-            <input
-              type="text"
-              name="experience"
-              id="experienceInput"
-              placeholder="e.g., 3"
-              required
-            />
-          </div>
-          <div class="field-error-feedback" id="experienceError"></div>
-        </div>
 
-        <button type="submit">
-          Continue Next Step <i class="bi bi-arrow-right-short fs-5"></i>
-        </button>
-      </form>
-    </div>
+width:100%;
+max-width:460px;
 
-    <script>
-      document
-        .getElementById("serviceDetailsForm")
-        .addEventListener("submit", function (event) {
-          let isFormValid = true;
 
-          const serviceSelect = document.getElementById("serviceSelect");
-          const addressInput = document.getElementById("addressInput");
-          const pincodeInput = document.getElementById("pincodeInput");
-          const experienceInput = document.getElementById("experienceInput");
+background:var(--card);
 
-          // Strict validation regex variables
-          const pincodeRegex = /^\d{6}$/;
-          // Forces experience to be input as a pure integer/decimal metric number
-          const experienceRegex = /^\d+(\.\d+)?$/;
+padding:40px 32px;
 
-          // --- 1. Service Dropdown Validation ---
-          if (!serviceSelect.value) {
-            showError(
-              "serviceBox",
-              "serviceError",
-              "Selecting a service branch is required.",
-            );
-            isFormValid = false;
-          } else {
-            showSuccess("serviceBox", "serviceError");
-          }
 
-          // --- 2. Address Line Validation ---
-          if (!addressInput.value.trim()) {
-            showError(
-              "addressBox",
-              "addressError",
-              "Operational address cannot be left empty.",
-            );
-            isFormValid = false;
-          } else if (addressInput.value.trim().length < 8) {
-            showError(
-              "addressBox",
-              "addressError",
-              "Please provide a more descriptive, complete address.",
-            );
-            isFormValid = false;
-          } else {
-            showSuccess("addressBox", "addressError");
-          }
+border-radius:28px;
 
-          // --- 3. Pin Code Digit Verification ---
-          if (!pincodeInput.value.trim()) {
-            showError(
-              "pincodeBox",
-              "pincodeError",
-              "Postal region code is required.",
-            );
-            isFormValid = false;
-          } else if (!pincodeRegex.test(pincodeInput.value.trim())) {
-            showError(
-              "pincodeBox",
-              "pincodeError",
-              "Must be a valid 6-digit numerical pincode.",
-            );
-            isFormValid = false;
-          } else {
-            showSuccess("pincodeBox", "pincodeError");
-          }
 
-          // --- 4. Experience Threshold Logic Check ---
-          const expValue = experienceInput.value.trim();
-          if (!expValue) {
-            showError(
-              "experienceBox",
-              "experienceError",
-              "Experience value is required.",
-            );
-            isFormValid = false;
-          } else if (!experienceRegex.test(expValue)) {
-            showError(
-              "experienceBox",
-              "experienceError",
-              "Please enter a valid numeric value for years (e.g., 2 or 4.5).",
-            );
-            isFormValid = false;
-          } else {
-            const parsingYears = parseFloat(expValue);
-            if (parsingYears < 0) {
-              showError(
-                "experienceBox",
-                "experienceError",
-                "Experience cannot be negative.",
-              );
-              isFormValid = false;
-            } else if (parsingYears > 45) {
-              showError(
-                "experienceBox",
-                "experienceError",
-                "Experience value entered exceeds realistic registration limits.",
-              );
-              isFormValid = false;
-            } else {
-              showSuccess("experienceBox", "experienceError");
-            }
-          }
+border:1px solid rgba(255,255,255,.1);
 
-          // Halt form transmission if triggers flag failures
-          if (!isFormValid) {
-            event.preventDefault();
-          }
-        });
 
-      // UI Layout Modifier Scripts
-      function showError(containerId, errorId, message) {
-        const container = document.getElementById(containerId);
-        const errorDiv = document.getElementById(errorId);
+backdrop-filter:blur(20px);
 
-        container.classList.add("is-invalid-field");
-        container.classList.remove("is-valid-field");
-        errorDiv.innerHTML = `<i class="bi bi-exclamation-circle-fill"></i> ${message}`;
-        errorDiv.style.display = "flex";
-      }
 
-      function showSuccess(containerId, errorId) {
-        const container = document.getElementById(containerId);
-        const errorDiv = document.getElementById(errorId);
+box-shadow:
+0 30px 80px rgba(0,0,0,.5);
 
-        container.classList.remove("is-invalid-field");
-        container.classList.add("is-valid-field");
-        errorDiv.style.display = "none";
-      }
-    </script>
-  </body>
-</html>
+
+animation:
+fade .6s ease;
+
+
+}
+
+
+@keyframes fade{
+
+from{
+opacity:0;
+transform:translateY(30px);
+}
+
+to{
+opacity:1;
+transform:none;
+}
+
+}
+
+
+
+/* Step */
+
+.step-progress-tracker{
+
+
+display:flex;
+justify-content:center;
+
+gap:8px;
+
+margin-bottom:25px;
+
+}
+
+
+
+.progress-bar-segment{
+
+
+width:45px;
+height:5px;
+
+border-radius:10px;
+
+background:#334155;
+
+}
+
+
+
+.progress-bar-segment.active{
+
+background:
+linear-gradient(
+90deg,
+#38bdf8,
+#6366f1
+);
+
+box-shadow:
+0 0 15px #38bdf8;
+
+}
+
+
+
+
+h2{
+
+text-align:center;
+
+color:white;
+
+font-size:28px;
+
+margin-bottom:8px;
+
+}
+
+
+
+.subtitle-desc{
+
+
+text-align:center;
+
+color:#94a3b8;
+
+font-size:14px;
+
+margin-bottom:30px;
+
+
+}
+
+
+
+
+.input-box{
+
+margin-bottom:22px;
+
+}
+
+
+
+.input-box label{
+
+
+display:block;
+
+color:#e2e8f0;
+
+font-size:12px;
+
+font-weight:700;
+
+letter-spacing:.8px;
+
+margin-bottom:8px;
+
+text-transform:uppercase;
+
+}
+
+
+
+.input-wrapper{
+
+
+position:relative;
+
+
+}
+
+
+
+.input-icon{
+
+
+position:absolute;
+
+left:15px;
+
+top:50%;
+
+transform:translateY(-50%);
+
+font-size:18px;
+
+color:#94a3b8;
+
+transition:.3s;
+
+
+}
+
+
+
+input,
+select{
+
+
+width:100%;
+
+
+padding:
+
+15px 45px;
+
+
+background:var(--input);
+
+
+border:
+
+1px solid var(--border);
+
+
+border-radius:14px;
+
+
+color:white;
+
+
+font-size:15px;
+
+
+outline:none;
+
+
+transition:.3s;
+
+
+}
+
+
+
+input::placeholder{
+
+color:#64748b;
+
+}
+
+
+
+input:focus,
+select:focus{
+
+
+border-color:var(--primary);
+
+
+box-shadow:
+
+0 0 0 4px rgba(56,189,248,.15);
+
+
+}
+
+
+
+input:focus + .input-icon{
+
+
+color:var(--primary);
+
+}
+
+
+
+select option{
+
+background:#020617;
+
+color:white;
+
+}
+
+
+
+/* Address */
+
+
+.address-wrapper{
+
+
+display:flex;
+
+gap:12px;
+
+align-items:center;
+
+}
+
+
+
+.address-input{
+
+flex:1;
+
+}
+
+
+
+
+.location-btn{
+
+
+width:55px;
+
+height:55px;
+
+
+border:none;
+
+border-radius:15px;
+
+
+background:
+
+linear-gradient(
+135deg,
+#2563eb,
+#1d4ed8
+);
+
+
+color:white;
+
+
+font-size:22px;
+
+
+cursor:pointer;
+
+
+display:flex;
+
+align-items:center;
+
+justify-content:center;
+
+
+transition:.3s;
+
+
+box-shadow:
+
+0 10px 25px rgba(37,99,235,.35);
+
+}
+
+
+
+.location-btn:hover{
+
+
+transform:
+translateY(-3px);
+
+
+box-shadow:
+
+0 15px 30px rgba(37,99,235,.5);
+
+}
+
+
+
+.location-btn:active{
+
+transform:scale(.95);
+
+}
+
+
+
+
+
+/* Validation */
+
+
+.is-invalid-field input,
+.is-invalid-field select{
+
+
+border-color:var(--danger);
+
+
+box-shadow:
+0 0 0 4px rgba(244,63,94,.15);
+
+
+}
+
+
+
+.is-valid-field input,
+.is-valid-field select{
+
+
+border-color:var(--success);
+
+
+}
+
+
+
+.field-error-feedback{
+
+
+display:none;
+
+color:#fb7185;
+
+font-size:12px;
+
+margin-top:6px;
+
+
+}
+
+
+
+/* Button */
+
+
+button[type="submit"]{
+
+
+width:100%;
+
+
+padding:15px;
+
+
+margin-top:15px;
+
+
+border:none;
+
+
+border-radius:15px;
+
+
+background:
+
+linear-gradient(
+135deg,
+#2563eb,
+#6366f1
+);
+
+
+color:white;
+
+
+font-size:16px;
+
+font-weight:700;
+
+
+cursor:pointer;
+
+
+transition:.3s;
+
+
+}
+
+
+
+button[type="submit"]:hover{
+
+
+transform:translateY(-3px);
+
+
+box-shadow:
+
+0 15px 30px rgba(99,102,241,.4);
+
+
+}
+
+
+
+/* Mobile */
+
+
+@media(max-width:480px){
+
+
+.card{
+
+padding:30px 20px;
+
+}
+
+
+
+h2{
+
+font-size:23px;
+
+}
+
+
+
+.address-wrapper{
+
+gap:8px;
+
+}
+
+
+
+.location-btn{
+
+width:50px;
+
+height:50px;
+
+}
+
+
+
+}
+
+
+</style>
+
+
+
+
+
+<div class="card">
+
+
+<div class="step-progress-tracker">
+
+<div class="progress-bar-segment completed"></div>
+<div class="progress-bar-segment active"></div>
+<div class="progress-bar-segment"></div>
+<div class="progress-bar-segment"></div>
+
+</div>
+
+
+
+<h2>
+Worker Signup
+</h2>
+
+
+<p class="subtitle-desc">
+Step 2 of 4 – Professional Core Specifications
+</p>
+
+
+
+
+<form method="POST" id="serviceDetailsForm">
+
+{% csrf_token %}
+
+
+
+<div class="input-box" id="serviceBox">
+
+
+<label>
+Service Allocation Type
+</label>
+
+
+<div class="input-wrapper">
+
+
+<i class="bi bi-briefcase-fill input-icon"></i>
+
+
+<select 
+name="service_type"
+id="serviceSelect"
+required>
+
+
+<option value="">
+Select Domain Specialization
+</option>
+
+
+<option>Electrician</option>
+
+<option>Plumber</option>
+
+<option>AC Repair</option>
+
+<option>Carpenter</option>
+
+<option>Painter</option>
+
+<option>Cleaning Service</option>
+
+<option>Mobile Repair</option>
+
+
+</select>
+
+</div>
+
+
+<div class="field-error-feedback" id="serviceError"></div>
+
+
+</div>
+
+
+
+
+
+<div class="input-box" id="addressBox">
+
+
+<label>
+Full Operational Address
+</label>
+
+
+
+<div class="address-wrapper">
+
+
+<div class="address-input">
+
+
+<div class="input-wrapper">
+
+
+<i class="bi bi-house-door-fill input-icon"></i>
+
+
+<input
+
+type="text"
+
+name="address"
+
+id="addressInput"
+
+placeholder="Click location button or enter address"
+
+required
+
+>
+
+
+</div>
+
+
+</div>
+
+
+
+
+<button
+
+type="button"
+
+class="location-btn"
+
+onclick="getCurrentLocation()"
+
+>
+
+<i class="bi bi-geo-alt-fill"></i>
+
+</button>
+
+
+
+</div>
+
+
+
+<input 
+type="hidden"
+name="latitude"
+id="latitude"
+>
+
+
+<input 
+type="hidden"
+name="longitude"
+id="longitude"
+>
+
+
+<div class="field-error-feedback"
+id="addressError">
+</div>
+
+
+</div>
+
+
+
+
+
+
+
+<div class="input-box" id="experienceBox">
+
+
+<label>
+Years of Trade Experience
+</label>
+
+
+<div class="input-wrapper">
+
+
+<i class="bi bi-award-fill input-icon"></i>
+
+
+<input
+
+type="number"
+
+name="experience"
+
+id="experienceInput"
+
+placeholder="Example: 3"
+
+min="0"
+
+max="45"
+
+required
+
+>
+
+
+</div>
+
+
+<div class="field-error-feedback"
+id="experienceError">
+</div>
+
+
+</div>
+
+
+
+
+
+<button type="submit">
+
+Continue Next Step
+
+<i class="bi bi-arrow-right"></i>
+
+</button>
+
+
+
+
+</form>
+
+
+</div>
+
+
+
+
+
+
+<script>
+
+
+function getCurrentLocation(){
+
+
+if(!navigator.geolocation){
+
+alert(
+"Geolocation not supported"
+);
+
+return;
+
+}
+
+
+
+navigator.geolocation.getCurrentPosition(
+
+async function(position){
+
+
+let lat =
+position.coords.latitude;
+
+
+let lng =
+position.coords.longitude;
+
+
+
+document.getElementById("latitude").value=lat;
+
+document.getElementById("longitude").value=lng;
+
+
+
+try{
+
+
+let response =
+await fetch(
+
+`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}`
+
+);
+
+
+
+let data =
+await response.json();
+
+
+
+document.getElementById("addressInput").value =
+data.display_name;
+
+
+
+}
+
+catch(error){
+
+
+alert(
+"Unable to fetch address"
+);
+
+
+}
+
+
+
+},
+
+
+
+function(){
+
+
+alert(
+"Location permission denied"
+);
+
+
+}
+
+
+
+);
+
+
+}
+
+
+
+
+
+document
+.getElementById("serviceDetailsForm")
+.addEventListener(
+"submit",
+function(e){
+
+
+
+let valid=true;
+
+
+
+let service=
+document.getElementById("serviceSelect");
+
+
+let address=
+document.getElementById("addressInput");
+
+
+let exp=
+document.getElementById("experienceInput");
+
+
+
+
+if(!service.value){
+
+showError(
+"serviceBox",
+"serviceError",
+"Please select service"
+);
+
+valid=false;
+
+}
+
+
+
+
+if(address.value.trim().length<8){
+
+
+showError(
+"addressBox",
+"addressError",
+"Enter complete address"
+);
+
+
+valid=false;
+
+
+}
+
+
+
+
+if(exp.value<0 || exp.value==""){
+
+
+showError(
+"experienceBox",
+"experienceError",
+"Enter valid experience"
+);
+
+
+valid=false;
+
+
+}
+
+
+
+
+if(!valid){
+
+e.preventDefault();
+
+}
+
+
+});
+
+
+
+
+
+function showError(box,error,msg){
+
+
+let b=document.getElementById(box);
+
+let e=document.getElementById(error);
+
+
+b.classList.add("is-invalid-field");
+
+
+e.innerHTML=
+"<i class='bi bi-exclamation-circle'></i> "+msg;
+
+
+e.style.display="block";
+
+
+}
+
+
+</script>

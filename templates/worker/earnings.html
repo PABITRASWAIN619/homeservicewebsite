@@ -1,293 +1,499 @@
-{% extends 'worker/base.html' %} {% block content %}
+{% extends 'worker/base.html' %}
+
+{% block content %}
+
+
+<style>
+
+
+.dashboard-card{
+
+
+background:white;
+
+padding:25px;
+
+border-radius:22px;
+
+box-shadow:
+0 10px 30px rgba(0,0,0,.08);
+
+transition:.3s;
+
+border-left:6px solid;
+
+
+}
+
+
+.dashboard-card:hover{
+
+transform:translateY(-8px);
+
+}
+
+
+
+
+.card-title{
+
+color:#64748b;
+
+font-size:14px;
+
+font-weight:600;
+
+}
+
+
+
+.amount{
+
+font-size:32px;
+
+font-weight:800;
+
+margin-top:10px;
+
+}
+
+
+
+
+
+.chart-box{
+
+
+background:white;
+
+margin-top:30px;
+
+padding:30px;
+
+border-radius:25px;
+
+
+box-shadow:
+0 10px 30px rgba(0,0,0,.08);
+
+
+}
+
+
+
+.table-card{
+
+
+background:white;
+
+margin-top:30px;
+
+border-radius:25px;
+
+overflow:hidden;
+
+box-shadow:
+0 10px 30px rgba(0,0,0,.08);
+
+
+}
+
+
+
+
+.badge-payout{
+
+
+background:#dcfce7;
+
+color:#15803d;
+
+padding:7px 15px;
+
+border-radius:50px;
+
+font-size:13px;
+
+font-weight:600;
+
+
+}
+
+
+</style>
+
+
+
+
+
+<div class="row g-4">
+
+
+<div class="col-md-6">
+
+
+<div class="dashboard-card"
+style="border-color:#3b82f6;">
+
+
+<div class="card-title">
+
+This Month
+
+</div>
+
+
+<div class="amount">
+
+₹{{ monthly_earnings }}
+
+</div>
+
+
+</div>
+
+
+</div>
+
+
+
+
+
+
+<div class="col-md-6">
+
+
+<div class="dashboard-card"
+style="border-color:#10b981;">
+
+
+<div class="card-title">
+
+Lifetime Earnings
+
+</div>
+
+
+<div class="amount text-success">
+
+₹{{ total }}
+
+</div>
+
+
+</div>
+
+
+</div>
+
+
+
+</div>
+
+
+
+
+
+
+
+
+<!-- Chart -->
+
+
+<div class="chart-box">
+
+
+<h4>
+Earnings Overview
+</h4>
+
+
+<canvas id="earningChart"></canvas>
+
+
+</div>
+
+
+
+
+
+
+
+
+<!-- Transactions -->
+
+
+<div class="table-card">
+
+
+<table class="table align-middle mb-0">
+
+
+<thead>
+
+
+<tr>
+
+
+<th>
+Transaction
+</th>
+
+
+<th>
+Service
+</th>
+
+
+<th>
+Customer
+</th>
+
+
+<th>
+Date
+</th>
+
+
+<th>
+Amount
+</th>
+
+
+<th>
+Status
+</th>
+
+
+</tr>
+
+
+</thead>
+
+
+
+<tbody>
+
+
+
+{% for booking in jobs %}
+
+
+<tr>
+
+
+<td>
+
+#TRX-{{ booking.id }}
+
+</td>
+
+
+
+<td>
+
+{{ booking.service.name }}
+
+</td>
+
+
+
+
+<td>
+
+{{ booking.customer.user.username }}
+
+</td>
+
+
+
+
+<td>
+
+{{ booking.booking_date|date:"d M Y" }}
+
+</td>
+
+
+
+
+<td>
+
+₹{{ booking.amount }}
+
+</td>
+
+
+
+
+<td>
+
+<span class="badge-payout">
+
+{{ booking.status }}
+
+</span>
+
+
+</td>
+
+
+
+</tr>
+
+
+
+{% empty %}
+
+
+
+<tr>
+
+<td colspan="6"
+class="text-center">
+
+No completed jobs yet.
+
+</td>
+
+</tr>
+
+
+
+{% endfor %}
+
+
+
+
+</tbody>
+
+
+</table>
+
+
+</div>
+
+
+
+
+
+
+
+
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
-<style>
-  :root {
-    --primary-emerald: #10b981;
-    --gradient-teal: linear-gradient(135deg, #10b981 0%, #059669 100%);
-    --bg-light: #f8fafc;
-    --text-dark: #0f172a;
-    --text-muted: #64748b;
-    --card-shadow: 0 10px 30px rgba(16, 185, 129, 0.05);
-  }
 
-  body {
-    background-color: var(--bg-light);
-    color: var(--text-dark);
-    font-family: "Segoe UI", Roboto, sans-serif;
-  }
-
-  /* PREMIUM STATISTICAL OVERVIEW CARDS */
-  .earnings-card {
-    background: white;
-    border: none;
-    border-radius: 20px;
-    padding: 26px;
-    box-shadow: var(--card-shadow);
-    border-left: 5px solid var(--primary-emerald);
-    transition: transform 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
-    position: relative;
-    overflow: hidden;
-  }
-
-  .earnings-card:hover {
-    transform: translateY(-5px);
-  }
-
-  .earnings-card::after {
-    content: "";
-    position: absolute;
-    right: -20px;
-    bottom: -20px;
-    font-family: "bootstrap-icons";
-    font-size: 90px;
-    color: rgba(16, 185, 129, 0.04);
-    pointer-events: none;
-  }
-
-  .icon-today::after {
-    content: "\b1fa";
-  } /* bi-cash */
-  .icon-month::after {
-    content: "\b292";
-  } /* bi-calendar-check */
-  .icon-total::after {
-    content: "\b5f6";
-  } /* bi-wallet2 */
-
-  .stat-title {
-    font-size: 13px;
-    font-weight: 600;
-    text-transform: uppercase;
-    letter-spacing: 0.75px;
-    color: var(--text-muted);
-    margin-bottom: 8px;
-  }
-
-  .stat-number {
-    font-size: 32px;
-    font-weight: 800;
-    color: var(--text-dark);
-    margin: 0;
-  }
-
-  /* INTERACTIVE CHARTS GRAPH PANEL */
-  .chart-panel-card {
-    background: white;
-    border: none;
-    border-radius: 24px;
-    box-shadow: var(--card-shadow);
-    padding: 30px;
-    margin-bottom: 40px;
-  }
-
-  /* LEDGER DATA TABLE LAYOUT */
-  .ledger-card {
-    background: #ffffff;
-    border: none;
-    border-radius: 20px;
-    box-shadow: var(--card-shadow);
-    overflow: hidden;
-  }
-
-  .ledger-header {
-    background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
-    padding: 24px 30px;
-    border: none;
-  }
-
-  .ledger-header h4 {
-    font-size: 18px;
-    font-weight: 700;
-    margin: 0;
-  }
-
-  .table-custom-earnings th {
-    background-color: #f1f5f9 !important;
-    color: var(--text-muted);
-    font-size: 13px;
-    font-weight: 600;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-    padding: 18px 16px;
-    border-bottom: 2px solid #e2e8f0 !important;
-  }
-
-  .table-custom-earnings td {
-    padding: 18px 16px;
-    border-bottom: 1px solid #edf2f7;
-    font-size: 15px;
-    color: var(--text-dark);
-    vertical-align: middle;
-  }
-
-  .table-custom-earnings tr:hover td {
-    background-color: #f8fafc;
-  }
-
-  .badge-payout {
-    padding: 6px 12px;
-    border-radius: 8px;
-    font-weight: 600;
-    font-size: 12px;
-    background-color: #e6f4ea;
-    color: #137333;
-    border: 1px solid #bbf7d0;
-    display: inline-block;
-  }
-</style>
-
-<div class="container mt-4 pb-5">
-  <div class="mb-4">
-    <h2 class="fw-bold text-dark m-0">Financial Portfolio</h2>
-    <p class="text-muted small">
-      Monitor real-time earnings parameters, payouts history, and analytics
-      metrics.
-    </p>
-  </div>
-
-  <div class="row g-4 mb-4">
-    <div class="col-md-4">
-      <div class="earnings-card icon-today">
-        <div class="stat-title">Cleared Revenue Today</div>
-        <h2 class="stat-number text-dark">
-          ₹{{ today_earnings|default:"500" }}
-        </h2>
-      </div>
-    </div>
-
-    <div class="col-md-4">
-      <div class="earnings-card icon-month" style="border-left-color: #3b82f6">
-        <div class="stat-title">Month-To-Date Aggregate</div>
-        <h2 class="stat-number text-dark">
-          ₹{{ monthly_earnings|default:"15,000" }}
-        </h2>
-      </div>
-    </div>
-
-    <div class="col-md-4">
-      <div class="earnings-card icon-total" style="border-left-color: #10b981">
-        <div class="stat-title">Lifetime Cumulative Payout</div>
-        <h2 class="stat-number text-success">
-          ₹{{ total_earnings|default:"75,000" }}
-        </h2>
-      </div>
-    </div>
-  </div>
-
-  <div class="card chart-panel-card shadow-sm">
-    <h5 class="fw-bold mb-4 text-dark">
-      <i class="bi bi-graph-up-arrow text-success me-2"></i>Weekly Performance
-      Revenue Radar
-    </h5>
-    <div style="position: relative; height: 260px; width: 100%">
-      <canvas id="revenueWeeklyChart"></canvas>
-    </div>
-  </div>
-
-  <div class="card ledger-card shadow-sm">
-    <div class="card-header ledger-header text-white">
-      <h4 class="mb-0">
-        <i class="bi bi-wallet2 me-2 text-success"></i>Income Stream Payout
-        Ledger
-      </h4>
-    </div>
-
-    <div class="card-body p-0 table-responsive">
-      <table class="table table-custom-earnings align-middle m-0">
-        <thead>
-          <tr>
-            <th>Transaction ID</th>
-            <th>Service Domain</th>
-            <th>Customer Account Nickname</th>
-            <th>Fulfillment Date</th>
-            <th>Net Revenue Generated</th>
-            <th>Payout State Status</th>
-          </tr>
-        </thead>
-        <tbody>
-          {% for booking in bookings %}
-          <tr>
-            <td class="fw-bold text-primary">#TRX-{{ booking.id }}</td>
-            <td class="fw-semibold text-dark">{{ booking.service.name }}</td>
-            <td class="text-secondary fw-medium">
-              {{ booking.customer.user.username }}
-            </td>
-            <td class="text-secondary small fw-medium">
-              {{ booking.booking_date }}
-            </td>
-            <td class="fw-bold text-dark">₹{{ booking.amount }}</td>
-            <td><span class="badge-payout">Disbursed</span></td>
-          </tr>
-          {% empty %}
-          <tr>
-            <td class="fw-bold text-primary">#TRX-1042</td>
-            <td class="fw-semibold text-dark">Plumber Specialist Service</td>
-            <td class="text-secondary fw-medium">pabitraswain</td>
-            <td class="text-secondary small fw-medium">
-              June 14, 2026, 1:47 p.m.
-            </td>
-            <td class="fw-bold text-dark">₹249</td>
-            <td><span class="badge-payout">Disbursed</span></td>
-          </tr>
-          {% endfor %}
-        </tbody>
-      </table>
-    </div>
-  </div>
-</div>
 
 <script>
-  const revenueCtxCanvas = document
-    .getElementById("revenueWeeklyChart")
-    .getContext("2d");
 
-  // Custom theme gradient mapping configurations
-  let greenGradientBlock = revenueCtxCanvas.createLinearGradient(0, 0, 0, 240);
-  greenGradientBlock.addColorStop(0, "rgba(16, 185, 129, 0.35)");
-  greenGradientBlock.addColorStop(1, "rgba(16, 185, 129, 0.01)");
 
-  new Chart(revenueCtxCanvas, {
-    type: "line",
-    data: {
-      labels: ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"],
-      datasets: [
-        {
-          label: "Gross Daily Collection (₹)",
-          data: [1200, 800, 2100, 500, 1600, 2400, 1900], // Smooth dummy tracking wave values
-          borderColor: "#10b981",
-          borderWidth: 3,
-          pointBackgroundColor: "#ffffff",
-          pointBorderColor: "#10b981",
-          pointBorderWidth: 2,
-          pointRadius: 5,
-          pointHoverRadius: 7,
-          backgroundColor: greenGradientBlock,
-          fill: true,
-          tension: 0.4,
-        },
-      ],
-    },
-    options: {
-      responsive: true,
-      maintainAspectRatio: false,
-      plugins: {
-        legend: { display: false },
-      },
-      scales: {
-        x: {
-          grid: { display: false },
-          ticks: { color: "#64748b", font: { family: "Segoe UI", size: 12 } },
-        },
-        y: {
-          grid: { color: "#f1f5f9" },
-          ticks: { color: "#64748b", font: { family: "Segoe UI", size: 12 } },
-          min: 0,
-        },
-      },
-    },
-  });
+const ctx =
+document.getElementById(
+"earningChart"
+);
+
+
+
+new Chart(ctx,{
+
+
+type:"line",
+
+
+
+data:{
+
+
+labels:[
+
+"Jan",
+"Feb",
+"Mar",
+"Apr",
+"May",
+"Jun",
+"Jul",
+"Aug",
+"Sep",
+"Oct",
+"Nov",
+"Dec"
+
+],
+
+
+
+datasets:[{
+
+
+label:"Earnings ₹",
+
+
+data:
+{{ monthly_data|safe }},
+
+
+borderWidth:3,
+
+
+tension:.4
+
+
+}]
+
+
+},
+
+
+
+options:{
+
+
+responsive:true,
+
+
+plugins:{
+
+
+legend:{
+
+
+display:true
+
+
+}
+
+
+},
+
+
+
+scales:{
+
+
+y:{
+
+
+beginAtZero:true
+
+
+}
+
+
+}
+
+
+}
+
+
+
+});
+
+
+
 </script>
+
+
 
 {% endblock %}

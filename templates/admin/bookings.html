@@ -46,11 +46,11 @@
 
             <!-- PAYMENT -->
             <td>
-              {% if b.payment_status %}
-              <span class="badge bg-success">Paid</span>
-              {% else %}
-              <span class="badge bg-warning text-dark">Pending</span>
-              {% endif %}
+              {% if b.payment_status == "Paid" %}
+    <span class="badge bg-success">Paid</span>
+{% else %}
+    <span class="badge bg-warning text-dark">Pending</span>
+{% endif %}
             </td>
 
             <!-- AMOUNT -->
@@ -131,79 +131,141 @@
 
             <!-- CREATED -->
             <td>
-              {{ b.created_at|date:"d M Y" }}
-              <br />
-              <small>{{ b.created_at|time:"H:i" }}</small>
+             {{ b.booking_date|date:"d M Y" }}
+<br>
+<small>{{ b.booking_date|time:"H:i" }}</small>
             </td>
 
             <!-- ACTION -->
-            <td>
-              {% if not b.worker %}
+<td>
 
-              <!-- AUTO ASSIGN -->
-              <a
-                href="{% url 'auto_assign_worker' b.id %}"
-                class="btn btn-success btn-sm mb-1"
-              >
-                Auto Assign
-              </a>
+    {% if not b.worker %}
 
-              <!-- MANUAL ASSIGN BUTTON -->
-              <button
-                class="btn btn-primary btn-sm"
+        <!-- AUTO ASSIGN -->
+        <a href="{% url 'auto_assign_worker' b.id %}"
+           class="btn btn-success btn-sm mb-2">
+            Auto Assign
+        </a>
+
+        <br>
+
+        <!-- MANUAL ASSIGN -->
+        <button class="btn btn-primary btn-sm"
                 data-bs-toggle="modal"
-                data-bs-target="#assignModal{{ b.id }}"
-              >
-                Manual Assign
-              </button>
+                data-bs-target="#assignModal{{ b.id }}">
+            Manual Assign
+        </button>
 
-              <!-- MODAL -->
-              <div class="modal fade" id="assignModal{{ b.id }}" tabindex="-1">
-                <div class="modal-dialog">
-                  <div class="modal-content">
-                    <form
-                      method="POST"
-                      action="{% url 'manual_assign_worker' b.id %}"
-                    >
-                      {% csrf_token %}
+        <!-- ASSIGN MODAL -->
+        <div class="modal fade"
+             id="assignModal{{ b.id }}"
+             tabindex="-1"
+             aria-hidden="true">
 
-                      <div class="modal-header">
-                        <h5 class="modal-title">Manual Assign Worker</h5>
-                        <button
-                          type="button"
-                          class="btn-close"
-                          data-bs-dismiss="modal"
-                        ></button>
-                      </div>
+            <div class="modal-dialog">
+                <div class="modal-content">
 
-                      <div class="modal-body">
-                        <label>Select Worker</label>
+                    <form method="POST"
+                          action="{% url 'manual_assign_worker' b.id %}">
 
-                        <select name="worker_id" class="form-select" required>
-                          <option value="">-- Choose Worker --</option>
+                        {% csrf_token %}
 
-                          {% for w in workers %}
-                          <option value="{{ w.id }}">
-                            {{ w.user.username }} ({{ w.service_type }})
-                          </option>
-                          {% endfor %}
-                        </select>
-                      </div>
+                        <div class="modal-header">
+                            <h5 class="modal-title">
+                                Manual Assign Worker
+                            </h5>
 
-                      <div class="modal-footer">
-                        <button type="submit" class="btn btn-primary">
-                          Assign
-                        </button>
-                      </div>
+                            <button type="button"
+                                    class="btn-close"
+                                    data-bs-dismiss="modal">
+                            </button>
+                        </div>
+
+                        <div class="modal-body">
+
+                            <label class="form-label">
+                                Select Worker
+                            </label>
+
+                            <select name="worker_id"
+                                    class="form-select"
+                                    required>
+
+                                <option value="">
+                                    -- Choose Worker --
+                                </option>
+
+                                {% for w in workers %}
+                                    <option value="{{ w.id }}">
+                                        {{ w.user.username }}
+                                        ({{ w.service_type }})
+                                    </option>
+                                {% endfor %}
+
+                            </select>
+
+                        </div>
+
+                        <div class="modal-footer">
+
+                            <button type="submit"
+                                    class="btn btn-primary">
+                                Assign Worker
+                            </button>
+
+                        </div>
+
                     </form>
-                  </div>
-                </div>
-              </div>
 
-              {% else %}
-              <span class="text-success fw-bold">✔ Assigned</span>
-              {% endif %}
-            </td>
+                </div>
+            </div>
+
+        </div>
+
+    {% else %}
+
+        <span class="badge bg-success mb-2">
+            ✔ {{ b.worker.user.username }}
+        </span>
+
+        <br>
+
+        {% if b.status == "Working" and b.otp %}
+
+            <a href="{% url 'admin_resend_otp' b.id %}"
+   class="btn btn-warning btn-sm">
+    🔄 Resend OTP
+</a>
+
+        {% elif b.status == "Completed" %}
+
+            <span class="badge bg-success mt-2">
+                Job Completed
+            </span>
+
+        {% elif b.status == "Assigned" %}
+
+            <span class="badge bg-primary mt-2">
+                Assigned
+            </span>
+
+        {% elif b.status == "Accepted" %}
+
+            <span class="badge bg-info mt-2">
+                Accepted
+            </span>
+
+        {% elif b.status == "On The Way" %}
+
+            <span class="badge bg-warning text-dark mt-2">
+                On The Way
+            </span>
+
+        {% endif %}
+
+    {% endif %}
+
+</td>
           </tr>
           {% empty %}
           <tr>

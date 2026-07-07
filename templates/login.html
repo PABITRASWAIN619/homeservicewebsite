@@ -8,6 +8,10 @@
 <title>Worker Login</title>
 
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<link 
+rel="stylesheet"
+href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css"
+/>
 
 <style>
 
@@ -363,6 +367,128 @@ padding:30px;
     color: #ffffff;
     text-decoration: underline;
 }
+/* Register Section */
+
+.toggle-section{
+
+    margin-top:25px;
+    text-align:center;
+    color:white;
+    font-size:14px;
+
+}
+
+
+.register-links{
+
+    margin-top:18px;
+
+    display:flex;
+
+    flex-direction:column;
+
+    gap:12px;
+
+}
+
+
+
+.register-links a{
+
+
+    display:flex;
+
+    align-items:center;
+
+    justify-content:center;
+
+    gap:8px;
+
+
+    padding:13px;
+
+
+    border-radius:12px;
+
+
+    text-decoration:none;
+
+
+    color:white;
+
+
+    font-weight:600;
+
+
+    background:
+
+    rgba(255,255,255,0.12);
+
+
+    border:
+
+    1px solid rgba(255,255,255,.25);
+
+
+    transition:.35s;
+
+
+}
+
+
+
+.register-links a:first-child{
+
+
+    background:
+
+    linear-gradient(
+    135deg,
+    #10b981,
+    #059669
+    );
+
+
+}
+
+
+
+.register-links a:last-child{
+
+
+    background:
+
+    linear-gradient(
+    135deg,
+    #2563eb,
+    #6366f1
+    );
+
+
+}
+
+
+
+.register-links a:hover{
+
+
+    transform:translateY(-3px);
+
+
+    box-shadow:
+
+    0 10px 25px rgba(0,0,0,.35);
+
+
+}
+
+
+
+.register-links i{
+
+    font-size:18px;
+
+}
 
 </style>
 
@@ -414,6 +540,29 @@ Login
         Forgot Password?
     </a>
 </div>
+<div class="toggle-section">
+
+    <p>
+        Don't have an account?
+    </p>
+
+    <div class="register-links">
+
+        <a href="{% url 'customer_signup' %}">
+            <i class="bi bi-person-fill"></i>
+            Register as Customer
+        </a>
+
+
+        <a href="{% url 'worker_signup' %}">
+            <i class="bi bi-tools"></i>
+            Register as Worker
+        </a>
+
+    </div>
+
+</div>
+
 
 
 
