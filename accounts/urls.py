@@ -173,7 +173,8 @@ urlpatterns = [
     path("worker/support/", views.worker_support, name="worker_support"),
     path("support/<int:id>/", views.support_detail, name="support_detail"),
     path("api/unread-count/", views.unread_messages_count, name="unread_messages_count"),
-    path("cleanup/", views.cleanup_customer_profiles),
+   path("clean-db/", views.clean_database, name="clean_database"),
+   path("cleanup/", views.cleanup_customer_profiles),
 ]
 
 if settings.DEBUG:

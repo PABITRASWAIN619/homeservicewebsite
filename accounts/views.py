@@ -1410,6 +1410,13 @@ def cleanup_customer_profiles(request):
     ).delete()
 
     return HttpResponse(f"Deleted: {deleted}")
+from django.http import HttpResponse
+from .models import CustomerProfile, WorkerProfile
+
+def clean_database(request):
+    CustomerProfile.objects.all().delete()
+    WorkerProfile.objects.all().delete()
+    return HttpResponse("Database cleaned successfully")
 # =========================
 # WORKER JOB LIST
 # =========================
