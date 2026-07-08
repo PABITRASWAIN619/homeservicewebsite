@@ -99,7 +99,11 @@ urlpatterns = [
     path("booking-otp/<int:booking_id>/", views.get_booking_otp, name="booking_otp"),
     path("verify-otp/<int:booking_id>/", views.verify_otp, name="verify_otp"),
     path("verify-otp/", views.verify_email_otp, name="verify_email_otp"),
-    path("send-otp/", views.resend_otp, name="send_otp"),
+    path(
+    "resend-otp/<int:booking_id>/",
+    views.resend_otp,
+    name="resend_otp",
+),
     path("ajax/verify-otp/", views.ajax_verify_otp, name="ajax_verify_otp"),
  path(
     "dashboard/admin/resend-otp/<int:booking_id>/",

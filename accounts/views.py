@@ -1381,13 +1381,13 @@ from .models import Booking, WorkerProfile
 # =========================
 @login_required
 def assign_jobs(request):
+    worker = WorkerProfile.objects.filter(user=request.user).first()
 
-    worker = WorkerProfile.objects.filter(
-        user=request.user
-    ).first()
+    print("Logged in user:", request.user)
+    print("Worker:", worker)
 
-    if not worker:
-        return redirect("worker_profile")
+    if worker is None:
+        return HttpResponse("Worker profile not found")
 
     bookings = Booking.objects.filter(
         worker=worker
@@ -1395,14 +1395,12 @@ def assign_jobs(request):
         status="Cancelled"
     ).order_by("-id")
 
-    return render(
-        request,
-        "worker/assign_jobs.html",
-        {
-            "worker": worker,
-            "bookings": bookings
-        }
-    )
+    print("Bookings:", bookings.count())
+
+    return render(request, "worker/assign_jobs.html", {
+        "worker": worker,
+        "bookings": bookings,
+    })
 
 # =========================
 # MARK PAYMENT DONE (CASH)

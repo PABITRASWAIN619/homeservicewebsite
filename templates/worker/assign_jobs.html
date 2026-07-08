@@ -1,243 +1,261 @@
 {% extends 'worker/base.html' %}
 {% block content %}
 
-<h3 class="mb-3">Assigned Jobs</h3>
+<div class="container mt-4">
 
-<div class="table-responsive">
-<table class="table table-bordered table-hover align-middle">
+    <h3 class="mb-4">Assigned Jobs</h3>
 
-
-<thead class="table-dark">
-    <tr>
-        <th>Customer</th>
-        <th>Phone</th>
-        <th>Service</th>
-        <th>Address</th>
-        <th>Location</th>
-        <th>Payment</th>
-        <th>Status</th>
-        <th>OTP</th>
-        <th>Actions</th>
-    </tr>
-</thead>
-
-<tbody>
-
-{% for booking in bookings %}
-<tr>
-
-    <td>{{ booking.customer.user.username }}</td>
-
-    <td>{{ booking.customer.phone }}</td>
-
-    <td>
-        <span class="badge bg-info">
-            {{ booking.service.name }}
-        </span>
-    </td>
-
-    <td>{{ booking.address }}</td>
-
-    <td>
-
-{% if booking.latitude and booking.longitude %}
-
-    <a href="https://www.google.com/maps?q={{ booking.latitude }},{{ booking.longitude }}"
-       target="_blank"
-       class="btn btn-primary btn-sm mb-2">
-        View Map
-    </a>
-
-    <br>
-
-    <a href="{% url 'track_worker' booking.id %}"
-       class="btn btn-success btn-sm">
-        📍 Live Location
-    </a>
-
-    <br>
-
-    <small class="text-muted">
-        {{ booking.latitude }},
-        {{ booking.longitude }}
-    </small>
-
-{% else %}
-
-    <span class="text-danger">
-        No Location
-    </span>
-
-{% endif %}
-
-</td>
-
-    <td>
-
-        {% if booking.payment_status == "Paid" %}
-
-            <span class="badge bg-success">
-                Paid
-            </span>
-
-        {% elif booking.payment_method == "Cash" %}
-
-            <span class="badge bg-warning text-dark">
-                Cash
-            </span>
-
-        {% else %}
-
-            <span class="badge bg-secondary">
-                Pending
-            </span>
-
-        {% endif %}
-
-    </td>
-
-    <td>
-
-        {% if booking.status == "Assigned" %}
-            <span class="badge bg-warning">Assigned</span>
-
-        {% elif booking.status == "Accepted" %}
-            <span class="badge bg-primary">Accepted</span>
-
-        {% elif booking.status == "On The Way" %}
-            <span class="badge bg-info">On The Way</span>
-
-        {% elif booking.status == "Working" %}
-            <span class="badge bg-primary">Working</span>
-
-        {% elif booking.status == "Completed" %}
-            <span class="badge bg-success">Completed</span>
-
-        {% elif booking.status == "Rejected" %}
-            <span class="badge bg-danger">Rejected</span>
-
-        {% else %}
-            <span class="badge bg-secondary">Pending</span>
-
-        {% endif %}
-
-    </td>
-
-    <td>
-
-{% if booking.otp_verified %}
-
-    <span class="badge bg-success">
-        OTP Verified
-    </span>
-
-{% elif booking.otp %}
-
-    <span class="badge bg-warning text-dark">
-        OTP Generated
-    </span>
-
-{% else %}
-
-    <span class="badge bg-secondary">
-        Not Generated
-    </span>
-
-{% endif %}
-
-</td>
-    <td>
-
-        {% if booking.status == "Assigned" %}
-
-            <a href="{% url 'accept_job' booking.id %}"
-               class="btn btn-success btn-sm">
-                Accept
-            </a>
-
-            <a href="{% url 'reject_job' booking.id %}"
-               class="btn btn-danger btn-sm">
-                Reject
-            </a>
-
-        {% elif booking.status == "Accepted" %}
-
-            <a href="{% url 'update_status' booking.id 'On The Way' %}"
-               class="btn btn-primary btn-sm">
-                Go On The Way
-            </a>
-
-        {% elif booking.status == "On The Way" %}
-
-            <a href="{% url 'update_status' booking.id 'Working' %}"
-               class="btn btn-info btn-sm">
-                Start Work
-            </a>
-
-        {% elif booking.status == "Working" %}
-
-    {% if booking.payment_status == "Pending" %}
-
-        <a href="{% url 'mark_payment_done' booking.id 'cash' %}"
-           class="btn btn-warning btn-sm">
-            Cash Paid
-        </a>
-
-        <a href="{% url 'mark_payment_done' booking.id 'online' %}"
-           class="btn btn-success btn-sm">
-            Online Paid
-        </a>
-
-    {% else %}
-
-        <a href="{% url 'verify_otp' booking.id %}"
-           class="btn btn-primary btn-sm mb-1">
-            Verify OTP
-        </a>
-
-        <a href="{% url 'resend_otp' booking.id %}"
-           class="btn btn-warning btn-sm">
-            🔄 Resend OTP
-        </a>
-
+    {% if messages %}
+        {% for message in messages %}
+            <div class="alert alert-success">
+                {{ message }}
+            </div>
+        {% endfor %}
     {% endif %}
 
-        {% elif booking.status == "Completed" %}
+    <div class="table-responsive">
+        <table class="table table-bordered table-hover align-middle">
 
-            <span class="text-success fw-bold">
-                ✔ Completed
-            </span>
+            <thead class="table-dark">
+                <tr>
+                    <th>Customer</th>
+                    <th>Phone</th>
+                    <th>Service</th>
+                    <th>Address</th>
+                    <th>Location</th>
+                    <th>Payment</th>
+                    <th>Status</th>
+                    <th>OTP</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
 
-        {% elif booking.status == "Rejected" %}
+            <tbody>
 
-            <span class="text-danger">
-                Rejected
-            </span>
+            {% for booking in bookings %}
 
-        {% else %}
+                <tr>
 
-            <span class="text-muted">
-                No Action
-            </span>
+                    <td>{{ booking.customer.user.username }}</td>
 
-        {% endif %}
+                    <td>{{ booking.customer.phone }}</td>
 
-    </td>
+                    <td>
+                        <span class="badge bg-info">
+                            {{ booking.service.name }}
+                        </span>
+                    </td>
 
-</tr>
+                    <td>{{ booking.address }}</td>
 
-{% empty %}
+                    <td>
 
-<tr>
-    <td colspan="9" class="text-center py-3">
-        No jobs assigned
-    </td>
-</tr>
+                        {% if booking.latitude and booking.longitude %}
 
-{% endfor %}
+                            <a href="https://www.google.com/maps?q={{ booking.latitude }},{{ booking.longitude }}"
+                               target="_blank"
+                               class="btn btn-primary btn-sm mb-2">
+                                View Map
+                            </a>
 
-</tbody>
-</table>
+                            <br>
+
+                            <a href="{% url 'track_worker' booking.id %}"
+                               class="btn btn-success btn-sm">
+                                📍 Live Location
+                            </a>
+
+                            <br>
+
+                            <small class="text-muted">
+                                {{ booking.latitude }}, {{ booking.longitude }}
+                            </small>
+
+                        {% else %}
+
+                            <span class="text-danger">
+                                No Location
+                            </span>
+
+                        {% endif %}
+
+                    </td>
+
+                    <td>
+
+                        {% if booking.payment_status == "Paid" %}
+
+                            <span class="badge bg-success">
+                                Paid
+                            </span>
+
+                        {% elif booking.payment_method == "Cash" %}
+
+                            <span class="badge bg-warning text-dark">
+                                Cash
+                            </span>
+
+                        {% elif booking.payment_method == "Online" %}
+
+                            <span class="badge bg-primary">
+                                Online
+                            </span>
+
+                        {% else %}
+
+                            <span class="badge bg-secondary">
+                                Pending
+                            </span>
+
+                        {% endif %}
+
+                    </td>
+
+                    <td>
+
+                        {% if booking.status == "Assigned" %}
+                            <span class="badge bg-warning">Assigned</span>
+
+                        {% elif booking.status == "Accepted" %}
+                            <span class="badge bg-primary">Accepted</span>
+
+                        {% elif booking.status == "On The Way" %}
+                            <span class="badge bg-info">On The Way</span>
+
+                        {% elif booking.status == "Working" %}
+                            <span class="badge bg-primary">Working</span>
+
+                        {% elif booking.status == "Completed" %}
+                            <span class="badge bg-success">Completed</span>
+
+                        {% elif booking.status == "Rejected" %}
+                            <span class="badge bg-danger">Rejected</span>
+
+                        {% else %}
+                            <span class="badge bg-secondary">Pending</span>
+                        {% endif %}
+
+                    </td>
+
+                    <td>
+
+                        {% if booking.otp_verified %}
+
+                            <span class="badge bg-success">
+                                OTP Verified
+                            </span>
+
+                        {% elif booking.otp %}
+
+                            <span class="badge bg-warning text-dark">
+                                OTP Generated
+                            </span>
+
+                        {% else %}
+
+                            <span class="badge bg-secondary">
+                                Not Generated
+                            </span>
+
+                        {% endif %}
+
+                    </td>
+
+                    <td>
+
+                        {% if booking.status == "Assigned" %}
+
+                            <a href="{% url 'accept_job' booking.id %}"
+                               class="btn btn-success btn-sm mb-1">
+                                Accept
+                            </a>
+
+                            <a href="{% url 'reject_job' booking.id %}"
+                               class="btn btn-danger btn-sm">
+                                Reject
+                            </a>
+
+                        {% elif booking.status == "Accepted" %}
+
+                            <a href="{% url 'update_status' booking.id 'On The Way' %}"
+                               class="btn btn-primary btn-sm">
+                                Go On The Way
+                            </a>
+
+                        {% elif booking.status == "On The Way" %}
+
+                            <a href="{% url 'update_status' booking.id 'Working' %}"
+                               class="btn btn-info btn-sm">
+                                Start Work
+                            </a>
+
+                        {% elif booking.status == "Working" %}
+
+                            {% if booking.payment_status == "Pending" %}
+
+                                <a href="{% url 'mark_payment_done' booking.id 'cash' %}"
+                                   class="btn btn-warning btn-sm mb-1">
+                                    Cash Paid
+                                </a>
+
+                                <a href="{% url 'mark_payment_done' booking.id 'online' %}"
+                                   class="btn btn-success btn-sm">
+                                    Online Paid
+                                </a>
+
+                            {% else %}
+
+                                <a href="{% url 'verify_otp' booking.id %}"
+                                   class="btn btn-primary btn-sm mb-1">
+                                    Verify OTP
+                                </a>
+
+                                <a href="{% url 'resend_otp' booking.id %}"
+                                   class="btn btn-warning btn-sm">
+                                    Resend OTP
+                                </a>
+
+                            {% endif %}
+
+                        {% elif booking.status == "Completed" %}
+
+                            <span class="text-success fw-bold">
+                                ✔ Completed
+                            </span>
+
+                        {% elif booking.status == "Rejected" %}
+
+                            <span class="text-danger">
+                                Rejected
+                            </span>
+
+                        {% else %}
+
+                            <span class="text-muted">
+                                No Action
+                            </span>
+
+                        {% endif %}
+
+                    </td>
+
+                </tr>
+
+            {% empty %}
+
+                <tr>
+                    <td colspan="9" class="text-center">
+                        No jobs assigned.
+                    </td>
+                </tr>
+
+            {% endfor %}
+
+            </tbody>
+
+        </table>
+    </div>
+
 </div>
 
 {% endblock %}
