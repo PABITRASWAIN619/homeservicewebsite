@@ -342,9 +342,12 @@ def worker_signup_pending(request):
 # ==========================================
 # CUSTOMER SIGNUP
 # ==========================================
-from django.shortcuts import render, redirect
+import re
+
 from django.contrib import messages
 from django.contrib.auth.models import User
+from django.db import transaction
+from django.shortcuts import render, redirect
 
 from .models import CustomerProfile, UserRole
 
@@ -353,56 +356,79 @@ def customer_signup(request):
 
     if request.method == "POST":
 
-        full_name = request.POST.get("full_name")
-        email = request.POST.get("email")
-        phone = request.POST.get("phone")
-        pincode = request.POST.get("pincode")
-        password1 = request.POST.get("password1")
-        password2 = request.POST.get("password2")
+        full_name = request.POST.get("full_name", "").strip()
+        email = request.POST.get("email", "").strip().lower()
+        phone = request.POST.get("phone", "").strip()
+        pincode = request.POST.get("pincode", "").strip()
+        password1 = request.POST.get("password1", "")
+        password2 = request.POST.get("password2", "")
 
         # -----------------------------
-        # Validation
+        # Full Name Validation
+        # -----------------------------
+        if len(full_name) < 3:
+            messages.error(request, "Full name must be at least 3 characters.")
+            return redirect("customer_signup")
+
+        # -----------------------------
+        # Phone Validation
+        # -----------------------------
+        if not re.fullmatch(r"[6-9]\d{9}", phone):
+            messages.error(request, "Enter a valid 10-digit mobile number.")
+            return redirect("customer_signup")
+
+        # -----------------------------
+        # Pincode Validation
+        # -----------------------------
+        if not re.fullmatch(r"[1-9]\d{5}", pincode):
+            messages.error(request, "Enter a valid 6-digit PIN code.")
+            return redirect("customer_signup")
+
+        # -----------------------------
+        # Password Validation
         # -----------------------------
         if password1 != password2:
             messages.error(request, "Passwords do not match.")
             return redirect("customer_signup")
 
+        if len(password1) < 8:
+            messages.error(
+                request,
+                "Password must contain at least 8 characters."
+            )
+            return redirect("customer_signup")
+
+        # -----------------------------
+        # Email Already Exists
+        # -----------------------------
         if User.objects.filter(username=email).exists():
             messages.error(request, "Email already exists.")
             return redirect("customer_signup")
 
         try:
 
-            # -----------------------------
-            # Create User
-            # -----------------------------
-            user = User.objects.create_user(
-                username=email,
-                email=email,
-                password=password1,
-                first_name=full_name
-            )
+            with transaction.atomic():
 
-            # -----------------------------
-            # Update Existing CustomerProfile
-            # (Created automatically by signals.py)
-            # -----------------------------
-            profile = CustomerProfile.objects.get(user=user)
+                # Create User
+                user = User.objects.create_user(
+                    username=email,
+                    email=email,
+                    password=password1,
+                    first_name=full_name,
+                )
 
-            profile.phone = phone
-            profile.pincode = pincode
+                # Create Customer Profile
+                CustomerProfile.objects.create(
+                    user=user,
+                    phone=phone,
+                    pincode=pincode,
+                )
 
-            profile.save()
-
-            # -----------------------------
-            # Create User Role
-            # -----------------------------
-            UserRole.objects.get_or_create(
-                user=user,
-                defaults={
-                    "role": "customer"
-                }
-            )
+                # Create User Role
+                UserRole.objects.create(
+                    user=user,
+                    role="customer",
+                )
 
             messages.success(
                 request,
@@ -418,11 +444,11 @@ def customer_signup(request):
             )
 
         except Exception as e:
+            print(e)   # Check terminal for the actual error
             messages.error(request, f"Error: {e}")
             return redirect("customer_signup")
 
-    return render(request, "customer_signup.html")
-# ==========================================
+    return render(request, "customer_signup.html")#==========================================
 # LOGIN
 # ==========================================
 

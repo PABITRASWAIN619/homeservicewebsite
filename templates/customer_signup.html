@@ -1,533 +1,920 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Customer Registration | HomeService</title>
+<head>
 
-    <!-- Bootstrap 5 -->
+    <meta charset="UTF-8">
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0">
+
+    <title>Customer Registration | Home Service</title>
+
+    <!-- Bootstrap -->
     <link
-      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/css/bootstrap.min.css"
-      rel="stylesheet"
-    />
+        href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/css/bootstrap.min.css"
+        rel="stylesheet">
 
     <!-- Bootstrap Icons -->
     <link
-      href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css"
-      rel="stylesheet"
-    />
+        href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css"
+        rel="stylesheet">
 
-    <style>
-      :root {
-        --primary-purple: #a855f7;
-        --accent-indigo: #6366f1;
-        --bg-dark-purple: #0f0c1b;
-        --card-glass: rgba(20, 16, 36, 0.75);
-        --input-glass: rgba(10, 7, 20, 0.6);
-        --text-muted-gray: #94a3b8;
-      }
+<style>
 
-      * {
-        box-sizing: border-box;
-        margin: 0;
-        padding: 0;
-      }
+:root{
 
-      body {
-        background-color: var(--bg-dark-purple);
-        min-height: 100vh;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
-        padding: 30px 20px;
-        position: relative;
-        overflow-x: hidden;
-      }
+    --primary:#A855F7;
+    --secondary:#6366F1;
+    --dark:#0F0C1B;
+    --glass:rgba(24,20,40,.78);
+    --input:rgba(15,13,28,.65);
+    --border:#2F2A4A;
+    --text:#ffffff;
+    --muted:#94A3B8;
 
-      /* Animated Canvas Glow Blobs */
-      .glow-blob {
-        position: absolute;
-        border-radius: 50%;
-        filter: blur(120px);
-        z-index: -1;
-        opacity: 0.25;
-        animation: floatBlobs 12s infinite alternate ease-in-out;
-      }
+}
 
-      .blob-1 {
-        width: 400px;
-        height: 400px;
-        background: var(--primary-purple);
-        top: -10%, left; -5%;
-      }
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+}
 
-      .blob-2 {
-        width: 500px;
-        height: 500px;
-        background: var(--accent-indigo);
-        bottom: -10%;
-        right: -5%;
-        animation-delay: -4s;
-      }
+body{
 
-      @keyframes floatBlobs {
-        0% { transform: translateY(0px) scale(1); }
-        100% { transform: translateY(30px) scale(1.1); }
-      }
+    min-height:100vh;
+    display:flex;
+    justify-content:center;
+    align-items:center;
 
-      /* SPLIT MODULE CARD CONTAINER */
-      .signup-container {
-        display: flex;
-        width: 100%;
-        max-width: 1100px;
-        background: var(--card-glass);
-        backdrop-filter: blur(20px);
-        -webkit-backdrop-filter: blur(20px);
-        border: 1px solid rgba(168, 85, 247, 0.15);
-        border-radius: 28px;
-        overflow: hidden;
-        box-shadow: 0 30px 60px rgba(0, 0, 0, 0.4), inset 0 1px 1px rgba(255, 255, 255, 0.1);
-        animation: cardSlideEntrance 0.8s cubic-bezier(0.2, 0.8, 0.2, 1);
-      }
+    font-family:
+    "Segoe UI",
+    sans-serif;
 
-      @keyframes cardSlideEntrance {
-        from { opacity: 0; transform: translateY(40px) scale(0.98); }
-        to { opacity: 1; transform: translateY(0) scale(1); }
-      }
+    background:
+    linear-gradient(
+    135deg,
+    #08060F,
+    #140F25,
+    #221438);
 
-      /* LEFT PANEL: PREMIUM CONTEXT MARKETING */
-      .info-panel {
-        background: linear-gradient(145deg, rgba(30, 20, 60, 0.85), rgba(15, 10, 35, 0.95));
-        padding: 55px;
-        width: 45%;
-        display: flex;
-        flex-direction: column;
-        justify-content: center;
-        border-right: 1px solid rgba(255, 255, 255, 0.05);
-      }
+    overflow-x:hidden;
+    padding:40px 20px;
+    position:relative;
 
-      .info-panel h3 {
-        font-weight: 800;
-        font-size: 34px;
-        color: white;
-        line-height: 1.25;
-        margin-bottom: 15px;
-        letter-spacing: -0.5px;
-      }
+}
 
-      .info-panel h3 span {
-        background: linear-gradient(135deg, #c084fc, #818cf8);
-        -webkit-background-clip: text;
-        -webkit-text-fill-color: transparent;
-      }
+/* Background Glow */
 
-      .feature-list {
-        margin-top: 35px;
-      }
+.glow{
 
-      .feature-item {
-        display: flex;
-        align-items: flex-start;
-        gap: 18px;
-        margin-bottom: 28px;
-      }
+    position:absolute;
+    border-radius:50%;
+    filter:blur(120px);
+    opacity:.28;
+    z-index:-1;
 
-      .feature-icon-box {
-        background: rgba(168, 85, 247, 0.12);
-        border: 1px solid rgba(168, 85, 247, 0.25);
-        color: var(--primary-purple);
-        border-radius: 14px;
-        width: 46px;
-        height: 46px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        flex-shrink: 0;
-        font-size: 22px;
-        box-shadow: 0 0 15px rgba(168, 85, 247, 0.1);
-      }
+}
 
-      .feature-item h6 {
-        color: white;
-        font-weight: 600;
-        margin-bottom: 4px;
-        font-size: 15px;
-      }
+.glow.one{
 
-      /* RIGHT PANEL: RESPONSIVE INTERACTIVE REGISTER FORM */
-      .form-panel {
-        padding: 55px;
-        width: 55%;
-        display: flex;
-        flex-direction: column;
-        justify-content: center;
-        background: rgba(12, 9, 24, 0.4);
-      }
+    width:450px;
+    height:450px;
+    background:#9333EA;
 
-      .form-panel h2 {
-        font-weight: 700;
-        color: white;
-        font-size: 30px;
-        letter-spacing: -0.5px;
-      }
+    left:-120px;
+    top:-100px;
 
-      /* ADVANCED FLOATING LABEL COMPONENT PACK */
-      .floating-group {
-        position: relative;
-        margin-bottom: 20px;
-      }
+}
 
-      .floating-group i.input-icon {
-        position: absolute;
-        left: 18px;
-        top: 50%;
-        transform: translateY(-50%);
-        color: #64748b;
-        font-size: 18px;
-        transition: all 0.3s;
-        z-index: 4;
-        pointer-events: none;
-      }
+.glow.two{
 
-      .floating-group .form-control {
-        height: 54px;
-        padding: 16px 20px 4px 50px;
-        background-color: var(--input-glass);
-        border: 1px solid #332a54;
-        border-radius: 14px;
-        font-size: 15px;
-        color: white;
-        transition: all 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
-      }
+    width:500px;
+    height:500px;
+    background:#4F46E5;
 
-      /* Configure Password Eye Padding offsets */
-      .floating-group .password-control {
-        padding-right: 50px;
-      }
+    right:-150px;
+    bottom:-120px;
 
-      .floating-group .form-control:focus {
-        background-color: #0e0a1f;
-        border-color: var(--primary-purple);
-        box-shadow: 0 0 0 4px rgba(168, 85, 247, 0.2);
-        outline: none;
-      }
+}
 
-      /* Handle standard placeholder invisibility matching behavior matrix */
-      .floating-group .form-control::placeholder {
-        color: transparent;
-      }
+/* Main Card */
 
-      /* Label States logic */
-      .floating-group label {
-        position: absolute;
-        left: 50px;
-        top: 50%;
-        transform: translateY(-50%);
-        color: var(--text-muted-gray);
-        font-size: 15px;
-        pointer-events: none;
-        transition: all 0.25s ease;
-        z-index: 3;
-      }
+.signup-wrapper{
 
-      /* Floating animations trigger mapping context rules */
-      .floating-group .form-control:focus ~ label,
-      .floating-group .form-control:not(:placeholder-shown) ~ label {
-        top: 14px;
-        font-size: 11px;
-        color: var(--primary-purple);
-      }
+    width:100%;
+    max-width:1150px;
 
-      .floating-group .form-control:focus ~ i.input-icon {
-        color: var(--primary-purple);
-        text-shadow: 0 0 8px rgba(168, 85, 247, 0.5);
-      }
+    display:flex;
 
-      /* INTERACTIVE EYE TOGGLE ICON MODULE */
-      .floating-group .toggle-password {
-        position: absolute;
-        right: 18px;
-        top: 50%;
-        transform: translateY(-50%);
-        cursor: pointer;
-        color: #64748b;
-        z-index: 5;
-        padding: 6px;
-        font-size: 16px;
-        transition: color 0.2s;
-      }
+    background:var(--glass);
 
-      .floating-group .toggle-password:hover {
-        color: white;
-      }
+    backdrop-filter:blur(20px);
 
-      /* ACTION CONVERSION BUTTON */
-      .btn-register {
-        width: 100%;
-        height: 54px;
-        border: none;
-        border-radius: 14px;
-        background: linear-gradient(135deg, var(--primary-purple), var(--accent-indigo));
-        color: white;
-        font-size: 16px;
-        font-weight: 600;
-        box-shadow: 0 10px 20px -5px rgba(168, 85, 247, 0.4);
-        transition: all 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
-        margin-top: 10px;
-      }
+    border-radius:28px;
 
-      .btn-register:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 15px 25px -3px rgba(168, 85, 247, 0.5);
-        filter: brightness(1.1);
-      }
+    overflow:hidden;
 
-      .btn-register:active {
-        transform: translateY(0);
-      }
+    border:1px solid rgba(255,255,255,.08);
 
-      .login-link {
-        text-align: center;
-        margin-top: 25px;
-        font-size: 14px;
-        color: var(--text-muted-gray);
-      }
+    box-shadow:
 
-      .login-link a {
-        color: var(--primary-purple);
-        text-decoration: none;
-        font-weight: 600;
-        transition: 0.2s;
-      }
+    0 20px 50px rgba(0,0,0,.45),
 
-      .login-link a:hover {
-        color: white;
-        text-decoration: underline;
-      }
+    inset 0 1px rgba(255,255,255,.08);
 
-      /* CUSTOM ALERT STYLING */
-      .alert-glass {
-        background: rgba(25, 135, 84, 0.15);
-        border: 1px solid rgba(25, 135, 84, 0.3);
-        color: #a7f3d0;
-        border-radius: 12px;
-        font-size: 14px;
-      }
+}
 
-      /* RESPONSIVE MEDIA UI OVERRIDES */
-      @media (max-width: 991px) {
-        .signup-container {
-          flex-direction: column;
-          max-width: 580px;
-        }
-        .info-panel {
-          width: 100%;
-          padding: 45px 35px;
-          border-right: none;
-          border-bottom: 1px solid rgba(255, 255, 255, 0.05);
-        }
-        .form-panel {
-          width: 100%;
-          padding: 45px 35px;
-        }
-      }
-    </style>
-  </head>
+/* Left */
 
-  <body>
-    <!-- Decorative Glowing Elements -->
-    <div class="glow-blob blob-1"></div>
-    <div class="glow-blob blob-2"></div>
+.left{
 
-    <div class="signup-container">
-      <!-- LEFT HAND PANEL: VALUE STACK COMPONENT -->
-      <div class="info-panel">
-        <h3>Your Home,<br /><span>Maintained By Experts.</span></h3>
-        <p class="small text-white-50 mb-2">
-          Create your account to unlock instant home maintenance booking
-          capabilities across your city.
-        </p>
+    width:42%;
 
-        <div class="feature-list">
-          <div class="feature-item">
-            <div class="feature-icon-box">
-              <i class="bi bi-shield-check"></i>
+    background:
+
+    linear-gradient(
+    145deg,
+    rgba(28,20,60,.95),
+    rgba(18,12,38,.95));
+
+    padding:60px 50px;
+
+    color:white;
+
+}
+
+.left h1{
+
+    font-size:38px;
+    font-weight:800;
+    line-height:1.2;
+    margin-bottom:20px;
+
+}
+
+.left h1 span{
+
+    background:
+
+    linear-gradient(
+    135deg,
+    #D8B4FE,
+    #818CF8);
+
+    -webkit-background-clip:text;
+    -webkit-text-fill-color:transparent;
+
+}
+
+.left p{
+
+    color:#CBD5E1;
+    margin-bottom:35px;
+
+}
+
+/* Feature */
+
+.feature{
+
+    display:flex;
+    gap:18px;
+    margin-bottom:28px;
+
+}
+
+.feature-icon{
+
+    width:52px;
+    height:52px;
+
+    border-radius:15px;
+
+    display:flex;
+    align-items:center;
+    justify-content:center;
+
+    background:
+    rgba(168,85,247,.12);
+
+    color:var(--primary);
+
+    font-size:24px;
+
+    flex-shrink:0;
+
+}
+
+.feature h6{
+
+    margin-bottom:6px;
+    font-weight:700;
+
+}
+
+.feature p{
+
+    margin:0;
+    color:#B8C2D4;
+    font-size:14px;
+
+}
+
+/* Right */
+
+.right{
+
+    width:58%;
+    padding:55px;
+
+}
+
+.right h2{
+
+    color:white;
+    font-weight:700;
+    margin-bottom:6px;
+
+}
+
+.right small{
+
+    color:#A1A1AA;
+
+}
+
+/* Messages */
+
+.alert{
+
+    border-radius:14px;
+
+}
+
+/* Floating */
+
+.form-group{
+
+    position:relative;
+    margin-bottom:22px;
+
+}
+
+.form-group input{
+
+    width:100%;
+    height:58px;
+
+    border-radius:15px;
+
+    border:1px solid var(--border);
+
+    background:var(--input);
+
+    color:white;
+
+    padding:
+
+    20px
+    52px
+    6px
+    50px;
+
+    transition:.3s;
+
+}
+
+.form-group input:focus{
+
+    outline:none;
+
+    border-color:var(--primary);
+
+    box-shadow:
+
+    0 0 0 4px
+
+    rgba(168,85,247,.15);
+
+}
+
+.form-group input::placeholder{
+
+    color:transparent;
+
+}
+
+.form-group label{
+
+    position:absolute;
+
+    left:50px;
+
+    top:50%;
+
+    transform:translateY(-50%);
+
+    color:var(--muted);
+
+    transition:.25s;
+
+    pointer-events:none;
+
+}
+
+.form-group input:focus~label,
+.form-group input:not(:placeholder-shown)~label{
+
+    top:14px;
+
+    font-size:12px;
+
+    color:var(--primary);
+
+}
+
+.input-icon{
+
+    position:absolute;
+
+    left:18px;
+    top:50%;
+
+    transform:translateY(-50%);
+
+    color:#6B7280;
+
+}
+
+.toggle-password{
+
+    position:absolute;
+
+    right:18px;
+
+    top:50%;
+
+    transform:translateY(-50%);
+
+    cursor:pointer;
+
+    color:#6B7280;
+
+}
+
+/* Button */
+
+.btn-register{
+
+    width:100%;
+    height:56px;
+
+    border:none;
+
+    border-radius:15px;
+
+    background:
+
+    linear-gradient(
+    135deg,
+    var(--primary),
+    var(--secondary));
+
+    color:white;
+
+    font-size:16px;
+
+    font-weight:700;
+
+    transition:.3s;
+
+}
+
+.btn-register:hover{
+
+    transform:translateY(-2px);
+
+    box-shadow:
+
+    0 15px 25px
+
+    rgba(168,85,247,.35);
+
+}
+
+/* Footer */
+
+.login-link{
+
+    margin-top:25px;
+    text-align:center;
+    color:#CBD5E1;
+
+}
+
+.login-link a{
+
+    color:#C084FC;
+    text-decoration:none;
+    font-weight:700;
+
+}
+
+.login-link a:hover{
+
+    color:white;
+
+}
+
+/* Responsive */
+
+@media(max-width:991px){
+
+.signup-wrapper{
+
+flex-direction:column;
+
+}
+
+.left,
+.right{
+
+width:100%;
+
+}
+
+.left{
+
+padding:40px;
+
+}
+
+.right{
+
+padding:40px 30px;
+
+}
+
+}
+
+</style>
+
+</head>
+<body>
+
+    <!-- Background Glow -->
+    <div class="glow one"></div>
+    <div class="glow two"></div>
+
+    <div class="signup-wrapper">
+
+        <!-- =========================
+             LEFT PANEL
+        ========================== -->
+
+        <div class="left">
+
+            <h1>
+                Your Home,<br>
+                <span>Maintained By Experts</span>
+            </h1>
+
+            <p>
+                Create your customer account and book trusted professionals
+                anytime, anywhere.
+            </p>
+
+            <div class="feature">
+
+                <div class="feature-icon">
+                    <i class="bi bi-shield-check"></i>
+                </div>
+
+                <div>
+
+                    <h6>Verified Workers</h6>
+
+                    <p>
+                        Every electrician, plumber and technician
+                        is manually verified before approval.
+                    </p>
+
+                </div>
+
             </div>
-            <div>
-              <h6>Verified Trade Professionals</h6>
-              <p class="small text-white-50 mb-0">
-                Every dispatched worker undergoes rigorous vetting procedures.
-              </p>
-            </div>
-          </div>
 
-          <div class="feature-item">
-            <div class="feature-icon-box">
-              <i class="bi bi-lightning-charge"></i>
-            </div>
-            <div>
-              <h6>On-Demand Scheduling</h6>
-              <p class="small text-white-50 mb-0">
-                Get matched with top electricians or plumbers within minutes.
-              </p>
-            </div>
-          </div>
+            <div class="feature">
 
-          <div class="feature-item">
-            <div class="feature-icon-box"><i class="bi bi-wallet2"></i></div>
-            <div>
-              <h6>Transparent Fixed Pricing</h6>
-              <p class="small text-white-50 mb-0">
-                Upfront billing estimations completely free of hidden
-                operational surcharges.
-              </p>
+                <div class="feature-icon">
+                    <i class="bi bi-lightning-charge"></i>
+                </div>
+
+                <div>
+
+                    <h6>Instant Booking</h6>
+
+                    <p>
+                        Book nearby professionals within minutes
+                        using live location.
+                    </p>
+
+                </div>
+
             </div>
-          </div>
+
+            <div class="feature">
+
+                <div class="feature-icon">
+                    <i class="bi bi-wallet2"></i>
+                </div>
+
+                <div>
+
+                    <h6>Secure Payments</h6>
+
+                    <p>
+                        Pay online or offline after your work
+                        is completed safely.
+                    </p>
+
+                </div>
+
+            </div>
+
         </div>
-      </div>
 
-      <!-- RIGHT HAND PANEL: DATA FIELDS CORE -->
-      <div class="form-panel">
-        <h2 class="mb-1">Create Account</h2>
-        <p class="small text-muted mb-4">
-          Join homeowners managing properties seamlessly.
-        </p>
+        <!-- =========================
+             RIGHT PANEL
+        ========================== -->
 
-        {% if messages %} {% for message in messages %}
-        <div
-          class="alert alert-glass d-flex align-items-center gap-2 mb-4 py-2+5 px-3"
-        >
-          <i class="bi bi-check-circle-fill text-success"></i>
-          <span>{{ message }}</span>
+        <div class="right">
+
+            <h2>Create Customer Account</h2>
+
+            <small>
+                Fill in your details to continue.
+            </small>
+
+            <br><br>
+
+            <!-- Django Messages -->
+
+            {% if messages %}
+
+                {% for message in messages %}
+
+                <div class="alert alert-info">
+
+                    {{ message }}
+
+                </div>
+
+                {% endfor %}
+
+            {% endif %}
+
+            <!-- Signup Form -->
+
+            <form
+                method="POST"
+                id="registrationForm"
+                novalidate>
+
+                {% csrf_token %}
+
+                <!-- Full Name -->
+
+                <div class="form-group">
+
+                    <i class="bi bi-person input-icon"></i>
+
+                    <input
+                        type="text"
+                        id="fullName"
+                        name="full_name"
+                        placeholder=" "
+                        required>
+
+                    <label for="fullName">
+                        Full Name
+                    </label>
+
+                </div>
+
+                <!-- Email -->
+
+                <div class="form-group">
+
+                    <i class="bi bi-envelope input-icon"></i>
+
+                    <input
+                        type="email"
+                        id="emailAddress"
+                        name="email"
+                        placeholder=" "
+                        required>
+
+                    <label for="emailAddress">
+                        Email Address
+                    </label>
+
+                </div>
+
+                <!-- Mobile -->
+
+                <div class="form-group">
+
+                    <i class="bi bi-telephone input-icon"></i>
+
+                    <input
+                        type="tel"
+                        id="phoneNumber"
+                        name="phone"
+                        maxlength="10"
+                        placeholder=" "
+                        required>
+
+                    <label for="phoneNumber">
+                        Mobile Number
+                    </label>
+
+                </div>
+
+                <!-- Pincode -->
+
+                <div class="form-group">
+
+                    <i class="bi bi-geo-alt input-icon"></i>
+
+                    <input
+                        type="text"
+                        id="pinCode"
+                        name="pincode"
+                        maxlength="6"
+                        placeholder=" "
+                        required>
+
+                    <label for="pinCode">
+                        PIN Code
+                    </label>
+
+                </div>
+
+                <!-- Password -->
+
+                <div class="form-group">
+
+                    <i class="bi bi-lock input-icon"></i>
+
+                    <input
+                        type="password"
+                        id="password1"
+                        name="password1"
+                        placeholder=" "
+                        required>
+
+                    <label for="password1">
+                        Create Password
+                    </label>
+
+                    <i
+                        class="bi bi-eye toggle-password"
+                        onclick="togglePassVisibility('password1',this)">
+                    </i>
+
+                </div>
+
+                <!-- Confirm Password -->
+
+                <div class="form-group">
+
+                    <i class="bi bi-lock-fill input-icon"></i>
+
+                    <input
+                        type="password"
+                        id="password2"
+                        name="password2"
+                        placeholder=" "
+                        required>
+
+                    <label for="password2">
+                        Confirm Password
+                    </label>
+
+                    <i
+                        class="bi bi-eye toggle-password"
+                        onclick="togglePassVisibility('password2',this)">
+                    </i>
+
+                </div>
+
+                <!-- Submit -->
+
+                <button
+                    type="submit"
+                    class="btn-register">
+
+                    <i class="bi bi-person-plus-fill"></i>
+
+                    Register Customer
+
+                </button>
+
+            </form>
+
+            <div class="login-link">
+
+                Already have an account?
+
+                <a href="{% url 'login' %}">
+                    Login Here
+                </a>
+
+            </div>
+
         </div>
-        {% endfor %} {% endif %}
 
-        <form method="POST" id="registrationForm">
-          {% csrf_token %}
-
-          <!-- Full Name Input -->
-          <div class="floating-group">
-            <input
-              type="text"
-              name="full_name"
-              id="fullName"
-              class="form-control"
-              placeholder=" "
-              required
-            />
-            <i class="bi bi-person input-icon"></i>
-            <label for="fullName">Full Name</label>
-          </div>
-
-          <!-- Email Input -->
-          <div class="floating-group">
-            <input
-              type="email"
-              name="email"
-              id="emailAddress"
-              class="form-control"
-              placeholder=" "
-              required
-            />
-            <i class="bi bi-envelope input-icon"></i>
-            <label for="emailAddress">Email Address</label>
-          </div>
-
-          <!-- Phone Input -->
-          <div class="floating-group">
-            <input
-              type="tel"
-              name="phone"
-              id="phoneNumber"
-              class="form-control"
-              placeholder=" "
-              required
-            />
-            <i class="bi bi-telephone input-icon"></i>
-            <label for="phoneNumber">Mobile Number</label>
-          </div>
-
-          <!-- Pincode Input -->
-          <div class="floating-group">
-            <input
-              type="text"
-              name="pincode"
-              id="pinCode"
-              class="form-control"
-              placeholder=" "
-              required
-            />
-            <i class="bi bi-geo-alt input-icon"></i>
-            <label for="pinCode">Location Pincode</label>
-          </div>
-
-          <!-- Password 1 Input -->
-          <div class="floating-group">
-            <input
-              type="password"
-              name="password1"
-              id="password1"
-              class="form-control password-control"
-              placeholder=" "
-              required
-            />
-            <i class="bi bi-lock input-icon"></i>
-            <i
-              class="bi bi-eye toggle-password"
-              onclick="togglePassVisibility('password1', this)"
-            ></i>
-            <label for="password1">Create Password</label>
-          </div>
-
-          <!-- Password 2 Input -->
-          <div class="floating-group">
-            <input
-              type="password"
-              name="password2"
-              id="password2"
-              class="form-control password-control"
-              placeholder=" "
-              required
-            />
-            <i class="bi bi-lock-fill input-icon"></i>
-            <i
-              class="bi bi-eye toggle-password"
-              onclick="togglePassVisibility('password2', this)"
-            ></i>
-            <label for="password2">Confirm Password</label>
-          </div>
-
-          <button type="submit" class="btn-register">Register Customer</button>
-        </form>
-
-        <div class="login-link">
-          Already have an account?
-          <a href="{% url 'login' %}">Sign In</a>
-        </div>
-      </div>
     </div>
+        <!-- =========================
+         JavaScript
+    ========================== -->
 
-    <!-- SCRIPT INFRASTRUCTURE -->
     <script>
-      function togglePassVisibility(inputId, element) {
-        const inputField = document.getElementById(inputId);
-        if (inputField.type === "password") {
-          inputField.type = "text";
-          element.classList.replace("bi-eye", "bi-eye-slash");
-        } else {
-          inputField.type = "password";
-          element.classList.replace("bi-eye-slash", "bi-eye");
+
+        // -----------------------------
+        // Show / Hide Password
+        // -----------------------------
+        function togglePassVisibility(inputId, icon){
+
+            const input = document.getElementById(inputId);
+
+            if(input.type === "password"){
+
+                input.type = "text";
+                icon.classList.replace("bi-eye","bi-eye-slash");
+
+            }else{
+
+                input.type = "password";
+                icon.classList.replace("bi-eye-slash","bi-eye");
+
+            }
+
         }
-      }
+
+        // -----------------------------
+        // Mobile Number Validation
+        // -----------------------------
+        const phone = document.getElementById("phoneNumber");
+
+        phone.addEventListener("input", function(){
+
+            this.value = this.value
+                .replace(/\D/g,"")
+                .slice(0,10);
+
+        });
+
+        // -----------------------------
+        // PIN Code Validation
+        // -----------------------------
+        const pin = document.getElementById("pinCode");
+
+        pin.addEventListener("input", function(){
+
+            this.value = this.value
+                .replace(/\D/g,"")
+                .slice(0,6);
+
+        });
+
+        // -----------------------------
+        // Form Validation
+        // -----------------------------
+        document
+        .getElementById("registrationForm")
+        .addEventListener("submit",function(e){
+
+            const name=document
+            .getElementById("fullName")
+            .value.trim();
+
+            const email=document
+            .getElementById("emailAddress")
+            .value.trim();
+
+            const phone=document
+            .getElementById("phoneNumber")
+            .value.trim();
+
+            const pin=document
+            .getElementById("pinCode")
+            .value.trim();
+
+            const pass1=document
+            .getElementById("password1")
+            .value;
+
+            const pass2=document
+            .getElementById("password2")
+            .value;
+
+            // Name
+
+            if(name.length<3){
+
+                alert("Full name must contain at least 3 characters.");
+
+                e.preventDefault();
+
+                return;
+
+            }
+
+            // Email
+
+            const emailRegex=/^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+            if(!emailRegex.test(email)){
+
+                alert("Enter a valid email address.");
+
+                e.preventDefault();
+
+                return;
+
+            }
+
+            // Phone
+
+            const phoneRegex=/^[6-9]\d{9}$/;
+
+            if(!phoneRegex.test(phone)){
+
+                alert("Enter a valid 10-digit Indian mobile number.");
+
+                e.preventDefault();
+
+                return;
+
+            }
+
+            // Pincode
+
+            const pinRegex=/^[1-9]\d{5}$/;
+
+            if(!pinRegex.test(pin)){
+
+                alert("Enter a valid 6-digit PIN code.");
+
+                e.preventDefault();
+
+                return;
+
+            }
+
+            // Password Length
+
+            if(pass1.length<8){
+
+                alert("Password must contain at least 8 characters.");
+
+                e.preventDefault();
+
+                return;
+
+            }
+
+            // Password Match
+
+            if(pass1!==pass2){
+
+                alert("Passwords do not match.");
+
+                e.preventDefault();
+
+                return;
+
+            }
+
+        });
+
     </script>
 
     {% if redirect_to_login %}
+
     <script>
-      setTimeout(function () {
-        window.location.href = "{% url 'login' %}";
-      }, 2000);
+
+        setTimeout(function(){
+
+            window.location.href="{% url 'login' %}";
+
+        },2000);
+
     </script>
+
     {% endif %}
-  </body>
+
+</body>
 </html>
