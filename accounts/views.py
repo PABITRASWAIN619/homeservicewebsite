@@ -1375,7 +1375,15 @@ from django.contrib.auth.decorators import login_required
 
 from .models import Booking, WorkerProfile
 
+from django.http import HttpResponse
+from .models import CustomerProfile
 
+def cleanup_customer_profiles(request):
+    deleted = CustomerProfile.objects.filter(
+        user__userrole__role="worker"
+    ).delete()
+
+    return HttpResponse(f"Deleted: {deleted}")
 # =========================
 # WORKER JOB LIST
 # =========================
