@@ -180,23 +180,18 @@ footer {
       ☰
     </button>
 
-    <h5 class="m-0">Customer Dashboard</h5>
+    <!-- Displaying Application Name -->
+    <h5 class="m-0">🏠 Home Service</h5>
 
+    <!-- UPDATED USER-BOX: Email/Username text removed -->
     <div class="user-box">
-      <i class="fas fa-bell fs-5"></i>
-      <span class="badge bg-danger">3</span>
-
       <div class="user-img">
         {% if request.user.customerprofile.image %}
           <img src="{{ request.user.customerprofile.image.url }}">
         {% else %}
+          <!-- Shows the first letter of the username -->
           {{ request.user.username|slice:":1"|upper }}
         {% endif %}
-      </div>
-
-      <div>
-        <strong>{{ request.user.username }}</strong><br/>
-        <small>{{ request.user.email }}</small>
       </div>
     </div>
 

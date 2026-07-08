@@ -1,20 +1,25 @@
-{% extends 'worker/base.html' %} {% block content %}
+{% extends 'worker/base.html' %} 
+{% block content %}
 
 <style>
   :root {
     --primary-emerald: #10b981;
     --neon-glow: #00f2fe;
     --royal-purple: #6366f1;
+    --hot-pink: #ee2a7b;
+    --amber-glow: #f9ce34;
     --gradient-premium: linear-gradient(
       135deg,
-      #0f172a 0%,
-      #1e1b4b 50%,
-      #311042 100%
+      #0b0f19 0%,
+      #111827 30%,
+      #1e1b4b 70%,
+      #2e104d 100%
     );
-    --card-glass: rgba(255, 255, 255, 0.85);
+    --card-glass: rgba(255, 255, 255, 0.92);
     --text-dark: #0f172a;
-    --text-muted: #475569;
-    --premium-shadow: 0 25px 50px -12px rgba(15, 23, 42, 0.25);
+    --text-muted: #64748b;
+    --premium-shadow: 0 30px 60px -15px rgba(15, 23, 42, 0.4);
+    --border-glow: linear-gradient(to right, rgba(99, 102, 241, 0.2), rgba(238, 42, 123, 0.2));
   }
 
   /* PREMIUM BACKGROUND REHAUL */
@@ -22,38 +27,45 @@
     background: var(--gradient-premium) !important;
     background-attachment: fixed !important;
     color: #f8fafc;
-    font-family: "Segoe UI", Roboto, sans-serif;
+    font-family: "Segoe UI", system-ui, Roboto, sans-serif;
+    -webkit-font-smoothing: antialiased;
   }
 
-  /* INSTAGRAM CREATOR HUB INSPIRED FLOATING CARD */
+  /* CONTAINER ADJUSTMENT */
+  .main-wrapper-container {
+    max-width: 1000px;
+  }
+
+  /* CREATOR HUB FLOATING CARD */
   .profile-container-card {
     background: var(--card-glass);
-    backdrop-filter: blur(20px);
-    -webkit-backdrop-filter: blur(20px);
-    border: 1px solid rgba(255, 255, 255, 0.4);
-    border-radius: 35px;
+    backdrop-filter: blur(24px);
+    -webkit-backdrop-filter: blur(24px);
+    border: 1px solid rgba(255, 255, 255, 0.6);
+    border-radius: 32px;
     box-shadow: var(--premium-shadow);
     overflow: hidden;
     margin-bottom: 40px;
-    transition: transform 0.3s ease;
+    transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
   }
 
   .profile-cover-banner {
     background:
       linear-gradient(
         180deg,
-        rgba(0, 0, 0, 0.4) 0%,
+        rgba(0, 0, 0, 0.5) 0%,
+        rgba(15, 23, 42, 0.2) 50%,
         rgba(255, 255, 255, 0) 100%
       ),
-      var(--gradient-premium);
-    height: 200px;
+      linear-gradient(45deg, #4f46e5, #9333ea, #db2777);
+    height: 220px;
     position: relative;
   }
 
   .profile-meta-header {
-    padding: 0 50px 35px 50px;
+    padding: 0 40px 30px 40px;
     position: relative;
-    margin-top: -100px;
+    margin-top: -80px;
     z-index: 5;
   }
 
@@ -61,75 +73,76 @@
   .profile-avatar-wrapper {
     position: relative;
     display: inline-block;
-    padding: 6px;
+    padding: 5px;
     background: linear-gradient(
       45deg,
-      #f9ce34,
-      #ee2a7b,
-      #6228d7
-    ); /* Instagram gradient ring */
+      var(--amber-glow),
+      var(--hot-pink),
+      var(--royal-purple)
+    ); 
     border-radius: 50%;
-    box-shadow: 0 10px 30px rgba(238, 42, 123, 0.3);
+    box-shadow: 0 12px 35px rgba(238, 42, 123, 0.4);
+    transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
   }
 
   .profile-avatar-img {
-    width: 150px;
-    height: 150px;
+    width: 140px;
+    height: 140px;
     border-radius: 50%;
     border: 4px solid #ffffff;
     object-fit: cover;
     background-color: #f8fafc;
-    transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
   }
 
-  .profile-avatar-wrapper:hover .profile-avatar-img {
-    transform: scale(1.04) rotate(-2deg);
+  .profile-avatar-wrapper:hover {
+    transform: scale(1.05) rotate(-1deg);
   }
 
-  /* Live Pulsating Online Status Beacon Checkmark */
+  /* Live Pulsating Checkmark */
   .profile-avatar-wrapper::after {
-    content: "\b3ac"; /* bootstrap icon check-circle-fill */
+    content: "\b3ac"; 
     font-family: "bootstrap-icons";
     position: absolute;
-    bottom: 12px;
-    right: 12px;
-    width: 26px;
-    height: 26px;
+    bottom: 8px;
+    right: 8px;
+    width: 28px;
+    height: 28px;
     background-color: var(--primary-emerald);
     color: white;
-    font-size: 14px;
+    font-size: 15px;
     font-weight: bold;
     display: flex;
     align-items: center;
     justify-content: center;
-    border: 4px solid #ffffff;
+    border: 3px solid #ffffff;
     border-radius: 50%;
     box-shadow: 0 4px 15px rgba(16, 185, 129, 0.6);
   }
 
   .worker-name-heading {
-    font-size: 32px;
-    font-weight: 900;
+    font-size: 34px;
+    font-weight: 800;
     letter-spacing: -1px;
     color: var(--text-dark);
   }
 
-  /* REFINED COUNTER HIGHLIGHT METRIC CHIPS */
+  /* REFINED HIGHLIGHT METRIC CHIPS */
   .info-stat-badge {
-    padding: 14px 26px;
-    background: rgba(255, 255, 255, 0.7);
-    backdrop-filter: blur(10px);
-    border-radius: 22px;
-    border: 1px solid rgba(226, 232, 240, 0.8);
+    padding: 12px 24px;
+    background: rgba(255, 255, 255, 0.8);
+    backdrop-filter: blur(8px);
+    border-radius: 20px;
+    border: 1px solid rgba(226, 232, 240, 0.9);
     text-align: center;
-    min-width: 140px;
+    min-width: 135px;
+    box-shadow: 0 4px 15px rgba(15, 23, 42, 0.03);
     transition: all 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
   }
 
   .info-stat-badge:hover {
     background: #ffffff;
     border-color: var(--royal-purple);
-    box-shadow: 0 15px 30px rgba(99, 102, 241, 0.15);
+    box-shadow: 0 12px 25px rgba(99, 102, 241, 0.15);
     transform: translateY(-3px);
   }
 
@@ -137,21 +150,21 @@
     font-size: 11px;
     font-weight: 700;
     text-transform: uppercase;
-    letter-spacing: 1.25px;
+    letter-spacing: 1.2px;
     color: var(--text-muted);
     display: block;
-    margin-bottom: 4px;
+    margin-bottom: 3px;
   }
 
   .info-stat-badge div {
-    font-size: 19px;
+    font-size: 18px;
     font-weight: 800;
     color: var(--text-dark);
   }
 
   /* HIGH-TECH INTERACTIVE ATTRIBUTE GRID CHIPS */
   .attribute-panel-title {
-    font-size: 15px;
+    font-size: 14px;
     font-weight: 700;
     text-transform: uppercase;
     letter-spacing: 1.5px;
@@ -170,15 +183,15 @@
   }
 
   .attribute-item-box {
-    background: rgba(248, 250, 252, 0.6);
-    border: 1px solid rgba(226, 232, 240, 0.8);
-    border-radius: 24px;
-    padding: 24px 28px;
+    background: rgba(248, 250, 252, 0.65);
+    border: 1px solid rgba(226, 232, 240, 0.9);
+    border-radius: 20px;
+    padding: 20px 24px;
     height: 100%;
     display: flex;
     align-items: center;
-    gap: 20px;
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    gap: 18px;
+    transition: all 0.3s cubic-bezier(0.25, 1, 0.5, 1);
     cursor: pointer;
     position: relative;
   }
@@ -186,20 +199,20 @@
   .attribute-item-box:hover {
     background: #ffffff;
     border-color: var(--royal-purple);
-    box-shadow: 0 15px 35px rgba(99, 102, 241, 0.12);
-    transform: translateY(-5px);
+    box-shadow: 0 15px 30px rgba(99, 102, 241, 0.08);
+    transform: translateY(-4px);
   }
 
   .attribute-icon-frame {
-    width: 52px;
-    height: 52px;
-    border-radius: 16px;
+    width: 48px;
+    height: 48px;
+    border-radius: 14px;
     background: #ffffff;
-    color: var(--text-muted);
+    color: #475569;
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 22px;
+    font-size: 20px;
     flex-shrink: 0;
     box-shadow: 0 4px 10px rgba(0, 0, 0, 0.02);
     border: 1px solid #e2e8f0;
@@ -211,27 +224,27 @@
     color: white;
     border-color: transparent;
     transform: scale(1.05);
-    box-shadow: 0 8px 20px rgba(99, 102, 241, 0.3);
+    box-shadow: 0 8px 20px rgba(99, 102, 241, 0.25);
   }
 
   .attribute-label-text {
-    font-size: 12px;
+    font-size: 11px;
     font-weight: 700;
     color: var(--text-muted);
-    margin-bottom: 4px;
+    margin-bottom: 2px;
     text-transform: uppercase;
     letter-spacing: 0.75px;
   }
 
   .attribute-value-text {
-    font-size: 16px;
+    font-size: 15px;
     font-weight: 700;
     color: var(--text-dark);
     margin: 0;
     word-break: break-word;
   }
 
-  /* INSTAGRAM-STYLE GLOWING PRIMARY PROFILE ACTION BUTTON */
+  /* GLOWING PROFILE ACTION BUTTON */
   .btn-modify-profile {
     background: linear-gradient(45deg, #f9ce34, #ee2a7b, #6228d7);
     color: white !important;
@@ -243,6 +256,7 @@
     text-decoration: none;
     display: inline-flex;
     align-items: center;
+    justify-content: center;
     gap: 10px;
     box-shadow: 0 10px 30px rgba(238, 42, 123, 0.35);
     transition: all 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
@@ -254,30 +268,32 @@
     box-shadow: 0 15px 35px rgba(238, 42, 123, 0.5);
   }
 
-  /* TOAST FLOATING POPUPS DECK */
+  /* TOAST SYSTEM */
   .toast-container {
     position: fixed;
-    bottom: 40px;
+    bottom: 30px;
     left: 50%;
     transform: translateX(-50%);
-    z-index: 2000;
+    z-index: 2050;
+    width: auto;
+    max-width: 90%;
   }
 
   .custom-toast {
     background: #0f172a;
     color: white;
-    padding: 14px 28px;
+    padding: 12px 24px;
     border-radius: 50px;
-    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
     display: flex;
     align-items: center;
-    gap: 12px;
+    gap: 10px;
     font-weight: 600;
     font-size: 14px;
     opacity: 0;
-    transform: translateY(20px);
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    border: 1px solid rgba(255, 255, 255, 0.1);
+    transform: translateY(15px);
+    transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+    border: 1px solid rgba(255, 255, 255, 0.15);
   }
 
   .custom-toast.show {
@@ -285,16 +301,102 @@
     transform: translateY(0);
   }
 
-  /* DIALOG CONTAINER MODALS MODS */
+  /* DIALOG CONTAINER MODALS */
   .modal-content {
     border: none;
-    border-radius: 30px;
-    box-shadow: 0 30px 60px rgba(0, 0, 0, 0.4);
+    border-radius: 24px;
+    box-shadow: 0 30px 60px rgba(0, 0, 0, 0.3);
     background: #ffffff;
+  }
+
+  /* RESPONSIVE CSS OVERRIDES */
+  @media (max-width: 767.98px) {
+    .profile-cover-banner {
+      height: 150px;
+    }
+    
+    .profile-meta-header {
+      padding: 0 20px 24px 20px;
+      margin-top: -70px;
+    }
+
+    .profile-avatar-img {
+      width: 110px;
+      height: 110px;
+    }
+
+    .profile-avatar-wrapper::after {
+      bottom: 6px;
+      right: 6px;
+      width: 24px;
+      height: 24px;
+      font-size: 12px;
+    }
+
+    .worker-name-heading {
+      font-size: 26px;
+      margin-top: 5px;
+    }
+
+    .info-stat-badge-group {
+      width: 100% !important;
+      display: grid !important;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px !important;
+    }
+
+    .info-stat-badge {
+      padding: 10px 12px;
+      min-width: 0;
+      width: 100%;
+    }
+
+    .info-stat-badge span {
+      font-size: 10px;
+    }
+
+    .info-stat-badge div {
+      font-size: 15px;
+    }
+
+    .profile-container-card {
+      border-radius: 24px;
+    }
+
+    .card-body {
+      padding: 24px 16px !important;
+    }
+
+    .attribute-panel-title {
+      font-size: 12px;
+      margin-bottom: 20px;
+    }
+
+    .attribute-item-box {
+      padding: 16px 18px;
+      gap: 14px;
+      border-radius: 16px;
+    }
+
+    .attribute-icon-frame {
+      width: 42px;
+      height: 42px;
+      border-radius: 10px;
+      font-size: 18px;
+    }
+
+    .attribute-value-text {
+      font-size: 14px;
+    }
+
+    .btn-modify-profile {
+      width: 100%;
+      padding: 14px 24px;
+      font-size: 15px;
+    }
   }
 </style>
 
-<!-- Floating clipboard feedback desk overlay -->
 <div class="toast-container">
   <div class="custom-toast" id="clipboardToast">
     <i class="bi bi-fire text-warning fs-5"></i>
@@ -302,46 +404,35 @@
   </div>
 </div>
 
-<div class="container mt-5 pb-5">
+<div class="container main-wrapper-container mt-3 mt-md-5 pb-5">
   <div class="card profile-container-card">
     <div class="profile-cover-banner"></div>
 
     <div class="profile-meta-header">
-      <div
-        class="d-flex flex-column flex-md-row align-items-center align-items-md-end justify-content-between gap-4"
-      >
-        <div
-          class="d-flex flex-column flex-md-row align-items-center align-items-md-end gap-4 text-center text-md-start"
-        >
+      <div class="d-flex flex-column flex-md-row align-items-center align-items-md-end justify-content-between gap-4">
+        
+        <div class="d-flex flex-column flex-md-row align-items-center align-items-md-end gap-3 gap-md-4 text-center text-md-start w-100">
           <div class="profile-avatar-wrapper">
-            <!-- Fixed default image asset parsing rules -->
             <img
               src="{% if worker.profile_image %}{{ worker.profile_image.url }}{% else %}https://cdn-icons-png.flaticon.com/512/3135/3135715.png{% endif %}"
               class="profile-avatar-img"
               alt="Worker Account Creator Profile Avatar Picture"
             />
           </div>
-          <div class="mb-2">
+          <div class="mb-1">
             <h2 class="worker-name-heading mb-2">
               {{ request.user.username }}
-              <i
-                class="bi bi-patch-check-fill text-primary ms-1"
-                title="Verified Home Service Creator Partner"
-              ></i>
+              <i class="bi bi-patch-check-fill text-primary ms-1" title="Verified Home Service Creator Partner"></i>
             </h2>
             <p class="text-muted fw-bold mb-0">
-              <span
-                class="badge bg-white text-dark border border-light-subtle px-3 py-2 rounded-pill shadow-sm"
-              >
-                <i class="bi bi-gem text-indigo me-1"></i> Pro {{
-                worker.service_type|default:"Specialist" }}
+              <span class="badge bg-white text-dark border border-light-subtle px-3 py-2 rounded-pill shadow-sm">
+                <i class="bi bi-gem text-indigo me-1"></i> Pro {{ worker.service_type|default:"Specialist" }}
               </span>
             </p>
           </div>
         </div>
 
-        <!-- Metric Counter Indicator Tracker Dashboard Modules -->
-        <div class="d-flex gap-3 mb-2">
+        <div class="d-flex info-stat-badge-group gap-2 gap-md-3 mb-1 w-100 justify-content-end">
           <div class="info-stat-badge">
             <span>Experience</span>
             <div>{{ worker.experience|default:"0" }} Years</div>
@@ -351,22 +442,20 @@
             <div>{{ worker.pincode|default:"750003" }}</div>
           </div>
         </div>
+
       </div>
     </div>
 
-    <!-- MAIN BODY DATA CREDENTIALS SHEETS -->
     <div class="card-body p-4 p-md-5 bg-white text-dark">
       <div class="attribute-panel-title">
-        <i class="bi bi-instagram text-danger"></i> Creator Hub Ledger (Tap row
-        field to execute interactive script)
+        <i class="bi bi-instagram text-danger"></i> Creator Hub Ledger (Tap field to execute interactive script)
       </div>
 
-      <div class="row g-4 mb-5">
-        <!-- 1. Username Copy Value Card -->
-        <div class="col-md-6">
+      <div class="row g-3 g-md-4 mb-4 mb-md-5">
+        <div class="col-12 col-md-6">
           <div
             class="attribute-item-box"
-            onclick="copyValue('{{ request.user.username }}', 'Username copied to clipboard desk!')"
+            onclick="copyValue('{{ request.user.username }}', 'Username copied to clipboard!')"
           >
             <div class="attribute-icon-frame">
               <i class="bi bi-person-circle"></i>
@@ -378,8 +467,7 @@
           </div>
         </div>
 
-        <!-- 2. Email Direct App Launch Trigger -->
-        <div class="col-md-6">
+        <div class="col-12 col-md-6">
           <a
             href="mailto:{{ request.user.email }}"
             class="attribute-link-wrapper"
@@ -397,8 +485,7 @@
           </a>
         </div>
 
-        <!-- 3. Cellular Dialer Native Interconnect Trigger -->
-        <div class="col-md-6">
+        <div class="col-12 col-md-6">
           <a
             href="tel:{{ worker.phone }}"
             class="attribute-link-wrapper"
@@ -410,16 +497,13 @@
               </div>
               <div>
                 <div class="attribute-label-text">Contact Line</div>
-                <p class="attribute-value-text">
-                  {{ worker.phone|default:"--" }}
-                </p>
+                <p class="attribute-value-text">{{ worker.phone|default:"--" }}</p>
               </div>
             </div>
           </a>
         </div>
 
-        <!-- 4. Domain Specialty Skill Allocation Component -->
-        <div class="col-md-6">
+        <div class="col-12 col-md-6">
           <div
             class="attribute-item-box"
             data-bs-toggle="modal"
@@ -431,33 +515,29 @@
             </div>
             <div>
               <div class="attribute-label-text">Service Domain Branch</div>
-              <p class="attribute-value-text">
-                {{ worker.service_type|default:"Not Set" }}
-              </p>
+              <p class="attribute-value-text">{{ worker.service_type|default:"Not Set" }}</p>
             </div>
           </div>
         </div>
 
-        <!-- 5. Operational Base Target City -->
-        <div class="col-md-6">
+        <div class="col-12 col-md-6">
           <div
             class="attribute-item-box"
             data-bs-toggle="modal"
             data-bs-target="#infoModal"
             onclick="setupModal('Active Operational Bounds', 'Your dispatcher hub handles telemetry records inside the city bounds of: **{{ worker.location }}**. Active field request logs automatically adjust to this region perimeter.')"
           >
-            <div class="attribute-icon-frame"><i class="bi bi-radar"></i></div>
+            <div class="attribute-icon-frame">
+              <i class="bi bi-radar"></i>
+            </div>
             <div>
               <div class="attribute-label-text">Operation Hub City</div>
-              <p class="attribute-value-text">
-                {{ worker.location|default:"--" }}
-              </p>
+              <p class="attribute-value-text">{{ worker.location|default:"--" }}</p>
             </div>
           </div>
         </div>
 
-        <!-- 6. Full Physical Core Address Sheet -->
-        <div class="col-md-6">
+        <div class="col-12 col-md-6">
           <div
             class="attribute-item-box"
             onclick="copyValue('{{ worker.address|default:'' }}', 'Full home base address copied!')"
@@ -467,15 +547,12 @@
             </div>
             <div>
               <div class="attribute-label-text">Residential Base Address</div>
-              <p class="attribute-value-text">
-                {{ worker.address|default:"--" }}
-              </p>
+              <p class="attribute-value-text">{{ worker.address|default:"--" }}</p>
             </div>
           </div>
         </div>
       </div>
 
-      <!-- INTERACTIVE ACCOUNT SUBMIT MODIFICATION LINK -->
       <div class="text-center text-md-start">
         <a href="{% url 'edit_worker_profile' %}" class="btn-modify-profile">
           <i class="bi bi-magic"></i> Edit Partner Profile
@@ -485,35 +562,19 @@
   </div>
 </div>
 
-<!-- INFO INGESTION DIALOG OVERLAY MODAL CHASSIS -->
 <div class="modal fade" id="infoModal" tabindex="-1" aria-hidden="true">
   <div class="modal-dialog modal-dialog-centered">
     <div class="modal-content text-dark">
       <div class="modal-header bg-light py-3 px-4">
-        <h5
-          class="modal-title fw-bold text-dark d-flex align-items-center gap-2"
-          id="modalTitle"
-        >
+        <h5 class="modal-title fw-bold text-dark d-flex align-items-center gap-2" id="modalTitle">
           Account Metrics Info
         </h5>
-        <button
-          type="button"
-          class="btn-close"
-          data-bs-dismiss="modal"
-          aria-label="Close"
-        ></button>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
       </div>
-      <div class="modal-body p-5 text-center">
+      <div class="modal-body p-4 p-md-5 text-center">
         <div
           class="attribute-icon-frame mx-auto mb-3"
-          style="
-            width: 65px;
-            height: 65px;
-            font-size: 28px;
-            background: rgba(99, 102, 241, 0.1);
-            color: var(--royal-purple);
-            border: none;
-          "
+          style="width: 60px; height: 60px; font-size: 24px; background: rgba(99, 102, 241, 0.1); color: var(--royal-purple); border: none;"
         >
           <i class="bi bi-layers-half"></i>
         </div>
@@ -525,17 +586,9 @@
   </div>
 </div>
 
-<!-- CLIENT APPLICATION JAVASCRIPT CONTROLLERS -->
 <script>
-  // Clipboard text engine utility execution
   function copyValue(textToCopy, statusMessage) {
-    if (
-      !textToCopy ||
-      textToCopy === "--" ||
-      textToCopy === "None" ||
-      textToCopy === ""
-    )
-      return;
+    if (!textToCopy || textToCopy === "--" || textToCopy === "None" || textToCopy === "") return;
 
     navigator.clipboard.writeText(textToCopy).then(() => {
       const toastElement = document.getElementById("clipboardToast");
@@ -549,10 +602,8 @@
     });
   }
 
-  // Populate info modal structures instantly on trigger
   function setupModal(title, description) {
-    document.getElementById("modalTitle").innerHTML =
-      `<i class="bi bi-star-fill text-warning"></i> ${title}`;
+    document.getElementById("modalTitle").innerHTML = `<i class="bi bi-star-fill text-warning"></i> ${title}`;
     document.getElementById("modalBodyText").innerText = description;
   }
 </script>
