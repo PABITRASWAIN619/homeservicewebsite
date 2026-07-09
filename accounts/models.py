@@ -414,49 +414,54 @@ from django.contrib.auth.models import User
 # =========================
 # SUPPORT CHAT
 # =========================
-class SupportChat(models.Model):
-    CHAT_TYPES = (
-        ("customer", "Customer"),
-        ("worker", "Worker"),
-    )
 
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
-    chat_type = models.CharField(max_length=20, choices=CHAT_TYPES)
-    created_at = models.DateTimeField(auto_now_add=True)
-
-    def __str__(self):
-        return f"{self.user.username} - {self.chat_type}"
 
 
 # =========================
 # SUPPORT MESSAGE
 # =========================
-from django.db import models
-from django.contrib.auth.models import User
-
+# =========================
+# SUPPORT CHAT
+# =========================
 
 class SupportChat(models.Model):
+
     CHAT_TYPES = (
         ("customer", "Customer"),
         ("worker", "Worker"),
     )
 
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
-    chat_type = models.CharField(max_length=20, choices=CHAT_TYPES)
-    created_at = models.DateTimeField(auto_now_add=True)
+    user = models.ForeignKey(
+        User,
+        on_delete=models.CASCADE
+    )
+
+    chat_type = models.CharField(
+        max_length=20,
+        choices=CHAT_TYPES
+    )
+
+    created_at = models.DateTimeField(
+        auto_now_add=True
+    )
 
     def __str__(self):
         return f"{self.user.username} - {self.chat_type}"
 
 
+
+# =========================
+# SUPPORT MESSAGE
+# =========================
+
 class SupportMessage(models.Model):
+
     chat = models.ForeignKey(
         SupportChat,
         on_delete=models.CASCADE,
         related_name="messages"
     )
 
-    # ✅ allows bot/system messages safely
     sender = models.ForeignKey(
         User,
         on_delete=models.SET_NULL,
@@ -464,7 +469,10 @@ class SupportMessage(models.Model):
         blank=True
     )
 
-    message = models.TextField(blank=True, null=True)
+    message = models.TextField(
+        blank=True,
+        null=True
+    )
 
     image = models.ImageField(
         upload_to="support/images/",
@@ -478,9 +486,13 @@ class SupportMessage(models.Model):
         null=True
     )
 
-    is_seen = models.BooleanField(default=False)
+    is_seen = models.BooleanField(
+        default=False
+    )
 
-    created_at = models.DateTimeField(auto_now_add=True)
+    created_at = models.DateTimeField(
+        auto_now_add=True
+    )
 
     def __str__(self):
         return self.message[:30] if self.message else "Empty Message"

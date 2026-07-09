@@ -1,22 +1,21 @@
-
 <!doctype html>
 <html lang="en">
   <head>
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
-<meta http-equiv="Pragma" content="no-cache">
-<meta http-equiv="Expires" content="0">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
     <title>Customer Panel</title>
 
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/css/bootstrap.min.css" rel="stylesheet"/>
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"/>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"/>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"/>
 
 <style>
 body {
   background: #f4f7fc;
-  font-family: Segoe UI, sans-serif;
+  font-family: 'Segoe UI', sans-serif;
+  overflow-x: hidden;
 }
 
 /* ================= SIDEBAR ================= */
@@ -28,18 +27,18 @@ body {
   height: 100vh;
   background: linear-gradient(135deg, #0d6efd, #084298);
   overflow-y: auto;
-  transition: 0.3s;
-  z-index: 1000;
+  transition: all 0.3s ease-in-out;
+  z-index: 1050;
 }
 
 .sidebar a {
   display: block;
-  color: white;
+  color: rgba(255, 255, 255, 0.9);
   text-decoration: none;
   padding: 14px 20px;
   margin: 8px 12px;
   border-radius: 12px;
-  transition: 0.3s;
+  transition: 0.2s ease;
 }
 
 .sidebar a:hover {
@@ -51,13 +50,18 @@ body {
 .logo {
   text-align: center;
   color: white;
-  padding: 20px;
+  padding: 25px 20px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  margin-bottom: 15px;
 }
 
-/* ================= MAIN ================= */
+/* ================= MAIN CONTENT ================= */
 .main-content {
   margin-left: 260px;
-  transition: 0.3s;
+  transition: all 0.3s ease-in-out;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
 }
 
 /* ================= TOPBAR FIXED ================= */
@@ -67,27 +71,26 @@ body {
   left: 260px;
   right: 0;
   height: 70px;
-  background: rgba(255,255,255,0.9);
+  background: rgba(255, 255, 255, 0.95);
   backdrop-filter: blur(10px);
-  box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+  box-shadow: 0 2px 15px rgba(0,0,0,0.05);
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 0 20px;
-  z-index: 999;
+  padding: 0 25px;
+  z-index: 1000;
+  transition: all 0.3s ease-in-out;
 }
 
-/* spacing below fixed topbar */
 .content {
   padding: 30px;
-  margin-top: 80px;
+  margin-top: 70px;
+  flex: 1;
 }
 
-/* ================= USER ================= */
-.user-box {
-  display: flex;
-  align-items: center;
-  gap: 12px;
+/* ================= USER AVATAR & DROPDOWN ================= */
+.user-box .dropdown-toggle::after {
+  display: none; /* Hide default bootstrap arrow */
 }
 
 .user-img {
@@ -99,8 +102,16 @@ body {
   display: flex;
   justify-content: center;
   align-items: center;
-  font-weight: bold;
+  font-weight: 600;
+  font-size: 1.2rem;
   overflow: hidden;
+  box-shadow: 0 3px 8px rgba(13, 110, 253, 0.3);
+  transition: transform 0.2s;
+  cursor: pointer;
+}
+
+.user-img:hover {
+  transform: scale(1.05);
 }
 
 .user-img img {
@@ -109,30 +120,44 @@ body {
   object-fit: cover;
 }
 
-/* ================= TOGGLE BUTTON ================= */
+/* ================= MOBILE TOGGLE BUTTON ================= */
 .toggle-btn {
-  background: linear-gradient(135deg, #00c851, #007e33);
-  color: white;
+  background: #eef2f7;
+  color: #333;
   border: none;
   border-radius: 10px;
-  padding: 8px 12px;
+  padding: 8px 14px;
   cursor: pointer;
-  transition: 0.3s;
+  transition: 0.2s;
+  font-size: 1.1rem;
 }
 
 .toggle-btn:hover {
-  transform: scale(1.05);
+  background: #0d6efd;
+  color: white;
 }
 
-/* ================= MOBILE ================= */
-@media (max-width: 768px) {
+/* ================= MOBILE BACKDROP OVERLAY ================= */
+.sidebar-overlay {
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(0, 0, 0, 0.4);
+  z-index: 1040;
+}
 
+/* ================= MOBILE RESPONSIVE CSS ================= */
+@media (max-width: 768px) {
   .sidebar {
     left: -260px;
   }
 
   .sidebar.active {
     left: 0;
+    box-shadow: 5px 0 25px rgba(0,0,0,0.15);
   }
 
   .main-content {
@@ -142,25 +167,38 @@ body {
   .topbar {
     left: 0;
   }
+  
+  .sidebar-overlay.active {
+    display: block;
+  }
+  
+  .content {
+    padding: 20px 15px;
+  }
 }
 
 /* ================= FOOTER ================= */
 footer {
   background: white;
-  padding: 15px;
+  padding: 20px;
   text-align: center;
-  margin-top: 30px;
+  border-top: 1px solid #eef2f7;
+  font-size: 0.9rem;
+  color: #6c757d;
 }
 </style>
+  </head>
+<body>
 
-<!-- ================= SIDEBAR ================= -->
+<div class="sidebar-overlay" onclick="toggleSidebar()"></div>
+
 <div class="sidebar">
   <div class="logo">
     <h3>🏠 Home Service</h3>
-    <small>Customer Panel</small>
+    <small class="text-white-50">Customer Panel</small>
   </div>
 
-  <a href="{% url 'customer_dashboard' %}"><i class="fas fa-home"></i> Dashboard</a>
+  <a href="{% url 'customer_dashboard' %}"><i class="fas fa-home fw-3"></i> Dashboard</a>
   <a href="{% url 'services' %}"><i class="fas fa-tools"></i> Services</a>
   <a href="{% url 'services' %}"><i class="fas fa-calendar-plus"></i> Book Service</a>
   <a href="{% url 'my_bookings' %}"><i class="fas fa-list"></i> My Bookings</a>
@@ -169,40 +207,51 @@ footer {
   <a href="{% url 'logout' %}"><i class="fas fa-sign-out-alt"></i> Logout</a>
 </div>
 
-<!-- ================= MAIN ================= -->
 <div class="main-content">
 
-  <!-- TOPBAR -->
   <div class="topbar">
 
-    <!-- TOGGLE BUTTON (MOBILE) -->
     <button class="toggle-btn d-md-none" onclick="toggleSidebar()">
-      ☰
+      <i class="fas fa-bars"></i>
     </button>
 
-    <!-- Displaying Application Name -->
-    <h5 class="m-0">🏠 Home Service</h5>
+    <h5 class="m-0 fw-semibold text-secondary d-none d-sm-block">🏠 Home Service</h5>
 
-    <!-- UPDATED USER-BOX: Email/Username text removed -->
-    <div class="user-box">
-      <div class="user-img">
+    <div class="user-box dropdown">
+      <div class="user-img dropdown-toggle" id="profileDropdown" data-bs-toggle="dropdown" aria-expanded="false">
         {% if request.user.customerprofile.image %}
-          <img src="{{ request.user.customerprofile.image.url }}">
+          <img src="{{ request.user.customerprofile.image.url }}" alt="Profile">
         {% else %}
-          <!-- Shows the first letter of the username -->
-          {{ request.user.username|slice:":1"|upper }}
+          {% if request.user.first_name %}
+            {{ request.user.first_name|slice:":1"|upper }}
+          {% else %}
+            {{ request.user.username|slice:":1"|upper }}
+          {% endif %}
         {% endif %}
       </div>
+      
+      <ul class="dropdown-menu dropdown-menu-end shadow border-0 mt-2" aria-lineby="profileDropdown">
+        <li class="px-3 py-2 border-bottom d-md-none">
+            <span class="fw-bold d-block">Welcome!</span>
+            <small class="text-muted">{{ request.user.get_full_name|default:request.user.username }}</small>
+        </li>
+        <li><a class="dropdown-menu-item dropdown-item py-2" href="{% url 'profile' %}"><i class="fas fa-user text-muted me-2"></i> Profile</a></li>
+        <li><a class="dropdown-menu-item dropdown-item py-2" href="{% url 'my_bookings' %}"><i class="fas fa-list text-muted me-2"></i> Bookings</a></li>
+        <li><hr class="dropdown-divider"></li>
+        <li><a class="dropdown-menu-item dropdown-item py-2 text-danger" href="{% url 'logout' %}"><i class="fas fa-sign-out-alt me-2"></i> Logout</a></li>
+      </ul>
     </div>
 
   </div>
 
-  <!-- CONTENT -->
   <div class="content">
 
     {% if messages %}
       {% for message in messages %}
-        <div class="alert alert-success">{{ message }}</div>
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+          {{ message }}
+          <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
       {% endfor %}
     {% endif %}
 
@@ -214,22 +263,27 @@ footer {
 
 </div>
 
-<!-- ================= JS ================= -->
 <script>
 function toggleSidebar() {
   document.querySelector(".sidebar").classList.toggle("active");
+  document.querySelector(".sidebar-overlay").classList.toggle("active");
 }
-</script>
-<script>
+
+// Close sidebar when clicking outside on mobile devices
 document.addEventListener("click", function(e){
   const sidebar = document.querySelector(".sidebar");
   const btn = document.querySelector(".toggle-btn");
+  const overlay = document.querySelector(".sidebar-overlay");
 
-  if(!sidebar.contains(e.target) && !btn.contains(e.target)){
-    sidebar.classList.remove("active");
+  if(window.innerWidth <= 768) {
+    if(!sidebar.contains(e.target) && !btn.contains(e.target) && sidebar.classList.contains("active")){
+      sidebar.classList.remove("active");
+      overlay.classList.remove("active");
+    }
   }
 });
 </script>
 
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
 </html>

@@ -2,658 +2,449 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-<title>Worker Login</title>
-
-<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-<link 
-rel="stylesheet"
-href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css"
-/>
-
-<style>
-
-*{
-margin:0;
-padding:0;
-box-sizing:border-box;
-font-family:'Poppins',sans-serif;
-}
-
-body{
-
-height:100vh;
-display:flex;
-justify-content:center;
-align-items:center;
-overflow:hidden;
-
-background:linear-gradient(-45deg,#0f2027,#203a43,#2c5364,#6a11cb,#2575fc);
-background-size:500% 500%;
-animation:bgAnimation 15s ease infinite;
-
-}
-
-@keyframes bgAnimation{
-
-0%{background-position:0% 50%;}
-50%{background-position:100% 50%;}
-100%{background-position:0% 50%;}
-
-}
-
-/* Floating Circles */
-
-body::before,
-body::after{
-
-content:'';
-position:absolute;
-border-radius:50%;
-filter:blur(40px);
-animation:float 8s infinite ease-in-out;
-
-}
-
-body::before{
-
-width:300px;
-height:300px;
-background:#00d4ff;
-top:-100px;
-left:-80px;
-
-}
-
-body::after{
-
-width:280px;
-height:280px;
-background:#ff0099;
-bottom:-100px;
-right:-80px;
-
-}
-
-@keyframes float{
-
-0%,100%{
-
-transform:translateY(0px);
-
-}
-
-50%{
-
-transform:translateY(40px);
-
-}
-
-}
-
-/* Login Card */
-
-.login-box{
-
-position:relative;
-width:420px;
-
-padding:45px;
-
-background:rgba(255,255,255,.12);
-
-backdrop-filter:blur(18px);
-
-border-radius:25px;
-
-border:1px solid rgba(255,255,255,.25);
-
-box-shadow:
-
-0 8px 32px rgba(0,0,0,.4),
-
-0 0 25px rgba(255,255,255,.1);
-
-animation:card 1s ease;
-
-}
-
-@keyframes card{
-
-from{
-
-opacity:0;
-transform:translateY(50px);
-
-}
-
-to{
-
-opacity:1;
-transform:translateY(0);
-
-}
-
-}
-
-.login-box:hover{
-
-transform:translateY(-5px);
-transition:.4s;
-
-}
-
-.login-box h2{
-
-text-align:center;
-color:white;
-margin-bottom:30px;
-font-weight:600;
-letter-spacing:1px;
-
-}
-
-/* Input */
-
-.input-box{
-
-margin-bottom:20px;
-position:relative;
-
-}
-
-.input-box input{
-
-width:100%;
-padding:15px 45px 15px 15px;
-
-background:rgba(255,255,255,.15);
-
-border:1px solid rgba(255,255,255,.25);
-
-border-radius:12px;
-
-outline:none;
-
-color:white;
-
-font-size:15px;
-
-transition:.4s;
-
-}
-
-.input-box input::placeholder{
-
-color:#ddd;
-
-}
-
-.input-box input:focus{
-
-border-color:#00d4ff;
-
-box-shadow:0 0 15px #00d4ff;
-
-}
-
-/* Eye Button */
-
-.eye{
-
-position:absolute;
-
-right:15px;
-
-top:50%;
-
-transform:translateY(-50%);
-
-cursor:pointer;
-
-font-size:20px;
-
-color:white;
-
-transition:.3s;
-
-}
-
-.eye:hover{
-
-transform:translateY(-50%) scale(1.2);
-
-color:#00d4ff;
-
-}
-
-/* Login Button */
-
-.btn{
-
-width:100%;
-
-padding:15px;
-
-border:none;
-
-border-radius:12px;
-
-background:linear-gradient(45deg,#00d4ff,#6a11cb);
-
-color:white;
-
-font-size:16px;
-
-font-weight:600;
-
-cursor:pointer;
-
-transition:.4s;
-
-margin-top:5px;
-
-}
-
-.btn:hover{
-
-transform:translateY(-3px);
-
-box-shadow:0 10px 25px rgba(0,212,255,.5);
-
-}
-
-/* Back Button */
-
-.back-btn{
-
-display:block;
-
-margin-top:15px;
-
-text-align:center;
-
-padding:14px;
-
-text-decoration:none;
-
-border-radius:12px;
-
-background:rgba(255,255,255,.12);
-
-border:1px solid rgba(255,255,255,.2);
-
-color:white;
-
-transition:.4s;
-
-animation:pulse 2s infinite;
-
-}
-
-.back-btn:hover{
-
-background:white;
-
-color:#6a11cb;
-
-transform:scale(1.03);
-
-}
-
-@keyframes pulse{
-
-0%{transform:scale(1);}
-50%{transform:scale(1.03);}
-100%{transform:scale(1);}
-
-}
-
-/* Toggle */
-
-.toggle-section{
-
-text-align:center;
-margin-top:25px;
-color:white;
-font-size:14px;
-
-}
-
-.toggle-section a{
-
-cursor:pointer;
-font-weight:600;
-text-decoration:none;
-color:#00d4ff;
-
-}
-
-.toggle-section a:hover{
-
-text-decoration:underline;
-
-}
-
-/* Responsive */
-
-@media(max-width:500px){
-
-.login-box{
-
-width:92%;
-padding:30px;
-
-}
-
-}
-.forgot-password{
-    text-align: right;
-    margin-top: 12px;
-    margin-bottom: 18px;
-}
-
-.forgot-password a{
-    color: #00d4ff;
-    text-decoration: none;
-    font-size: 14px;
-    font-weight: 500;
-    transition: all 0.3s ease;
-}
-
-.forgot-password a:hover{
-    color: #ffffff;
-    text-decoration: underline;
-}
-/* Register Section */
-
-.toggle-section{
-
-    margin-top:25px;
-    text-align:center;
-    color:white;
-    font-size:14px;
-
-}
-
-
-.register-links{
-
-    margin-top:18px;
-
-    display:flex;
-
-    flex-direction:column;
-
-    gap:12px;
-
-}
-
-
-
-.register-links a{
-
-
-    display:flex;
-
-    align-items:center;
-
-    justify-content:center;
-
-    gap:8px;
-
-
-    padding:13px;
-
-
-    border-radius:12px;
-
-
-    text-decoration:none;
-
-
-    color:white;
-
-
-    font-weight:600;
-
-
-    background:
-
-    rgba(255,255,255,0.12);
-
-
-    border:
-
-    1px solid rgba(255,255,255,.25);
-
-
-    transition:.35s;
-
-
-}
-
-
-
-.register-links a:first-child{
-
-
-    background:
-
-    linear-gradient(
-    135deg,
-    #10b981,
-    #059669
-    );
-
-
-}
-
-
-
-.register-links a:last-child{
-
-
-    background:
-
-    linear-gradient(
-    135deg,
-    #2563eb,
-    #6366f1
-    );
-
-
-}
-
-
-
-.register-links a:hover{
-
-
-    transform:translateY(-3px);
-
-
-    box-shadow:
-
-    0 10px 25px rgba(0,0,0,.35);
-
-
-}
-
-
-
-.register-links i{
-
-    font-size:18px;
-
-}
-
-</style>
-
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Worker Login</title>
+
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css"/>
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        body {
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background: radial-gradient(circle at 0% 0%, #111827 0%, #0f172a 50%, #020617 100%);
+            position: relative;
+            overflow-x: hidden;
+        }
+
+        /* Ambient Professional Glows */
+        body::before,
+        body::after {
+            content: '';
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(120px);
+            opacity: 0.35;
+            z-index: 0;
+            pointer-events: none;
+        }
+
+        body::before {
+            width: 400px;
+            height: 400px;
+            background: #3b82f6;
+            top: -10%;
+            left: -10%;
+            animation: pulseGlowOne 8s infinite alternate ease-in-out;
+        }
+
+        body::after {
+            width: 350px;
+            height: 350px;
+            background: #6366f1;
+            bottom: -5%;
+            right: -5%;
+            animation: pulseGlowTwo 8s infinite alternate ease-in-out;
+        }
+
+        @keyframes pulseGlowOne {
+            0% { transform: scale(1) translate(0, 0); }
+            100% { transform: scale(1.1) translate(20px, 15px); }
+        }
+        @keyframes pulseGlowTwo {
+            0% { transform: scale(1) translate(0, 0); }
+            100% { transform: scale(1.15) translate(-30px, -20px); }
+        }
+
+        /* Layout Container for Clean Resizing */
+        .wrapper {
+            width: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 24px;
+            z-index: 10;
+        }
+
+        /* Fluid Animated Login Card */
+        .login-box {
+            width: 100%;
+            max-width: 440px;
+            padding: 40px;
+            background: rgba(30, 41, 59, 0.65);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-radius: 24px;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+            transition: transform 0.4s cubic-bezier(0.25, 1, 0.5, 1), 
+                        box-shadow 0.4s cubic-bezier(0.25, 1, 0.5, 1), 
+                        border-color 0.4s ease;
+        }
+
+        .login-box:hover {
+            transform: translateY(-8px) scale(1.01);
+            border-color: rgba(59, 130, 246, 0.3);
+            box-shadow: 0 30px 60px rgba(0, 0, 0, 0.6),
+                        0 0 40px rgba(59, 130, 246, 0.15);
+        }
+
+        .login-box h2 {
+            text-align: center;
+            color: #ffffff;
+            margin-bottom: 28px;
+            font-weight: 600;
+            font-size: 24px;
+            letter-spacing: -0.5px;
+            transition: transform 0.3s ease;
+        }
+        .login-box:hover h2 {
+            transform: translateY(-2px);
+        }
+
+        /* Input Controls with Dynamic Focus/Hover */
+        .input-box {
+            margin-bottom: 18px;
+            position: relative;
+        }
+
+        .input-box input {
+            width: 100%;
+            padding: 14px 45px 14px 16px;
+            background: rgba(15, 23, 42, 0.5);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 12px;
+            outline: none;
+            color: #f8fafc;
+            font-size: 14.5px;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .input-box input::placeholder {
+            color: #94a3b8;
+            transition: transform 0.3s ease, opacity 0.3s ease;
+        }
+
+        .input-box input:hover {
+            background: rgba(15, 23, 42, 0.7);
+            border-color: rgba(255, 255, 255, 0.2);
+        }
+
+        .input-box input:focus {
+            border-color: #3b82f6;
+            background: rgba(15, 23, 42, 0.85);
+            box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.25);
+            transform: scale(1.01);
+        }
+        
+        .input-box input:focus::placeholder {
+            transform: translateX(8px);
+            opacity: 0.5;
+        }
+
+        /* Eye Button Toggle */
+        .eye {
+            position: absolute;
+            right: 16px;
+            top: 50%;
+            transform: translateY(-50%);
+            cursor: pointer;
+            font-size: 18px;
+            color: #94a3b8;
+            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            user-select: none;
+        }
+
+        .eye:hover {
+            color: #3b82f6;
+            transform: translateY(-50%) scale(1.25);
+        }
+
+        /* High-Impact Primary Button */
+        .btn {
+            width: 100%;
+            padding: 14px;
+            border: none;
+            border-radius: 12px;
+            background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 50%, #4f46e5 100%);
+            background-size: 200% auto;
+            color: #ffffff;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            margin-top: 4px;
+            box-shadow: 0 4px 14px rgba(59, 130, 246, 0.3);
+        }
+
+        .btn:hover {
+            background-position: right center;
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(99, 102, 241, 0.5);
+        }
+
+        /* Utilities Links */
+        .forgot-password-container {
+            text-align: right;
+            margin-top: -8px;
+            margin-bottom: 24px;
+        }
+
+        .forgot-password-container a {
+            color: #60a5fa;
+            text-decoration: none;
+            font-size: 13px;
+            font-weight: 400;
+            display: inline-block;
+            transition: all 0.3s ease;
+        }
+
+        .forgot-password-container a:hover {
+            color: #ffffff;
+            transform: translateX(-3px);
+        }
+
+        /* Register Action Links & Dynamic Hover */
+        .toggle-section {
+            text-align: center;
+            margin-top: 24px;
+            color: #94a3b8;
+            font-size: 13.5px;
+        }
+
+        .toggle-section p {
+            margin-bottom: 12px;
+        }
+
+        .toggle-section a.inline-link {
+            cursor: pointer;
+            font-weight: 500;
+            text-decoration: none;
+            color: #60a5fa;
+            display: inline-block;
+            transition: all 0.3s ease;
+        }
+
+        .toggle-section a.inline-link:hover {
+            color: #ffffff;
+            transform: scale(1.05);
+        }
+
+        .register-links {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .register-links a {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            padding: 13px;
+            border-radius: 12px;
+            text-decoration: none;
+            color: #ffffff;
+            font-weight: 500;
+            font-size: 14px;
+            transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+            border: 1px solid transparent;
+        }
+
+        /* Interactive Brand Styling */
+        .register-links a:first-child {
+            background: rgba(16, 185, 129, 0.08);
+            border: 1px solid rgba(16, 185, 129, 0.2);
+            color: #34d399;
+        }
+
+        .register-links a:first-child:hover {
+            background: #10b981;
+            color: #ffffff;
+            transform: translateY(-4px);
+            box-shadow: 0 8px 20px rgba(16, 185, 129, 0.4);
+        }
+
+        .register-links a:last-child {
+            background: rgba(99, 102, 241, 0.08);
+            border: 1px solid rgba(99, 102, 241, 0.25);
+            color: #818cf8;
+        }
+
+        .register-links a:last-child:hover {
+            background: #6366f1;
+            color: #ffffff;
+            transform: translateY(-4px);
+            box-shadow: 0 8px 20px rgba(99, 102, 241, 0.4);
+        }
+        
+        .register-links a i {
+            transition: transform 0.3s ease;
+        }
+        .register-links a:hover i {
+            transform: scale(1.2) rotate(-5deg);
+        }
+
+        .back-btn {
+            display: block;
+            margin-top: 22px;
+            text-align: center;
+            padding: 12px;
+            text-decoration: none;
+            border-radius: 12px;
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid rgba(255, 255, 255, 0.04);
+            color: #94a3b8;
+            font-size: 13.5px;
+            transition: all 0.3s ease;
+        }
+
+        .back-btn:hover {
+            background: rgba(255, 255, 255, 0.08);
+            color: #ffffff;
+            border-color: rgba(255, 255, 255, 0.15);
+            transform: translateY(-2px);
+        }
+
+        /* High-fidelity Mobile Breakpoints */
+        @media(max-width: 480px) {
+            .wrapper {
+                padding: 16px;
+            }
+            .login-box {
+                padding: 28px 20px;
+                border-radius: 20px;
+            }
+            .login-box:hover {
+                transform: translateY(-4px); /* Tamer scale lift for mobile gesture friendliness */
+                box-shadow: 0 15px 35px rgba(0, 0, 0, 0.5);
+            }
+            .login-box h2 {
+                font-size: 21px;
+                margin-bottom: 22px;
+            }
+            .input-box input {
+                padding: 13px 40px 13px 14px;
+                font-size: 14px;
+            }
+            .btn, .register-links a, .back-btn {
+                padding: 13px;
+                font-size: 14px;
+            }
+            .register-links {
+                gap: 10px;
+            }
+        }
+
+        /* Tiny Mobile Height & Aspect Adjustments */
+        @media (max-height: 700px) {
+            body {
+                align-items: flex-start;
+            }
+            .wrapper {
+                padding-top: 40px;
+                padding-bottom: 40px;
+            }
+        }
+    </style>
 </head>
-
 <body>
 
-<div class="login-box">
+<div class="wrapper">
+    <div class="login-box">
+        <h2 id="form-title">Welcome Back</h2>
 
-<h2 id="form-title"> Welcome Back! Sign In to Continue</h2>
+        <form method="POST">
+            {% csrf_token %}
 
-<form method="POST">
+            <div class="input-box">
+                <input type="email" name="email" placeholder="Enter Email" required>
+            </div>
 
-{% csrf_token %}
+            <div class="input-box" id="pass-field">
+                <input type="password" name="password" id="password" placeholder="Enter Password" required>
+                <span class="eye" onclick="togglePassword()">👁</span>
+            </div>
 
-<div class="input-box">
+            <div class="forgot-password-container">
+                <a href="{% url 'forgot_password' %}">Forgot Password?</a>
+            </div>
 
-<input
-type="email"
-name="email"
-placeholder="Enter Email"
-required>
+            <button class="btn" type="submit" id="submit-btn">Login</button>
 
-</div>
+            <div class="toggle-section">
+                <p>Don't have an account?</p>
+                <div class="register-links">
+                    <a href="{% url 'customer_signup' %}">
+                        <i class="bi bi-person-fill"></i>
+                        Register as Customer
+                    </a>
+                    <a href="{% url 'worker_signup' %}">
+                        <i class="bi bi-tools"></i>
+                        Register as Worker
+                    </a>
+                </div>
+            </div>
 
-<div class="input-box" id="pass-field">
+            <a href="{% url 'home' %}" class="back-btn">← Back To Home</a>
+        </form>
 
-<input
-type="password"
-name="password"
-id="password"
-placeholder="Enter Password"
-required>
-
-<span class="eye" onclick="togglePassword()">👁</span>
-
-</div>
-
-<button class="btn" type="submit" id="submit-btn">
-
-Login
-
-</button>
-
-
-<div style="text-align:right;margin-top:10px;">
-    <a href="{% url 'forgot_password' %}"
-       style="color:#00d4ff;text-decoration:none;font-size:14px;">
-        Forgot Password?
-    </a>
-</div>
-<div class="toggle-section">
-
-    <p>
-        Don't have an account?
-    </p>
-
-    <div class="register-links">
-
-        <a href="{% url 'customer_signup' %}">
-            <i class="bi bi-person-fill"></i>
-            Register as Customer
-        </a>
-
-
-        <a href="{% url 'worker_signup' %}">
-            <i class="bi bi-tools"></i>
-            Register as Worker
-        </a>
-
+        <div class="toggle-section" style="margin-top: 15px;">
+            <p id="mode-text">
+                Don't use password? 
+                <a onclick="toggleMode()" class="inline-link">Login with OTP</a>
+            </p>
+        </div>
     </div>
-
-</div>
-
-
-
-
-<a href="{% url 'home' %}" class="back-btn">
-
-← Back To Home
-
-</a>
-
-</form>
-
-<div class="toggle-section">
-
-{% comment %} <p id="mode-text">
-
-Don't use password?
-
-<a onclick="toggleMode()">
-
-Login with OTP {% endcomment %}
-
-</a>
-
-</p>
-
-</div>
-
 </div>
 
 <script>
+    let isOtpMode = false;
 
-let isOtpMode=false;
+    function toggleMode() {
+        isOtpMode = !isOtpMode;
+        const title = document.getElementById("form-title");
+        const pass = document.getElementById("pass-field");
+        const btn = document.getElementById("submit-btn");
+        const text = document.getElementById("mode-text");
+        const forgotPass = document.querySelector(".forgot-password-container");
 
-function toggleMode(){
+        if (isOtpMode) {
+            title.innerHTML = "Email OTP Login";
+            pass.style.display = "none";
+            forgotPass.style.display = "none";
+            btn.innerHTML = "Send OTP";
+            text.innerHTML = 'Back to <a onclick="toggleMode()" class="inline-link">Password Login</a>';
+        } else {
+            title.innerHTML = "Welcome Back";
+            pass.style.display = "block";
+            forgotPass.style.display = "block";
+            btn.innerHTML = "Login";
+            text.innerHTML = 'Don\'t use password? <a onclick="toggleMode()" class="inline-link">Login with OTP</a>';
+        }
+    }
 
-isOtpMode=!isOtpMode;
-
-const title=document.getElementById("form-title");
-
-const pass=document.getElementById("pass-field");
-
-const btn=document.getElementById("submit-btn");
-
-const text=document.getElementById("mode-text");
-
-if(isOtpMode){
-
-title.innerHTML="Email OTP Login";
-
-pass.style.display="none";
-
-btn.innerHTML="Send OTP";
-
-text.innerHTML='Back to <a onclick="toggleMode()">Password Login</a>';
-
-}else{
-
-title.innerHTML="Worker Login";
-
-pass.style.display="block";
-
-btn.innerHTML="Login";
-
-text.innerHTML='Don\'t use password? <a onclick="toggleMode()">Login with OTP</a>';
-
-}
-
-}
-
-function togglePassword(){
-
-const pass=document.getElementById("password");
-
-const eye=document.querySelector(".eye");
-
-if(pass.type==="password"){
-
-pass.type="text";
-
-eye.innerHTML="🙈";
-
-}else{
-
-pass.type="password";
-
-eye.innerHTML="👁";
-
-}
-
-}
-
+    function togglePassword() {
+        const pass = document.getElementById("password");
+        const eye = document.querySelector(".eye");
+        if (pass.type === "password") {
+            pass.type = "text";
+            eye.innerHTML = "🙈";
+        } else {
+            pass.type = "password";
+            eye.innerHTML = "👁";
+        }
+    }
 </script>
 
 </body>

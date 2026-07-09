@@ -1,19 +1,19 @@
-{% extends 'worker/base.html' %} {% block content %}
+{% extends 'worker/base.html' %} 
+{% block content %}
 
-<link
-  rel="stylesheet"
-  href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
-/>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
 
 <style>
   :root {
     --primary-emerald: #10b981;
     --gradient-teal: linear-gradient(135deg, #10b981 0%, #059669 100%);
+    --gradient-dark: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
     --bg-light: #f8fafc;
     --text-dark: #0f172a;
     --text-muted: #64748b;
-    --card-shadow:
-      0 10px 25px rgba(16, 185, 129, 0.04), 0 1px 3px rgba(0, 0, 0, 0.02);
+    --card-shadow: 0 10px 25px rgba(16, 185, 129, 0.04), 0 1px 3px rgba(0, 0, 0, 0.02);
+    --transition-smooth: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
   }
 
   body {
@@ -29,6 +29,7 @@
     border-radius: 20px;
     box-shadow: var(--card-shadow);
     overflow: hidden;
+    transition: var(--transition-smooth);
   }
 
   .profile-header-banner {
@@ -45,16 +46,19 @@
     padding: 24px;
     box-shadow: var(--card-shadow);
     border-left: 5px solid #10b981;
-    transition: transform 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
+    transition: var(--transition-smooth);
+    cursor: pointer;
+    position: relative;
   }
 
   .metric-box-card:hover {
-    transform: translateY(-4px);
+    transform: translateY(-5px);
+    box-shadow: 0 12px 20px rgba(0, 0, 0, 0.05);
   }
 
   .metric-box-title {
     font-size: 13px;
-    font-weight: 600;
+    font-weight: 700;
     text-transform: uppercase;
     letter-spacing: 0.5px;
     color: var(--text-muted);
@@ -66,6 +70,36 @@
     color: var(--text-dark);
     margin-top: 6px;
     margin-bottom: 0;
+  }
+
+  .metric-icon-bg {
+    position: absolute;
+    right: 20px;
+    bottom: 15px;
+    font-size: 2.5rem;
+    opacity: 0.15;
+    color: var(--text-dark);
+  }
+
+  /* INTERACTIVE QUICK LINKS / UTILITIES */
+  .action-card-clickable {
+    background: white;
+    border: 1px solid #e2e8f0;
+    border-radius: 12px;
+    padding: 16px;
+    transition: var(--transition-smooth);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    text-decoration: none;
+    color: var(--text-dark);
+  }
+
+  .action-card-clickable:hover {
+    background: #f1f5f9;
+    border-color: #cbd5e1;
+    transform: translateX(4px);
   }
 
   /* DYNAMIC LEDGER TABLE CONFIGURATION */
@@ -89,203 +123,214 @@
 
   /* ACTION CONTROLS CHIPS */
   .btn-action-pill {
-    padding: 6px 14px;
+    padding: 8px 16px;
     font-size: 13px;
     font-weight: 600;
-    border-radius: 8px;
-    transition: all 0.2s ease;
+    border-radius: 30px;
+    transition: var(--transition-smooth);
   }
 
   .btn-action-pill:hover {
-    transform: translateY(-1px);
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
   }
 
   /* ACCENT BADGE MODULE MATRIX */
   .badge-state {
     padding: 6px 12px;
-    border-radius: 6px;
+    border-radius: 30px;
     font-weight: 600;
     font-size: 12px;
     display: inline-block;
+    text-align: center;
   }
-  .state-pending {
-    background-color: #fef3c7;
-    color: #d97706;
-  }
-  .state-assigned {
-    background-color: #e0f2fe;
-    color: #0369a1;
-  }
-  .state-ontheway {
-    background-color: #e0f8ff;
-    color: #0284c7;
-  }
-  .state-working {
-    background-color: #f1f5f9;
-    color: #475569;
-  }
-  .state-completed {
-    background-color: #e6f4ea;
-    color: #137333;
-  }
+  .state-pending { background-color: #fef3c7; color: #d97706; }
+  .state-assigned { background-color: #e0f2fe; color: #0369a1; }
+  .state-ontheway { background-color: #e0f8ff; color: #0284c7; }
+  .state-working { background-color: #f1f5f9; color: #475569; }
+  .state-completed { background-color: #e6f4ea; color: #137333; }
 
   #map-container {
     border: 1px solid #e2e8f0;
     background-color: #edf2f7;
+    border-radius: 0 0 20px 20px;
   }
 </style>
+
 {% if worker.warning_count > 0 %}
-<div class="alert alert-warning border-warning shadow-sm mb-4">
-
-    <h5>⚠ Warning from Admin</h5>
-
-    <p>{{ worker.warning_message }}</p>
-
-    <strong>Total Warnings:</strong>
-    {{ worker.warning_count }}
-
+<div class="alert alert-warning border-warning shadow-sm mb-4 alert-dismissible fade show" role="alert">
+  <div class="d-flex align-items-center">
+    <i class="bi bi-exclamation-triangle-fill fs-4 me-3"></i>
+    <div>
+      <h5 class="alert-heading mb-1 fw-bold">Warning Notification</h5>
+      <p class="mb-0">{{ worker.warning_message }} (<strong>Total Logs:</strong> {{ worker.warning_count }})</p>
+    </div>
+  </div>
+  <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
 </div>
 {% endif %}
+
 <div class="container mt-4 pb-5">
+  
   <div class="row g-4 mb-4">
-    <div class="col-md-5">
+    <div class="col-lg-5">
       <div class="card profile-card h-100">
-        <div class="profile-header-banner text-center py-4">
+        <div class="profile-header-banner text-center py-4 position-relative">
+          <div class="position-absolute top-0 end-0 p-3">
+            <span class="badge {% if worker.is_approved %}bg-light text-success{% else %}bg-dark text-warning{% endif %} rounded-pill px-3 py-2 fw-bold shadow-sm">
+              ● Live Session Connected
+            </span>
+          </div>
 
-  {% if worker.profile_image %}
-    <img
-      src="{{ worker.profile_image.url }}"
-      class="rounded-circle shadow mb-3"
-      width="120"
-      height="120"
-      style="object-fit:cover;border:4px solid white;"
-      alt="Worker Profile"
-    >
-  {% else %}
-    <img
-      src="https://cdn-icons-png.flaticon.com/512/3135/3135715.png"
-      class="rounded-circle shadow mb-3"
-      width="120"
-      height="120"
-      style="object-fit:cover;border:4px solid white;"
-      alt="Default Profile"
-    >
-  {% endif %}
+          {% if worker.profile_image %}
+            <img src="{{ worker.profile_image.url }}" class="rounded-circle shadow mb-3" width="110" height="110" style="object-fit:cover; border:4px solid white;" alt="Worker Profile">
+          {% else %}
+            <img src="https://cdn-icons-png.flaticon.com/512/3135/3135715.png" class="rounded-circle shadow mb-3" width="110" height="110" style="object-fit:cover; border:4px solid white;" alt="Default Profile">
+          {% endif %}
 
-  <h4 class="m-0 fw-bold">
-    {{ request.user.username }}
-  </h4>
-
-  <small>{{ worker.get_service_type_display }}</small>
-
-</div>
+          <h4 class="m-0 fw-bold text-white">{{ request.user.username }}</h4>
+          <span class="badge bg-white text-dark mt-2 px-3 py-1 rounded-pill fw-semibold">{{ worker.get_service_type_display }}</span>
+        </div>
 
         <div class="card-body p-4">
+          <div class="d-flex align-items-center justify-content-between mb-3 pb-2 border-bottom">
+            <span class="text-secondary fw-medium"><i class="bi bi-person me-2"></i>Identity Username</span>
+            <span class="text-dark fw-bold">{{ request.user.username }}</span>
+          </div>
 
-          <p class="mb-2">
-            <strong class="text-secondary">Identity Username:</strong>
-            {{ request.user.username }}
-          </p>
+          <div class="d-flex align-items-center justify-content-between mb-3 pb-2 border-bottom">
+            <span class="text-secondary fw-medium"><i class="bi bi-telephone me-2"></i>Contact Phone</span>
+            <span class="text-dark fw-bold">{{ worker.phone|default:"Not Available" }}</span>
+          </div>
 
-          <p class="mb-2">
-            <strong class="text-secondary">Contact Phone:</strong>
-            {{ worker.phone|default:"Not Available" }}
-          </p>
+          <div class="d-flex align-items-center justify-content-between mb-3 pb-2 border-bottom">
+            <span class="text-secondary fw-medium"><i class="bi bi-briefcase me-2"></i>Field Experience</span>
+            <span class="badge bg-teal text-white bg-success px-2.5 py-1">{{ worker.experience }} Years</span>
+          </div>
 
-          <p class="mb-2">
-            <strong class="text-secondary">Assigned Domain Specialty:</strong>
-            <span class="badge bg-dark text-white px-2 py-1">
-              {{ worker.get_service_type_display }}
-            </span>
-          </p>
-
-          <p class="mb-2">
-            <strong class="text-secondary">Validated Field Experience:</strong>
-            {{ worker.experience }}
-          </p>
-
-          <p class="mb-2">
-            <strong class="text-secondary">Approval Status:</strong>
+          <div class="d-flex align-items-center justify-content-between mb-3 pb-2 border-bottom">
+            <span class="text-secondary fw-medium"><i class="bi bi-shield-check me-2"></i>Approval Status</span>
             {% if worker.is_approved %}
               <span class="badge bg-success">Approved Partner</span>
             {% else %}
               <span class="badge bg-warning text-dark">Verification Pending</span>
             {% endif %}
-          </p>
+          </div>
 
-          <p class="mb-2">
-            <strong class="text-secondary">Telemetry Last Seen:</strong>
-            <span class="text-primary small fw-medium">
-              {{ worker.last_seen }}
+          <div class="d-flex align-items-center justify-content-between mb-3 pb-2 border-bottom">
+            <span class="text-secondary fw-medium"><i class="bi bi-clock me-2"></i>Telemetry Pulse</span>
+            <span class="text-primary small fw-bold">{{ worker.last_seen|default:"Just Now" }}</span>
+          </div>
+
+          <div class="d-flex align-items-center justify-content-between mb-0">
+            <span class="text-secondary fw-medium"><i class="bi bi-geo me-2"></i>Coordinates</span>
+            <span class="text-dark small font-monospace bg-light px-2 py-1 rounded">
+              <span id="lat">{{ worker.latitude|default:"20.5937" }}</span>, <span id="lng">{{ worker.longitude|default:"78.9629" }}</span>
             </span>
-          </p>
-
-          <p class="mb-0">
-            <strong class="text-secondary">Telemetry Coordinates:</strong>
-            <span id="lat" class="fw-bold text-dark">
-              {{ worker.latitude|default:"20.5937" }}
-            </span>,
-            <span id="lng" class="fw-bold text-dark">
-              {{ worker.longitude|default:"78.9629" }}
-            </span>
-          </p>
-
+          </div>
         </div>
       </div>
     </div>
 
-    <div class="col-md-7">
+    <div class="col-lg-7">
       <div class="card profile-card h-100">
-        <div class="p-3 bg-light border-bottom fw-bold text-dark">
-          <i class="bi bi-geo-alt-fill text-danger me-2"></i>Live Real-Time
-          Fleet Tracking Radar
+        <div class="p-3 bg-white border-bottom fw-bold text-dark d-flex justify-content-between align-items-center">
+          <span><i class="bi bi-geo-alt-fill text-danger me-2 animate-pulse"></i>Live Real-Time Fleet Tracking Radar</span>
+          <button class="btn btn-sm btn-outline-secondary rounded-pill" onclick="sendLocation()"><i class="bi bi-arrow-clockwise me-1"></i>Force Sync</button>
         </div>
-        <div class="card-body p-0">
-          <div id="map-container" style="height: 290px"></div>
+        <div class="card-body p-0 position-relative">
+          <div id="map-container" style="height: 340px"></div>
         </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="row g-4 mb-4">
+    <div class="col-md-4">
+      <div class="metric-box-card" onclick="alert('Filtering assignments: Total Dispatches')">
+        <div class="metric-box-title">Total Allocated Tickets</div>
+        <h2 class="metric-box-number text-dark">{{ total_jobs|default:"0" }}</h2>
+        <i class="bi bi-archive-fill metric-icon-bg"></i>
+      </div>
+    </div>
+    <div class="col-md-4">
+      <div class="metric-box-card" style="border-left-color: #0ea5e9" onclick="alert('Filtering assignments: Active Queues')">
+        <div class="metric-box-title">Active Assigned Queue</div>
+        <h2 class="metric-box-number text-info">{{ assigned_jobs|default:"0" }}</h2>
+        <i class="bi bi-play-circle-fill metric-icon-bg"></i>
+      </div>
+    </div>
+    <div class="col-md-4">
+      <div class="metric-box-card" style="border-left-color: #10b981" onclick="alert('Opening Detailed Ledger View Summary')">
+        <div class="metric-box-title">Gross Cleared Earnings Tally</div>
+        <h2 class="metric-box-number text-success">₹{{ total_earnings|default:"0" }}</h2>
+        <i class="bi bi-currency-rupee metric-icon-bg"></i>
       </div>
     </div>
   </div>
 
   <div class="row g-4 mb-5">
     <div class="col-md-4">
-      <div class="metric-box-card">
-        <div class="metric-box-title">Total Allocated Tickets</div>
-        <h2 class="metric-box-number">{{ total_jobs }}</h2>
+      <h5 class="fw-bold mb-3"><i class="bi bi-sliders me-2 text-success"></i>Quick Controls Matrix</h5>
+      <div class="d-flex flex-column gap-2">
+        <div class="action-card-clickable" onclick="this.style.opacity=0.5; alert('Availability status changed dynamically!')">
+          <div class="bg-success text-white p-2 rounded-3 d-flex align-items-center justify-content-center"><i class="bi bi-person-check fs-5"></i></div>
+          <div>
+            <div class="fw-bold small">Toggle Profile Availability</div>
+            <div class="text-muted small" style="font-size:11px;">Set your profile active or offline</div>
+          </div>
+        </div>
+        <a href="#" class="action-card-clickable">
+          <div class="bg-primary text-white p-2 rounded-3 d-flex align-items-center justify-content-center"><i class="bi bi-file-earmark-pdf fs-5"></i></div>
+          <div>
+            <div class="fw-bold small">Download Earnings Statement</div>
+            <div class="text-muted small" style="font-size:11px;">Extract verified accounts data sheet</div>
+          </div>
+        </a>
       </div>
     </div>
-    <div class="col-md-4">
-      <div class="metric-box-card" style="border-left-color: #0ea5e9">
-        <div class="metric-box-title">Active Assigned Queue</div>
-        <h2 class="metric-box-number text-info">{{ assigned_jobs }}</h2>
-      </div>
-    </div>
-    <div class="col-md-4">
-      <div class="metric-box-card" style="border-left-color: #10b981">
-        <div class="metric-box-title">Gross Cleared Earnings Tally</div>
-        <h2 class="metric-box-number text-success">₹{{ total_earnings }}</h2>
+
+    <div class="col-md-8">
+      <h5 class="fw-bold mb-3"><i class="bi bi-bar-chart-line me-2 text-info"></i>Performance & Dispatch Health</h5>
+      <div class="card profile-card p-4 h-100 justify-content-center" style="min-height: 140px;">
+        <div class="row text-center">
+          <div class="col-6 border-end">
+            <div class="text-uppercase tracking-wider text-muted font-weight-bold" style="font-size: 11px;">Completion SLA</div>
+            <div class="display-6 fw-bold text-dark mt-1">94%</div>
+            <div class="progress mx-auto mt-2" style="width: 70%; height: 6px;">
+              <div class="progress-bar bg-success" role="progressbar" style="width: 94%"></div>
+            </div>
+          </div>
+          <div class="col-6">
+            <div class="text-uppercase tracking-wider text-muted font-weight-bold" style="font-size: 11px;">Customer Reviews</div>
+            <div class="display-6 fw-bold text-dark mt-1">4.8<span class="fs-6 text-muted">/5</span></div>
+            <div class="text-warning mt-1" style="font-size: 12px;">
+              <i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star-half"></i>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   </div>
 
   <div class="card profile-card">
-    <div class="p-4 bg-white border-bottom">
+    <div class="p-4 bg-white border-bottom d-flex justify-content-between align-items-center flex-wrap gap-2">
       <h4 class="fw-bold m-0 text-dark">
-        <i class="bi bi-list-task text-success me-2"></i>My Job Dispatches
+        <i class="bi bi-list-task text-success me-2"></i>My Active Job Dispatches
       </h4>
+      <div class="d-flex gap-2">
+        <input type="text" class="form-control form-control-sm rounded-pill px-3" placeholder="Filter dispatches..." id="tableSearch" onkeyup="filterTable()">
+      </div>
     </div>
     <div class="card-body p-0">
       <div class="table-responsive">
-        <table class="table table-custom-worker table-hover align-middle m-0">
+        <table class="table table-custom-worker table-hover align-middle m-0" id="jobsTable">
           <thead>
             <tr>
               <th>Domain Service</th>
               <th>Status State Badge</th>
               <th>Order Amount Metric</th>
-              <th style="min-width: 280px">
-                Contextual Field Actions Pipeline
-              </th>
+              <th style="min-width: 280px">Contextual Field Actions Pipeline</th>
             </tr>
           </thead>
           <tbody>
@@ -293,68 +338,26 @@
             <tr>
               <td class="fw-bold text-dark">{{ booking.service.name }}</td>
               <td>
-                {% if booking.status == 'Pending' %}<span
-                  class="badge-state state-pending"
-                  >Pending</span
-                >
-                {% elif booking.status == 'Assigned' %}<span
-                  class="badge-state state-assigned"
-                  >Assigned</span
-                >
-                {% elif booking.status == 'On The Way' %}<span
-                  class="badge-state state-ontheway"
-                  >On The Way</span
-                >
-                {% elif booking.status == 'Working' %}<span
-                  class="badge-state state-working"
-                  >Working</span
-                >
-                {% else %}<span class="badge-state state-completed"
-                  >Completed</span
-                >{% endif %}
+                {% if booking.status == 'Pending' %}<span class="badge-state state-pending">Pending</span>
+                {% elif booking.status == 'Assigned' %}<span class="badge-state state-assigned">Assigned</span>
+                {% elif booking.status == 'On The Way' %}<span class="badge-state state-ontheway">On The Way</span>
+                {% elif booking.status == 'Working' %}<span class="badge-state state-working">Working</span>
+                {% else %}<span class="badge-state state-completed">Completed</span>{% endif %}
               </td>
               <td class="fw-bold text-success">₹{{ booking.amount }}</td>
               <td>
-                <div class="d-flex gap-1 flex-wrap">
+                <div class="d-flex gap-2 flex-wrap">
                   {% if booking.status == 'Pending' %}
-                  <a
-                    href="{% url 'accept_job' booking.id %}"
-                    class="btn btn-success btn-action-pill btn-sm"
-                    >Accept Dispatch</a
-                  >
-                  <a
-                    href="{% url 'reject_job' booking.id %}"
-                    class="btn btn-danger btn-action-pill btn-sm"
-                    >Reject Ticket</a
-                  >
-
+                    <a href="{% url 'accept_job' booking.id %}" class="btn btn-success btn-action-pill btn-sm"><i class="bi bi-check2 me-1"></i>Accept Dispatch</a>
+                    <a href="{% url 'reject_job' booking.id %}" class="btn btn-outline-danger btn-action-pill btn-sm"><i class="bi bi-x-circle me-1"></i>Reject Ticket</a>
                   {% elif booking.status == 'Assigned' %}
-                  <a
-                    href="{% url 'update_status' booking.id 'On The Way' %}"
-                    class="btn btn-info btn-action-pill text-white btn-sm"
-                    ><i class="bi bi-truck me-1"></i>Mark On The Way</a
-                  >
-
+                    <a href="{% url 'update_status' booking.id 'On The Way' %}" class="btn btn-info btn-action-pill text-white btn-sm"><i class="bi bi-truck me-1"></i>Mark On The Way</a>
                   {% elif booking.status == 'On The Way' %}
-                  <a
-                    href="{% url 'update_status' booking.id 'Working' %}"
-                    class="btn btn-warning btn-action-pill text-dark btn-sm"
-                    ><i class="bi bi-hammer me-1"></i>Commence Work</a
-                  >
-
+                    <a href="{% url 'update_status' booking.id 'Working' %}" class="btn btn-warning btn-action-pill text-dark btn-sm"><i class="bi bi-hammer me-1"></i>Commence Work</a>
                   {% elif booking.status == 'Working' %}
-                  <a
-                    href="{% url 'update_status' booking.id 'Completed' %}"
-                    class="btn btn-success btn-action-pill btn-sm"
-                    ><i class="bi bi-check-circle me-1"></i>Finalize
-                    Execution</a
-                  >
-
+                    <a href="{% url 'update_status' booking.id 'Completed' %}" class="btn btn-success btn-action-pill btn-sm"><i class="bi bi-check-circle me-1"></i>Finalize Execution</a>
                   {% else %}
-                  <span class="text-muted small fw-medium"
-                    ><i class="bi bi-archive me-1"></i>Ticket Closed &
-                    Archived</span
-                  >
+                    <span class="text-muted small fw-medium bg-light px-3 py-1.5 rounded-pill"><i class="bi bi-archive me-1"></i>Ticket Closed & Archived</span>
                   {% endif %}
                 </div>
               </td>
@@ -362,10 +365,7 @@
             {% empty %}
             <tr>
               <td colspan="4" class="text-center text-muted py-5">
-                <i
-                  class="bi bi-folder-x display-6 d-block mb-2 text-secondary"
-                ></i
-                >No jobs currently assigned to your profile coordinates.
+                <i class="bi bi-folder-x display-5 d-block mb-2 text-secondary"></i>No jobs currently assigned to your profile coordinates.
               </td>
             </tr>
             {% endfor %}
@@ -378,11 +378,10 @@
 
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script>
-  // Initialise Leaflet Map Container Framework Map
-  let workerRadarMap = L.map("map-container").setView([20.5937, 78.9629], 5); // Fallback base matching global setup
+  let workerRadarMap = L.map("map-container").setView([20.5937, 78.9629], 5);
   L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
     maxZoom: 19,
-    attribution: "© OpenStreetMap core tracking radar",
+    attribution: "© OpenStreetMap telemetry radar tracking console",
   }).addTo(workerRadarMap);
 
   let realTimeMarkerInstance = null;
@@ -393,46 +392,53 @@
         const currentLatVal = position.coords.latitude;
         const currentLngVal = position.coords.longitude;
 
-        // Sync directly into UI view matrix hooks text strings
         document.getElementById("lat").innerText = currentLatVal.toFixed(4);
         document.getElementById("lng").innerText = currentLngVal.toFixed(4);
 
-        // Pan map canvas instantly to the current client layout footprint
-        workerRadarMap.setView([currentLatVal, currentLngVal], 15);
+        workerRadarMap.setView([currentLatVal, currentLngVal], 14);
 
-        // Redraw or spawn marker tracking properties dynamically
         if (realTimeMarkerInstance) {
           realTimeMarkerInstance.setLatLng([currentLatVal, currentLngVal]);
         } else {
           realTimeMarkerInstance = L.marker([currentLatVal, currentLngVal])
             .addTo(workerRadarMap)
-            .bindPopup("Your Broadcast Field Dispatch Station Core Active.")
+            .bindPopup("<b style='color:var(--primary-emerald);'>Active Operator Base Station</b><br>Currently broadcasting telemetry feed updates.")
             .openPopup();
         }
 
-        // Post telemetry context properties directly onto database targets
         fetch("/api/update-location/", {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
-            "X-CSRFToken": "{{ csrf_token|default:'' }}", // Pass standard Django defense parameters securely if mapped
+            "X-CSRFToken": "{{ csrf_token|default:'' }}",
           },
           body: JSON.stringify({
             worker_id: "{{ worker.id }}",
             latitude: currentLatVal,
             longitude: currentLngVal,
           }),
-        }).catch((err) =>
-          console.log(
-            "Telemetry Sync logging bypass. Tracking active locally.",
-          ),
-        );
+        }).catch((err) => console.log("Telemetry locally mapped. Sync bypassed."));
       });
     }
   }
 
-  // Interval trigger loop updates database positions securely every 5 seconds
-  setInterval(sendLocation, 5000);
+  // Client-Side Responsive Ledger Search Configuration Filter Routine Hook 
+  function filterTable() {
+    let input = document.getElementById("tableSearch");
+    let filter = input.value.toUpperCase();
+    let table = document.getElementById("jobsTable");
+    let tr = table.getElementsByTagName("tr");
+
+    for (let i = 1; i < tr.length; i++) {
+      let td = tr[i].getElementsByTagName("td")[0];
+      if (td) {
+        let txtValue = td.textContent || td.innerText;
+        tr[i].style.display = txtValue.toUpperCase().indexOf(filter) > -1 ? "" : "none";
+      }
+    }
+  }
+
+  setInterval(sendLocation, 10000); // Pulse location update synchronization every 10 seconds securely
   sendLocation();
 </script>
 

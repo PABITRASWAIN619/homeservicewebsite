@@ -8,6 +8,7 @@
     --text-dark: #0f172a;
     --text-muted: #64748b;
     --card-shadow: 0 10px 30px rgba(16, 185, 129, 0.05);
+    --card-hover-shadow: 0 20px 40px rgba(15, 23, 42, 0.12);
   }
 
   body {
@@ -38,7 +39,7 @@
     margin: 0;
   }
 
-  /* WORKER SUMMARY CARDS */
+  /* WORKER SUMMARY CARDS WITH BOOSTED ANIMATION */
   .stat-card-custom {
     background: white;
     border: none;
@@ -46,11 +47,16 @@
     padding: 24px;
     box-shadow: var(--card-shadow);
     border-left: 5px solid var(--primary-emerald);
-    transition: transform 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
+    /* Smoother, springy timing function */
+    transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+    position: relative;
+    top: 0;
   }
 
   .stat-card-custom:hover {
-    transform: translateY(-5px);
+    top: -8px; /* Lift effect */
+    box-shadow: var(--card-hover-shadow);
+    border-left-width: 8px; /* Widens the side border slightly on hover */
   }
 
   .stat-title {
@@ -69,7 +75,7 @@
     margin: 0;
   }
 
-  /* PROFESSIONAL TABLE DESIGN */
+  /* PROFESSIONAL TABLE DESIGN WITH LIVE ROW HOVER */
   .table-custom-history th {
     background-color: #f1f5f9 !important;
     color: var(--text-muted);
@@ -87,10 +93,18 @@
     font-size: 15px;
     color: var(--text-dark);
     vertical-align: middle;
+    transition: background-color 0.2s ease;
   }
 
-  .table-custom-history tr:hover td {
-    background-color: #f8fafc;
+  /* Dynamic row highlight */
+  .table-custom-history tbody tr {
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+  }
+
+  .table-custom-history tbody tr:hover td {
+    background-color: #f0fdf4 !important; /* Gentle emerald tint on hover */
+    color: #0f172a;
+    cursor: pointer;
   }
 
   /* CUSTOM MINI ACCENT BADGES */
@@ -102,6 +116,11 @@
     display: inline-flex;
     align-items: center;
     gap: 6px;
+    transition: transform 0.2s ease;
+  }
+  
+  .badge-chip:hover {
+    transform: scale(1.05); /* Quick pop effect on badge hover */
   }
 
   .badge-chip-success {
@@ -128,7 +147,7 @@
     <div>
       <h2 class="fw-bold text-dark m-0">Performance Insights</h2>
       <p class="text-muted small mb-0">
-        Track and review metrics of all archived historical transactions.
+        Track and review metrics of all historical transactions.
       </p>
     </div>
   </div>
@@ -153,10 +172,7 @@
     <div class="col-md-3 col-sm-6">
       <div class="stat-card-custom" style="border-left-color: #0ea5e9">
         <div class="stat-title">Trade Branch</div>
-        <h2
-          class="stat-number text-info"
-          style="font-size: 24px; padding-top: 8px"
-        >
+        <h2 class="stat-number text-info" style="font-size: 24px; padding-top: 8px">
           {{ worker.service_type }}
         </h2>
       </div>
@@ -165,10 +181,7 @@
     <div class="col-md-3 col-sm-6">
       <div class="stat-card-custom" style="border-left-color: #64748b">
         <div class="stat-title">Experience Metrics</div>
-        <h2
-          class="stat-number text-secondary"
-          style="font-size: 24px; padding-top: 8px"
-        >
+        <h2 class="stat-number text-secondary" style="font-size: 24px; padding-top: 8px">
           {{ worker.experience }}
         </h2>
       </div>
@@ -179,10 +192,7 @@
     <div class="card-body p-4">
       <div class="row align-items-center g-3">
         <div class="col-md-2 text-center text-md-start">
-          <div
-            class="bg-light rounded-circle d-inline-flex align-items-center justify-content-center shadow-sm"
-            style="width: 100px; height: 100px"
-          >
+          <div class="bg-light rounded-circle d-inline-flex align-items-center justify-content-center shadow-sm" style="width: 100px; height: 100px">
             <i class="bi bi-person-workspace text-success display-6"></i>
           </div>
         </div>
@@ -204,7 +214,7 @@
   <div class="card history-card">
     <div class="card-header history-header text-white">
       <h3 class="mb-0">
-        <i class="bi bi-clock-history me-2"></i>Completed Job History
+        <i class="bi bi-clock-history me-2"></i>Job History
       </h3>
     </div>
 
@@ -219,9 +229,8 @@
             <th>Address</th>
             <th>Amount Earned</th>
             <th>Payment Status</th>
-            <th>OTP Status</th>
-            <th>Completion Date</th>
-            <th>Job State</th>
+            <th>Booking Date</th>
+            <th>Working Status</th>
           </tr>
         </thead>
 
@@ -239,21 +248,10 @@
             </td>
 
             <td>
-              <span class="badge-chip badge-chip-dark"
-                >{{ booking.service.name }}</span
-              >
+              <span class="badge-chip badge-chip-dark">{{ booking.service.name }}</span>
             </td>
 
-            <td
-              class="text-secondary small"
-              style="
-                max-width: 180px;
-                white-space: nowrap;
-                overflow: hidden;
-                text-overflow: ellipsis;
-              "
-              title="{{ booking.address }}"
-            >
+            <td class="text-secondary small" style="max-width: 180px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;" title="{{ booking.address }}">
               {{ booking.address }}
             </td>
 
@@ -261,25 +259,9 @@
 
             <td>
               {% if booking.payment_status %}
-              <span class="badge-chip badge-chip-success"
-                ><i class="bi bi-check-circle-fill me-1"></i>Paid</span
-              >
+              <span class="badge-chip badge-chip-success"><i class="bi bi-check-circle-fill me-1"></i>Paid</span>
               {% else %}
-              <span class="badge-chip badge-chip-danger"
-                ><i class="bi bi-exclamation-circle-fill me-1"></i>Unpaid</span
-              >
-              {% endif %}
-            </td>
-
-            <td>
-              {% if booking.otp_verified or booking.status == "Completed" %}
-              <span class="badge-chip badge-chip-success"
-                ><i class="bi bi-shield-check-fill me-1"></i>Verified</span
-              >
-              {% else %}
-              <span class="badge-chip badge-chip-danger"
-                ><i class="bi bi-shield-slash-fill me-1"></i>Unverified</span
-              >
+              <span class="badge-chip badge-chip-danger"><i class="bi bi-exclamation-circle-fill me-1"></i>Unpaid</span>
               {% endif %}
             </td>
 
@@ -288,18 +270,23 @@
             </td>
 
             <td>
-              <span class="badge-chip badge-chip-info fw-bold">Completed</span>
+              {% if booking.status == "Completed" or booking.otp_verified %}
+              <span class="badge-chip badge-chip-success fw-bold">
+                <i class="bi bi-check-lg me-1"></i>Complete
+              </span>
+              {% else %}
+              <span class="badge-chip badge-chip-danger fw-bold">
+                <i class="bi bi-x-lg me-1"></i>Not Complete
+              </span>
+              {% endif %}
             </td>
           </tr>
 
           {% empty %}
           <tr>
-            <td colspan="10" class="text-center text-muted py-5">
-              <i
-                class="bi bi-folder-x display-6 d-block mb-2 text-secondary"
-              ></i>
-              No completed archival jobs mapped to this account history
-              workspace.
+            <td colspan="9" class="text-center text-muted py-5">
+              <i class="bi bi-folder-x display-6 d-block mb-2 text-secondary"></i>
+              No jobs mapped to this account history workspace.
             </td>
           </tr>
           {% endfor %}

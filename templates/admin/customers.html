@@ -1,83 +1,184 @@
-{% extends "admin/base.html" %} {% block content %}
+{% extends "admin/base.html" %} 
+{% block content %}
 
 <style>
+  :root {
+    --primary-color: #1e3c72;
+    --primary-dark: #122546;
+    --text-main: #1f2937;
+    --text-muted: #6b7280;
+    --bg-success: #10b981;
+    --bg-danger: #ef4444;
+  }
+
   .page-title {
     font-weight: 700;
-    margin-bottom: 20px;
-    color: #1f2937;
+    margin-bottom: 24px;
+    color: var(--text-main);
+    display: flex;
+    align-items: center;
+    gap: 10px;
   }
 
   .table-box {
-    background: #fff;
-    padding: 20px;
-    border-radius: 15px;
-    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
+    background: #ffffff;
+    padding: 24px;
+    border-radius: 16px;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.05);
+    border: 1px solid #e5e7eb;
+    margin-bottom: 30px;
   }
 
-  .table th {
-    background: #1e3c72 !important;
-    color: white !important;
+  /* FORCED SCROLLFIX: Ensures scrolling works beautifully on mobile */
+  .table-responsive-fixed {
+    width: 100%;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    border-radius: 12px;
+    border: 1px solid #e5e7eb;
+  }
+
+  .custom-admin-table {
+    margin-bottom: 0;
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0;
+    min-width: 1100px; /* Forces table width so it can scroll on small screens */
+  }
+
+  .custom-admin-table th {
+    background: var(--primary-color) !important;
+    color: #ffffff !important;
+    font-weight: 600;
+    text-transform: uppercase;
+    font-size: 12px;
+    letter-spacing: 0.5px;
+    padding: 16px;
     text-align: center;
     vertical-align: middle;
+    border: none;
   }
 
-  .table td {
+  .custom-admin-table td {
+    padding: 16px;
     vertical-align: middle;
     text-align: center;
+    color: #4b5563;
+    border-bottom: 1px solid #f3f4f6;
+    font-size: 14px;
   }
 
-  .badge-active {
-    background: #16a34a;
-    color: white;
-    padding: 6px 10px;
-    border-radius: 8px;
+  .custom-admin-table tbody tr:hover {
+    background-color: #f8fafc;
+    transition: background-color 0.2s ease;
   }
 
-  .badge-inactive {
-    background: #dc2626;
-    color: white;
-    padding: 6px 10px;
-    border-radius: 8px;
+  .customer-profile {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
   }
 
   .customer-name {
     font-weight: 600;
-    color: #111827;
+    color: var(--text-main);
+    margin-bottom: 2px;
+    white-space: nowrap;
   }
 
   .email-text {
-    font-size: 13px;
-    color: #6b7280;
+    font-size: 12px;
+    color: var(--text-muted);
+    white-space: nowrap;
   }
 
-  @media (max-width: 768px) {
-    .table-box {
-      overflow-x: auto;
-    }
+  /* Badges & Tags styling */
+  .badge-count {
+    background: #eff6ff;
+    color: #2563eb;
+    font-weight: 600;
+    padding: 6px 12px;
+    border-radius: 20px;
+    font-size: 13px;
+    border: 1px solid #bfdbfe;
+    white-space: nowrap;
+  }
 
-    .table {
-      min-width: 1200px;
-    }
+  .badge-status {
+    font-weight: 600;
+    font-size: 12px;
+    padding: 6px 14px;
+    border-radius: 50px;
+    display: inline-block;
+  }
+
+  .badge-active {
+    background: #ecfdf5;
+    color: var(--bg-success);
+    border: 1px solid #a7f3d0;
+  }
+
+  .badge-inactive {
+    background: #fef2f2;
+    color: var(--bg-danger);
+    border: 1px solid #fecaca;
+  }
+
+  /* Location Styling */
+  .location-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+  }
+
+  .location-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    background: #f3f4f6;
+    color: #374151;
+    padding: 4px 8px;
+    border-radius: 6px;
+    font-size: 12px;
+    text-decoration: none;
+    font-weight: 500;
+    transition: all 0.2s;
+    white-space: nowrap;
+  }
+
+  .location-link:hover {
+    background: #e5e7eb;
+    color: var(--primary-color);
+  }
+
+  .text-not-available {
+    color: #9ca3af;
+    font-style: italic;
+    font-size: 13px;
+    white-space: nowrap;
   }
 </style>
 
-<div class="container-fluid">
-  <h3 class="page-title">👥 Customers Management</h3>
+<div class="container-fluid py-4">
+  <h3 class="page-title">
+    <span>👥</span> Customers Management
+  </h3>
 
   <div class="table-box">
-    <div class="table-responsive">
-      <table class="table table-bordered table-hover">
+    <div class="table-responsive-fixed">
+      <table class="table custom-admin-table table-hover">
         <thead>
           <tr>
             <th>ID</th>
-            <th>Customer</th>
-            <th>Email</th>
+            <th>Customer Info</th>
             <th>Phone</th>
             <th>Pincode</th>
-            <th>Location</th>
+            <th>Location Map</th>
             <th>Total Bookings</th>
             <th>Last Service</th>
-            <th>Joined</th>
+            <th>Joined Date</th>
             <th>Status</th>
           </tr>
         </thead>
@@ -85,43 +186,80 @@
         <tbody>
           {% for c in customers %}
           <tr>
-            <td>#{{ c.id }}</td>
-
-            <td class="customer-name">{{ c.user.username }}</td>
-
-            <td class="email-text">{{ c.user.email }}</td>
-
-            <td>{{ c.phone|default:"Not Available" }}</td>
-
-            <td>{{ c.pincode|default:"-" }}</td>
+            <td style="font-weight: 600; color: var(--text-muted);">#{{ c.id }}</td>
 
             <td>
-              {% if c.latitude and c.longitude %} 📍 {{ c.latitude }}, {{
-              c.longitude }} {% else %} Not Available {% endif %}
+              <div class="customer-profile">
+                <span class="customer-name">{{ c.user.username }}</span>
+                <span class="email-text">{{ c.user.email }}</span>
+              </div>
             </td>
 
             <td>
-              <span class="badge bg-primary"> {{ c.booking_set.count }} </span>
+              {% if c.phone %}
+                <span style="white-space: nowrap;">{{ c.phone }}</span>
+              {% else %}
+                <span class="text-not-available">Not Available</span>
+              {% endif %}
             </td>
 
             <td>
-              {% if c.booking_set.last %} {{ c.booking_set.last.service.name }}
-              {% else %} No Booking {% endif %}
+              {% if c.pincode %}
+                <span style="font-weight: 500;">{{ c.pincode }}</span>
+              {% else %}
+                <span class="text-not-available">—</span>
+              {% endif %}
             </td>
 
-            <td>{{ c.user.date_joined|date:"d M Y" }}</td>
+            <td>
+              <div class="location-container">
+                {% if c.latitude and c.longitude %}
+                  <a href="https://www.google.com/maps/search/?api=1&query={{ c.latitude }},{{ c.longitude }}" 
+                     target="_blank" 
+                     class="location-link" 
+                     title="View on Google Maps">
+                    📍 View Map
+                  </a>
+                  <small style="font-size: 10px; color: #9ca3af; white-space: nowrap;">
+                    {{ c.latitude|slice:":7" }}, {{ c.longitude|slice:":7" }}
+                  </small>
+                {% else %}
+                  <span class="text-not-available">No GPS Data</span>
+                {% endif %}
+              </div>
+            </td>
+
+            <td>
+              <span class="badge-count">
+                {{ c.booking_set.count }} Bookings
+              </span>
+            </td>
+
+            <td>
+              {% if c.booking_set.last %} 
+                <strong style="color: #374151; white-space: nowrap;">{{ c.booking_set.last.service.name }}</strong>
+              {% else %} 
+                <span class="text-not-available">No Bookings</span> 
+              {% endif %}
+            </td>
+
+            <td style="white-space: nowrap;">{{ c.user.date_joined|date:"d M Y" }}</td>
 
             <td>
               {% if c.user.is_active %}
-              <span class="badge-active"> Active </span>
+                <span class="badge-status badge-active">Active</span>
               {% else %}
-              <span class="badge-inactive"> Inactive </span>
+                <span class="badge-status badge-inactive">Inactive</span>
               {% endif %}
             </td>
           </tr>
           {% empty %}
           <tr>
-            <td colspan="10">No Customers Found</td>
+            <td colspan="9" class="py-5 text-muted">
+              <div class="text-center">
+                <p class="mb-0" style="font-size: 16px; font-weight: 500;">No Customers Found</p>
+              </div>
+            </td>
           </tr>
           {% endfor %}
         </tbody>
