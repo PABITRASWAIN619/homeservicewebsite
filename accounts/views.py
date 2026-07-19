@@ -342,6 +342,10 @@ def worker_signup_pending(request):
 # ==========================================
 # CUSTOMER SIGNUP
 # ==========================================
+# ==========================================
+# CUSTOMER SIGNUP
+# ==========================================
+
 import re
 
 from django.contrib import messages
@@ -352,6 +356,7 @@ from django.shortcuts import render, redirect
 from .models import CustomerProfile, UserRole
 
 
+
 def customer_signup(request):
 
     if request.method == "POST":
@@ -360,102 +365,212 @@ def customer_signup(request):
         email = request.POST.get("email", "").strip().lower()
         phone = request.POST.get("phone", "").strip()
         pincode = request.POST.get("pincode", "").strip()
+
         password1 = request.POST.get("password1", "")
         password2 = request.POST.get("password2", "")
 
-        # -----------------------------
-        # Full Name Validation
-        # -----------------------------
+
+        # ======================================
+        # FULL NAME VALIDATION
+        # ======================================
+
         if len(full_name) < 3:
-            messages.error(request, "Full name must be at least 3 characters.")
-            return redirect("customer_signup")
 
-        # -----------------------------
-        # Phone Validation
-        # -----------------------------
-        if not re.fullmatch(r"[6-9]\d{9}", phone):
-            messages.error(request, "Enter a valid 10-digit mobile number.")
-            return redirect("customer_signup")
-
-        # -----------------------------
-        # Pincode Validation
-        # -----------------------------
-        if not re.fullmatch(r"[1-9]\d{5}", pincode):
-            messages.error(request, "Enter a valid 6-digit PIN code.")
-            return redirect("customer_signup")
-
-        # -----------------------------
-        # Password Validation
-        # -----------------------------
-        if password1 != password2:
-            messages.error(request, "Passwords do not match.")
-            return redirect("customer_signup")
-
-        if len(password1) < 8:
             messages.error(
                 request,
-                "Password must contain at least 8 characters."
+                "Full name must contain at least 3 characters."
             )
+
             return redirect("customer_signup")
 
-        # -----------------------------
-        # Email Already Exists
-        # -----------------------------
-        if User.objects.filter(username=email).exists():
-            messages.error(request, "Email already exists.")
+
+
+        # ======================================
+        # EMAIL VALIDATION
+        # ======================================
+
+        email_pattern = r"^[^\s@]+@[^\s@]+\.[^\s@]+$"
+
+        if not re.match(email_pattern, email):
+
+            messages.error(
+                request,
+                "Enter a valid email address."
+            )
+
             return redirect("customer_signup")
+
+
+
+        # ======================================
+        # MOBILE VALIDATION
+        # ======================================
+
+        if not re.fullmatch(
+            r"[6-9]\d{9}",
+            phone
+        ):
+
+            messages.error(
+                request,
+                "Enter a valid 10 digit mobile number."
+            )
+
+            return redirect("customer_signup")
+
+
+
+        # ======================================
+        # PINCODE VALIDATION
+        # ======================================
+
+        if not re.fullmatch(
+            r"[1-9]\d{5}",
+            pincode
+        ):
+
+            messages.error(
+                request,
+                "Enter a valid 6 digit pincode."
+            )
+
+            return redirect("customer_signup")
+
+
+
+        # ======================================
+        # PASSWORD VALIDATION
+        # ======================================
+
+        if len(password1) < 8:
+
+            messages.error(
+                request,
+                "Password must contain minimum 8 characters."
+            )
+
+            return redirect("customer_signup")
+
+
+
+        if password1 != password2:
+
+            messages.error(
+                request,
+                "Password and confirm password do not match."
+            )
+
+            return redirect("customer_signup")
+
+
+
+        # ======================================
+        # CHECK EXISTING USER
+        # ======================================
+
+        if User.objects.filter(username=email).exists():
+
+            messages.error(
+                request,
+                "Email already registered."
+            )
+
+            return redirect("customer_signup")
+
+
 
         try:
 
             with transaction.atomic():
 
-                # Create User
+
+                # ======================================
+                # CREATE DJANGO USER
+                # ======================================
+
                 user = User.objects.create_user(
+
                     username=email,
+
                     email=email,
-                    password=password1,
+
                     first_name=full_name,
+
+                    password=password1
+
                 )
 
-                # Create Customer Profile
+
+
+                # ======================================
+                # CREATE CUSTOMER PROFILE
+                # ======================================
+
                 CustomerProfile.objects.create(
+
                     user=user,
+
                     phone=phone,
-                    pincode=pincode,
+
+                    pincode=pincode
+
                 )
 
-                # Create User Role
+
+
+                # ======================================
+                # CREATE USER ROLE
+                # ======================================
+
                 UserRole.objects.create(
+
                     user=user,
-                    role="customer",
+
+                    role="customer"
+
                 )
+
+
 
             messages.success(
                 request,
                 "Customer account created successfully."
             )
 
-            return render(
-                request,
-                "customer_signup.html",
-                {
-                    "redirect_to_login": True
-                }
-            )
+
+            return redirect("login")
+
+
 
         except Exception as e:
-            print(e)   # Check terminal for the actual error
-            messages.error(request, f"Error: {e}")
+
+
+            print(
+                "CUSTOMER SIGNUP ERROR:",
+                e
+            )
+
+
+            messages.error(
+                request,
+                f"Something went wrong: {e}"
+            )
+
+
             return redirect("customer_signup")
 
-    return render(request, "customer_signup.html")#==========================================
+
+
+    return render(
+        request,
+        "customer_signup.html"
+    )
+    # ==========================================
 # LOGIN
 # ==========================================
 
-
-from django.contrib.auth import login, logout, authenticate
+from django.contrib.auth import authenticate, login, logout
 from django.contrib import messages
-from django.shortcuts import render, redirect
 from .models import UserRole, WorkerProfile
 
 
@@ -466,19 +581,6 @@ def user_login(request):
         email = request.POST.get("email")
         password = request.POST.get("password")
 
-        # If someone is already logged in in this browser
-        if request.user.is_authenticated:
-
-            if request.user.email != email:
-
-                old_email = request.user.email
-
-                logout(request)
-
-                messages.warning(
-                    request,
-                    f"Previous account ({old_email}) was logged out."
-                )
 
         user = authenticate(
             request,
@@ -486,66 +588,85 @@ def user_login(request):
             password=password
         )
 
+
         if user is not None:
 
             login(request, user)
 
-            # ADMIN
-            if user.is_superuser:
-                return redirect("admin_dashboard")
 
-            # ROLE FETCH SAFELY
-            role = UserRole.objects.filter(user=user).first()
+            # ADMIN LOGIN
+
+            if user.is_superuser:
+
+                return redirect(
+                    "admin_dashboard"
+                )
+
+
+            # CHECK ROLE
+
+            role = UserRole.objects.filter(
+                user=user
+            ).first()
+
 
             if not role:
+
                 messages.error(
                     request,
-                    "No role assigned. Contact admin."
+                    "Role not assigned."
                 )
+
                 logout(request)
+
                 return redirect("login")
 
-            # WORKER FLOW
+
+
+            # CUSTOMER
+
+            if role.role == "customer":
+
+                return redirect(
+                    "customer_dashboard"
+                )
+
+
+
+            # WORKER
+
             if role.role == "worker":
 
-                profile = WorkerProfile.objects.filter(
+                worker = WorkerProfile.objects.filter(
                     user=user
                 ).first()
 
-                if not profile:
-                    messages.error(
-                        request,
-                        "Worker profile missing"
+
+                if worker and worker.is_approved:
+
+                    return redirect(
+                        "worker_dashboard"
                     )
-                    logout(request)
-                    return redirect("login")
 
-                if not profile.is_approved:
-                    messages.error(
-                        request,
-                        "Not approved yet"
-                    )
-                    logout(request)
-                    return redirect("login")
 
-                return redirect("worker_dashboard")
+                messages.error(
+                    request,
+                    "Worker approval pending."
+                )
 
-            # CUSTOMER FLOW
-            if role.role == "customer":
-                return redirect("customer_dashboard")
+                logout(request)
 
-            # UNKNOWN ROLE
+                return redirect("login")
+
+
+
+        else:
+
             messages.error(
                 request,
-                "Invalid role assigned"
+                "Invalid email or password."
             )
-            logout(request)
-            return redirect("login")
 
-        messages.error(
-            request,
-            "Invalid email or password"
-        )
 
     return render(
         request,
