@@ -49,7 +49,7 @@ INSTALLED_APPS = [
     "django.contrib.staticfiles",
 
 
-    # Your App
+    # Application
     "accounts",
 
 
@@ -96,6 +96,7 @@ MIDDLEWARE = [
 ROOT_URLCONF = "home_service.urls"
 
 
+
 # ======================================================
 # TEMPLATES
 # ======================================================
@@ -107,12 +108,10 @@ TEMPLATES = [
         "BACKEND":
         "django.template.backends.django.DjangoTemplates",
 
-
         "DIRS":
         [
             BASE_DIR / "templates"
         ],
-
 
         "APP_DIRS": True,
 
@@ -138,6 +137,7 @@ TEMPLATES = [
 ]
 
 
+
 # ======================================================
 # WSGI / ASGI
 # ======================================================
@@ -150,8 +150,8 @@ ASGI_APPLICATION = "home_service.asgi.application"
 
 # ======================================================
 # DATABASE
-# Local  -> SQLite
-# Render -> PostgreSQL
+# Render PostgreSQL
+# Local SQLite
 # ======================================================
 
 
@@ -182,13 +182,11 @@ else:
 
     DATABASES = {
 
-
         "default":
         {
 
             "ENGINE":
             "django.db.backends.sqlite3",
-
 
             "NAME":
             BASE_DIR / "db.sqlite3",
@@ -196,7 +194,6 @@ else:
         }
 
     }
-
 
 
 
@@ -211,15 +208,18 @@ AUTH_PASSWORD_VALIDATORS = [
         "django.contrib.auth.password_validation.UserAttributeSimilarityValidator",
     },
 
+
     {
         "NAME":
         "django.contrib.auth.password_validation.MinimumLengthValidator",
     },
 
+
     {
         "NAME":
         "django.contrib.auth.password_validation.CommonPasswordValidator",
     },
+
 
     {
         "NAME":
@@ -236,12 +236,9 @@ AUTH_PASSWORD_VALIDATORS = [
 
 LANGUAGE_CODE = "en-us"
 
-
 TIME_ZONE = "Asia/Kolkata"
 
-
 USE_I18N = True
-
 
 USE_TZ = True
 
@@ -251,21 +248,20 @@ USE_TZ = True
 # STATIC FILES
 # ======================================================
 
-
 STATIC_URL = "/static/"
-
 
 STATIC_ROOT = BASE_DIR / "staticfiles"
 
 
+# Only load if folder exists
 
-# Only add if folder exists
+if (BASE_DIR / "static").exists():
 
-STATICFILES_DIRS = [
+    STATICFILES_DIRS = [
 
-    BASE_DIR / "static",
+        BASE_DIR / "static"
 
-]
+    ]
 
 
 STATICFILES_STORAGE = (
@@ -275,26 +271,27 @@ STATICFILES_STORAGE = (
 
 
 # ======================================================
-# CLOUDINARY MEDIA STORAGE
+# CLOUDINARY
 # ======================================================
 
-
-CLOUDINARY_STORAGE = {
-
-
-    "CLOUD_NAME":
-    os.environ.get("CLOUDINARY_CLOUD_NAME"),
+import cloudinary
 
 
-    "API_KEY":
-    os.environ.get("CLOUDINARY_API_KEY"),
+cloudinary.config(
 
+    cloud_name=os.environ.get(
+        "CLOUDINARY_CLOUD_NAME"
+    ),
 
-    "API_SECRET":
-    os.environ.get("CLOUDINARY_API_SECRET"),
+    api_key=os.environ.get(
+        "CLOUDINARY_API_KEY"
+    ),
 
+    api_secret=os.environ.get(
+        "CLOUDINARY_API_SECRET"
+    )
 
-}
+)
 
 
 
@@ -303,11 +300,7 @@ DEFAULT_FILE_STORAGE = (
 )
 
 
-
 MEDIA_URL = "/media/"
-
-MEDIA_ROOT = BASE_DIR / "media"
-
 
 
 
@@ -315,22 +308,17 @@ MEDIA_ROOT = BASE_DIR / "media"
 # LOGIN
 # ======================================================
 
-
 LOGIN_URL = "/login/"
-
 
 LOGIN_REDIRECT_URL = "/customer-dashboard/"
 
-
 LOGOUT_REDIRECT_URL = "/login/"
-
 
 
 
 # ======================================================
 # SESSION
 # ======================================================
-
 
 SESSION_ENGINE = (
     "django.contrib.sessions.backends.db"
@@ -347,11 +335,9 @@ SESSION_EXPIRE_AT_BROWSER_CLOSE = True
 
 
 
-
 # ======================================================
 # EMAIL OTP
 # ======================================================
-
 
 EMAIL_BACKEND = (
     "django.core.mail.backends.smtp.EmailBackend"
@@ -360,9 +346,7 @@ EMAIL_BACKEND = (
 
 EMAIL_HOST = "smtp.gmail.com"
 
-
 EMAIL_PORT = 587
-
 
 EMAIL_USE_TLS = True
 
@@ -378,11 +362,9 @@ EMAIL_HOST_PASSWORD = os.environ.get(
 
 
 
-
 # ======================================================
 # AUTH BACKEND
 # ======================================================
-
 
 AUTHENTICATION_BACKENDS = [
 
@@ -398,11 +380,11 @@ AUTHENTICATION_BACKENDS = [
 # CHANNELS
 # ======================================================
 
-
 CHANNEL_LAYERS = {
 
 
     "default":
+
     {
 
         "BACKEND":
@@ -410,14 +392,14 @@ CHANNEL_LAYERS = {
 
     }
 
+
 }
 
 
 
 # ======================================================
-# PRODUCTION SECURITY
+# SECURITY
 # ======================================================
-
 
 SECURE_PROXY_SSL_HEADER = (
 
@@ -442,4 +424,6 @@ CSRF_COOKIE_SECURE = False
 # DEFAULT PRIMARY KEY
 # ======================================================
 
-DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
+DEFAULT_AUTO_FIELD = (
+    "django.db.models.BigAutoField"
+)
